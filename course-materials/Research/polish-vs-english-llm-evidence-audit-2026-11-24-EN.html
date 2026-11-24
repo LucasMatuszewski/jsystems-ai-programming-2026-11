@@ -1,0 +1,558 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Polish vs English in LLMs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800&family=Source+Sans+3:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: a measuring-instrument notebook — a ruler scale opens the page, then stacked evidence "readings" with one shared dumbbell instrument */
+:root{
+  --bg:#f3f6f5; --panel:#ffffff; --fg:#15211d; --muted:#5a6b65; --line:#d5dfdb;
+  --accent:#0b6e69; --pl:#c8323c; --en:#2f56a6; --slav:#8a7a3c;
+  --good:#2e7d4f; --warn:#a8650a; --bad:#b3343b;
+  --f-display:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;
+  --f-body:"Source Sans 3","Segoe UI",system-ui,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f1513; --panel:#16201d; --fg:#e3ece8; --muted:#97a9a2; --line:#2a3833;
+  --accent:#4fc3b8; --pl:#f06b73; --en:#8aa8f0; --slav:#d0bd72;
+  --good:#6fcf97; --warn:#f2b45a; --bad:#f07178; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1513; --panel:#16201d; --fg:#e3ece8; --muted:#97a9a2; --line:#2a3833;
+  --accent:#4fc3b8; --pl:#f06b73; --en:#8aa8f0; --slav:#d0bd72;
+  --good:#6fcf97; --warn:#f2b45a; --bad:#f07178; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font:16px/1.55 var(--f-body);margin:0}
+body.en .pl, body.pl .en{display:none!important}
+.wrap{max-width:980px;margin:0 auto;padding-inline:20px;padding-block:20px 64px}
+header.top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.eyebrow{font:600 12px/1 var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.langsw{display:flex;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.langsw button{font:600 13px var(--f-mono);padding:6px 12px;border:0;background:transparent;color:var(--muted);cursor:pointer}
+.langsw button[aria-pressed="true"]{background:var(--accent);color:var(--bg)}
+button:focus-visible,select:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+h1{font:800 clamp(40px,7vw,76px)/.95 var(--f-display);letter-spacing:.01em;margin:18px 0 12px;text-wrap:balance;text-transform:uppercase}
+h1 em{font-style:normal;color:var(--pl)}
+h2{font:800 clamp(28px,4vw,40px)/1 var(--f-display);text-transform:uppercase;margin:0 0 6px;text-wrap:balance}
+h3{font:600 18px/1.3 var(--f-body);margin:0 0 6px}
+.lede{font-size:19px;max-width:65ch;color:var(--fg)}
+p{max-width:68ch}
+.muted{color:var(--muted)}
+section{padding-block:44px 8px;border-top:1px solid var(--line);margin-top:40px}
+nav.toc{display:flex;flex-wrap:wrap;gap:6px 14px;margin:18px 0 0;font:600 13px var(--f-mono)}
+nav.toc a{color:var(--accent);text-decoration:none}
+nav.toc a:hover{text-decoration:underline}
+.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+/* ruler */
+.ruler{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:18px 18px 10px;margin-top:22px}
+.ruler svg{width:100%;height:auto;display:block}
+.ruler .tick{stroke:var(--muted)} .ruler .tl{fill:var(--muted);font:11px var(--f-mono)}
+.ruler .base{stroke:var(--fg);stroke-width:1.5}
+.ctrl{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;margin-top:8px;font-size:14px}
+.ctrl label{display:flex;gap:6px;align-items:center;cursor:pointer}
+/* verdict list */
+.verdicts{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin-top:22px}
+.v{padding:14px 16px;border:1px solid var(--line);border-radius:8px;background:var(--panel);min-width:0}
+.v .n{font:800 34px/1 var(--f-display);color:var(--accent)}
+.chip{display:inline-block;font:600 11px/1 var(--f-mono);letter-spacing:.05em;text-transform:uppercase;padding:4px 7px;border-radius:4px;border:1px solid currentColor;white-space:nowrap}
+.chip.bad{color:var(--bad)} .chip.warn{color:var(--warn)} .chip.good{color:var(--good)} .chip.neu{color:var(--muted)}
+table{border-collapse:collapse;width:100%;font-size:15px}
+th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font:600 12px var(--f-mono);text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.tscroll{overflow-x:auto;margin-top:14px}
+/* instrument */
+.inst{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:16px;margin-top:16px}
+.dsbar{display:flex;flex-wrap:wrap;gap:6px}
+.dsbar button{font:600 13px var(--f-body);padding:6px 10px;border-radius:5px;border:1px solid var(--line);background:transparent;color:var(--fg);cursor:pointer}
+.dsbar button[aria-pressed="true"]{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 14%,transparent)}
+.dsmeta{margin:14px 0 6px;display:flex;flex-wrap:wrap;gap:8px 16px;align-items:baseline}
+.dsmeta .src{font:13px var(--f-mono);color:var(--muted)}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--muted);margin:6px 0 4px}
+.legend i{display:inline-block;width:11px;height:11px;border-radius:50%;vertical-align:-1px;margin-right:5px}
+.rows{display:flex;flex-direction:column;gap:14px;margin-top:10px}
+.row{display:grid;grid-template-columns:minmax(150px,230px) 1fr;gap:6px 14px;align-items:center}
+@media (max-width:620px){.row{grid-template-columns:1fr}}
+.rl{font-size:14px;line-height:1.25;min-width:0}
+.rl .d{font:600 12px var(--f-mono);margin-left:6px}
+.track{position:relative;height:34px;border-left:1px solid var(--line);border-right:1px solid var(--line)}
+.track .grid{position:absolute;top:0;bottom:0;border-left:1px dashed var(--line)}
+.track .bar{position:absolute;top:22px;height:3px;background:var(--line);border-radius:2px}
+.dot{position:absolute;top:17px;width:13px;height:13px;margin-left:-6.5px;border-radius:50%;border:2px solid var(--bg)}
+.dot.ref{background:var(--bg);border:2.5px solid var(--en)}
+.dot.pl{background:var(--pl)} .dot.oth{background:var(--slav);width:9px;height:9px;margin-left:-4.5px;top:19px;opacity:.85}
+.dot.alt{background:var(--muted)} .dot.slv{background:var(--slav)}
+.dl{position:absolute;top:0;transform:translateX(-50%);font:600 11px var(--f-mono);white-space:nowrap}
+.dl.ref{color:var(--en)} .dl.pl{color:var(--pl)} .dl.oth{color:var(--slav)} .dl.alt{color:var(--muted)} .dl.slv{color:var(--slav)}
+.axis{display:grid;grid-template-columns:minmax(150px,230px) 1fr;gap:14px}
+@media (max-width:620px){.axis{grid-template-columns:1fr}.axis>span:first-child{display:none}}
+.axis .ax{position:relative;height:16px;font:11px var(--f-mono);color:var(--muted)}
+.axis .ax span{position:absolute;transform:translateX(-50%)}
+.note{font-size:14px;color:var(--muted);margin-top:14px;max-width:75ch}
+details{margin-top:12px} summary{cursor:pointer;font-size:14px;color:var(--accent)}
+/* calculators */
+.calc{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-top:16px}
+.calc .inst{margin-top:0;min-width:0}
+.field{display:flex;flex-direction:column;gap:4px;margin:10px 0}
+.field label{font-size:13px;color:var(--muted)}
+.field .val{font:600 15px var(--f-mono)}
+input[type=range]{width:100%;accent-color:var(--accent)}
+input[type=number],select{font:15px var(--f-mono);padding:6px 8px;border:1px solid var(--line);border-radius:5px;background:var(--bg);color:var(--fg);width:100%}
+.presets{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.presets button{font:12px var(--f-mono);padding:5px 8px;border:1px solid var(--line);border-radius:4px;background:transparent;color:var(--fg);cursor:pointer}
+.out{font:800 30px/1.1 var(--f-display);margin-top:10px}
+.ci{position:relative;height:26px;background:color-mix(in srgb,var(--line) 50%,transparent);border-radius:4px;margin-top:10px}
+.ci .band{position:absolute;top:0;bottom:0;background:color-mix(in srgb,var(--accent) 35%,transparent);border-radius:4px}
+.ci .pt{position:absolute;top:-3px;bottom:-3px;width:3px;background:var(--accent);margin-left:-1.5px}
+.ci .lab{position:absolute;bottom:-18px;font:11px var(--f-mono);color:var(--muted);transform:translateX(-50%)}
+/* evidence cards */
+.filters{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin-top:14px}
+.card{border:1px solid var(--line);border-radius:8px;padding:14px;background:var(--panel);display:flex;flex-direction:column;gap:8px;min-width:0}
+.card h3{font-size:16px}
+.card .meta{font:12px var(--f-mono);color:var(--muted)}
+.card a{color:var(--accent);word-break:break-word}
+.q{display:inline-flex;gap:3px;vertical-align:middle}
+.q b{width:9px;height:9px;border-radius:2px;background:var(--line)}
+.q b.on{background:var(--accent)}
+.cardfoot{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:auto;flex-wrap:wrap}
+ol.advice{padding-left:22px;max-width:70ch} ol.advice li{margin:8px 0}
+code{font:14px var(--f-mono);background:color-mix(in srgb,var(--line) 55%,transparent);padding:1px 5px;border-radius:3px}
+footer{margin-top:50px;font-size:13px;color:var(--muted)}
+@media (prefers-reduced-motion:no-preference){.ruler .mk,.ci .band,.ci .pt{transition:all .35s ease}}
+</style>
+
+</head>
+<body>
+<script>document.body.classList.add("en");</script>
+<div class="wrap">
+<header class="top">
+  <span class="eyebrow"><span class="en">Evidence audit · 24 Nov 2026</span><span class="pl">Audyt dowodów · 24.11.2026</span></span>
+  <div class="langsw" role="group" aria-label="Language">
+    <button id="b-pl" type="button" aria-pressed="false">PL</button>
+    <button id="b-en" type="button" aria-pressed="true">EN</button>
+  </div>
+</header>
+
+<h1><span class="en">Is <em>Polish</em> really the best language for LLMs?</span><span class="pl">Czy <em>polski</em> naprawdę jest najlepszy dla LLM?</span></h1>
+<p class="lede"><span class="en">The headline comes from one 2025 benchmark, OneRuler. It found Polish 1st of 26 languages on synthetic long-context retrieval. We traced the source, checked its method and sample size, and collected newer 2025–2026 studies on Polish, other Slavic languages and English in retrieval, RAG, reasoning and agents.</span><span class="pl">Nagłówek pochodzi z jednego benchmarku z 2025 r., OneRuler. Polski zajął w nim 1. miejsce z 26 języków w syntetycznym wyszukiwaniu w długim kontekście. Dotarliśmy do źródła, sprawdziliśmy metodę i liczebność próby, a potem zebraliśmy nowsze badania z lat 2025–2026 porównujące polski, inne języki słowiańskie i angielski w wyszukiwaniu, RAG, rozumowaniu i pracy agentów.</span></p>
+
+<div class="ruler" aria-label="OneRuler headline">
+  <svg id="rulerSvg" viewBox="0 0 900 150" role="img" aria-labelledby="rulerT"><title id="rulerT">OneRuler: Polish 88%, English 83.9%, Chinese 62.1%</title></svg>
+  <div class="ctrl">
+    <label><input type="checkbox" id="ciToggle"> <span class="en">Show the 95% interval of a single 50-item cell</span><span class="pl">Pokaż 95% przedział dla jednej komórki z 50 przykładami</span></label>
+    <span class="muted" style="font-size:13px"><span class="en">NIAH average, 7 early-2025 models, 64K + 128K context only. Source: arXiv 2503.01996, Sec. 3.1.</span><span class="pl">Średnia NIAH, 7 modeli z początku 2025, tylko kontekst 64K + 128K. Źródło: arXiv 2503.01996, rozdz. 3.1.</span></span>
+  </div>
+</div>
+
+<div class="verdicts">
+  <div class="v"><div class="n">4.1 pt</div><div class="en">Polish vs English gap in OneRuler. The co-author says it was <b>not statistically significant</b>.</div><div class="pl">Różnica PL–EN w OneRuler. Według współautorki <b>nieistotna statystycznie</b>.</div></div>
+  <div class="v"><div class="n">0</div><div class="en">Studies from 2025–2026 that replicate "Polish beats English" on the same questions.</div><div class="pl">Badania z lat 2025–2026, które powtórzyły wynik „polski bije angielski” na tych samych pytaniach.</div></div>
+  <div class="v"><div class="n">8–22 pt</div><div class="en">Polish deficit vs English in multilingual RAG (MKQA) for small open models.</div><div class="pl">Strata polskiego względem angielskiego w wielojęzycznym RAG (MKQA) dla małych modeli otwartych.</div></div>
+  <div class="v"><div class="n">1.3–1.8×</div><div class="en">More tokens for the same text in Polish with mainstream tokenizers.</div><div class="pl">Tyle razy więcej tokenów zajmuje ten sam tekst po polsku w popularnych tokenizerach.</div></div>
+</div>
+
+<nav class="toc" aria-label="Sections">
+  <a href="#audit"><span class="en">Source audit</span><span class="pl">Audyt źródła</span></a>
+  <a href="#stats"><span class="en">Is it significant?</span><span class="pl">Czy to istotne?</span></a>
+  <a href="#evidence"><span class="en">Newer evidence</span><span class="pl">Nowsze dowody</span></a>
+  <a href="#thinking"><span class="en">Language of thought</span><span class="pl">Język myślenia</span></a>
+  <a href="#tokens"><span class="en">Token cost</span><span class="pl">Koszt tokenów</span></a>
+  <a href="#sources"><span class="en">Sources</span><span class="pl">Źródła</span></a>
+  <a href="#advice"><span class="en">For agent work</span><span class="pl">Dla pracy z agentami</span></a>
+</nav>
+
+<!-- 1 -->
+<section id="audit">
+  <span class="eyebrow"><span class="en">Source</span><span class="pl">Źródło</span></span>
+  <h2><span class="en">What OneRuler actually measured</span><span class="pl">Co naprawdę zmierzył OneRuler</span></h2>
+  <p><span class="en">The paper is Kim, Russell, Karpinska and Iyyer (University of Maryland, Microsoft, UMass Amherst), "One ruler to measure them all", COLM 2025, arXiv 2503.01996. The benchmark runs 7 synthetic tasks: needle-in-a-haystack variants and common-word extraction. It covers 26 languages and 4 context lengths, with 50 examples per task × language × length.</span><span class="pl">Publikacja: Kim, Russell, Karpinska, Iyyer (University of Maryland, Microsoft, UMass Amherst), „One ruler to measure them all”, COLM 2025, arXiv 2503.01996. Benchmark obejmuje 7 syntetycznych zadań: warianty „igły w stogu siana” i ekstrakcję najczęstszych słów. Testuje 26 języków i 4 długości kontekstu, z 50 przykładami na zadanie × język × długość.</span></p>
+  <div class="tscroll"><table>
+    <thead><tr><th><span class="en">Article claim</span><span class="pl">Teza artykułu</span></th><th><span class="en">What the paper says</span><span class="pl">Co mówi publikacja</span></th><th><span class="en">Verdict</span><span class="pl">Ocena</span></th></tr></thead>
+    <tbody>
+      <tr><td><span class="en">Polish is the best language for AI and prompting</span><span class="pl">Polski to najlepszy język dla AI i do promptowania</span></td><td><span class="en">It measures long-context retrieval on synthetic tasks, not prompting. The co-author: "we have not researched this at all".</span><span class="pl">Mierzy wyszukiwanie w długim kontekście na zadaniach syntetycznych, a nie promptowanie. Współautorka: „w ogóle tego nie badaliśmy”.</span></td><td><span class="chip bad"><span class="en">Overstated</span><span class="pl">Wyolbrzymione</span></span></td></tr>
+      <tr><td><span class="en">Polish beat English</span><span class="pl">Polski pokonał angielski</span></td><td><span class="en">88% vs 83.9%. No significance test or confidence interval was reported for languages.</span><span class="pl">88% vs 83,9%. Brak testu istotności i przedziałów ufności dla języków.</span></td><td><span class="chip bad"><span class="en">Overstated</span><span class="pl">Wyolbrzymione</span></span></td></tr>
+      <tr><td><span class="en">Despite little training data</span><span class="pl">Mimo małej ilości danych treningowych</span></td><td><span class="en">Not in the paper. The paper groups Polish with high-resource languages.</span><span class="pl">Tego nie ma w publikacji. Polski jest w niej wśród języków wysokozasobowych.</span></td><td><span class="chip bad"><span class="en">Unsupported</span><span class="pl">Bez pokrycia</span></span></td></tr>
+      <tr><td><span class="en">Newest models</span><span class="pl">Najnowsze modele</span></td><td><span class="en">7 models from early 2025: Gemini 1.5 Flash, o3-mini-high, DeepSeek-R1, Llama 3.3 70B, Llama 3.1 8B, Qwen2.5 72B and 7B.</span><span class="pl">7 modeli z początku 2025: Gemini 1.5 Flash, o3-mini-high, DeepSeek-R1, Llama 3.3 70B, Llama 3.1 8B, Qwen2.5 72B i 7B.</span></td><td><span class="chip warn"><span class="en">Outdated</span><span class="pl">Nieaktualne</span></span></td></tr>
+      <tr><td><span class="en">Polish ranked 1st, English 6th</span><span class="pl">Polski 1., angielski 6.</span></td><td><span class="en">Correct for the NIAH average over 7 models at 64K and 128K.</span><span class="pl">Zgadza się dla średniej NIAH z 7 modeli przy 64K i 128K.</span></td><td><span class="chip good"><span class="en">Accurate</span><span class="pl">Zgodne</span></span></td></tr>
+    </tbody>
+  </table></div>
+  <h3 style="margin-top:22px"><span class="en">Three confounders behind the 1st place</span><span class="pl">Trzy czynniki zakłócające za 1. miejscem</span></h3>
+  <ol class="advice">
+    <li><span class="en"><b>Different haystack per language.</b> Polish used <i>Noce i dnie</i> and English used <i>Little Women</i>, so filler difficulty is not controlled. The co-author pointed to this herself.</span><span class="pl"><b>Inny „stóg siana” w każdym języku.</b> Polski miał <i>Noce i dnie</i>, angielski <i>Little Women</i>, więc trudność wypełniacza nie była kontrolowana. Współautorka sama na to wskazała.</span></li>
+    <li><span class="en"><b>One model moves the mean.</b> At 128K, o3-mini-high scored 67% in English and 92% in Polish, and often wrongly answered "none". Our arithmetic: one 25-point gap among 7 models adds about 3.6 points to the average at that length.</span><span class="pl"><b>Jeden model przesuwa średnią.</b> Przy 128K o3-mini-high uzyskał 67% po angielsku i 92% po polsku, a często błędnie odpowiadał „none”. Nasz rachunek: 25 pkt różnicy w jednym z 7 modeli dokłada około 3,6 pkt do średniej dla tej długości.</span></li>
+    <li><span class="en"><b>Small cells.</b> With 50 items per cell, one cell's 95% interval is about ±10 points. Try it in the calculator below.</span><span class="pl"><b>Małe komórki.</b> Przy 50 przykładach 95% przedział dla jednej komórki to około ±10 pkt. Sprawdź w kalkulatorze poniżej.</span></li>
+  </ol>
+</section>
+
+<!-- 2 -->
+<section id="stats">
+  <span class="eyebrow"><span class="en">Interactive</span><span class="pl">Interaktywnie</span></span>
+  <h2><span class="en">Is the gap real or noise?</span><span class="pl">Prawdziwa różnica czy szum?</span></h2>
+  <p><span class="en">Benchmark headlines rarely report uncertainty. Adjust the sample size to see when a gap between two languages stops being noise. These are simple binomial approximations that assume independent items. Real benchmarks have correlated items, so true uncertainty is larger.</span><span class="pl">Nagłówki o benchmarkach rzadko podają niepewność. Zmieniaj liczebność próby i zobacz, kiedy różnica między językami przestaje być szumem. To proste przybliżenia dwumianowe przy założeniu niezależnych pytań. W prawdziwych benchmarkach pytania są skorelowane, więc niepewność jest większa.</span></p>
+  <div class="calc">
+    <div class="inst">
+      <h3><span class="en">Two languages, same test</span><span class="pl">Dwa języki, ten sam test</span></h3>
+      <div class="field"><label for="p1"><span class="en">Language A accuracy</span><span class="pl">Trafność języka A</span> <span class="val" id="p1v"></span></label><input id="p1" type="range" min="50" max="100" step="0.1" value="88"></div>
+      <div class="field"><label for="p2"><span class="en">Language B accuracy</span><span class="pl">Trafność języka B</span> <span class="val" id="p2v"></span></label><input id="p2" type="range" min="50" max="100" step="0.1" value="83.9"></div>
+      <div class="field"><label for="nn"><span class="en">Items per language (n)</span><span class="pl">Pytań na język (n)</span> <span class="val" id="nnv"></span></label><input id="nn" type="range" min="1" max="4" step="0.01" value="1.699"></div>
+      <div class="presets" aria-label="Presets">
+        <button type="button" data-p="88,83.9,50"><span class="en">OneRuler, one cell</span><span class="pl">OneRuler, jedna komórka</span></button>
+        <button type="button" data-p="88,83.9,700">OneRuler, 7×2×50</button>
+        <button type="button" data-p="94.4,100,25">mmPISA Opus, 25 items</button>
+        <button type="button" data-p="68.9,86,3594">MKQA Qwen2.5</button>
+      </div>
+      <div class="out" id="zout"></div>
+      <p class="note" id="znote" style="margin-top:6px"></p>
+    </div>
+    <div class="inst">
+      <h3><span class="en">95% interval for one score</span><span class="pl">95% przedział dla jednego wyniku</span></h3>
+      <div class="field"><label for="cp"><span class="en">Accuracy</span><span class="pl">Trafność</span> <span class="val" id="cpv"></span></label><input id="cp" type="range" min="1" max="99.9" step="0.1" value="85"></div>
+      <div class="field"><label for="cn"><span class="en">Items (n)</span><span class="pl">Pytań (n)</span> <span class="val" id="cnv"></span></label><input id="cn" type="range" min="1" max="4" step="0.01" value="1.699"></div>
+      <div class="ci" id="ciBar"><div class="band"></div><div class="pt"></div><span class="lab" style="left:0%">0</span><span class="lab" style="left:50%">50</span><span class="lab" style="left:100%">100</span></div>
+      <div class="out" id="ciout" style="margin-top:26px"></div>
+      <p class="note"><span class="en">Wilson score interval.</span><span class="pl">Przedział Wilsona.</span></p>
+    </div>
+  </div>
+</section>
+
+<!-- 3 -->
+<section id="evidence">
+  <span class="eyebrow"><span class="en">Instrument</span><span class="pl">Przyrząd</span></span>
+  <h2><span class="en">Newer evidence: English vs Polish and Slavic</span><span class="pl">Nowsze dowody: angielski vs polski i języki słowiańskie</span></h2>
+  <p><span class="en">Each study asks the same questions in English and in another language. Pick a study. The hollow ring is English, red is Polish, small gold dots are other Slavic languages. The number next to each model is the Polish (or Slavic-average) score minus English.</span><span class="pl">W każdym badaniu te same pytania zadano po angielsku i w innym języku. Wybierz badanie. Pusty pierścień to angielski, czerwony to polski, małe złote kropki to inne języki słowiańskie. Liczba przy modelu to wynik polskiego (lub średniej słowiańskiej) minus wynik angielskiego.</span></p>
+  <div class="inst">
+    <div class="dsbar" id="dsbar" role="group" aria-label="Dataset"></div>
+    <div class="dsmeta"><h3 id="dsTitle" style="margin:0"></h3><span class="src" id="dsSrc"></span></div>
+    <div class="legend" id="dsLegend"></div>
+    <div class="rows" id="dsRows"></div>
+    <div class="axis"><span></span><div class="ax" id="dsAxis"></div></div>
+    <p class="note" id="dsNote"></p>
+    <details><summary><span class="en">Data table</span><span class="pl">Tabela danych</span></summary><div class="tscroll" id="dsTable"></div></details>
+  </div>
+  <p class="note"><span class="en"><b>Reading across studies:</b> small open models lose 8–22 points in Polish. Frontier models (GPT-5, GPT-5.1, Claude Opus 4.5, Qwen3-235B-Thinking, DeepSeek-R1) are within about 0–6 points of English. The native language helps when the question is about local knowledge (CUS-QA). No study shows a general Polish advantage.</span><span class="pl"><b>W przekroju badań:</b> małe modele otwarte tracą po polsku 8–22 pkt. Modele czołowe (GPT-5, GPT-5.1, Claude Opus 4.5, Qwen3-235B-Thinking, DeepSeek-R1) mieszczą się w około 0–6 pkt od angielskiego. Język natywny pomaga przy pytaniach o lokalną wiedzę (CUS-QA). Żadne badanie nie pokazuje ogólnej przewagi polskiego.</span></p>
+</section>
+
+<!-- 4 -->
+<section id="thinking">
+  <span class="eyebrow"><span class="en">Reasoning</span><span class="pl">Rozumowanie</span></span>
+  <h2><span class="en">Does the language of thought matter?</span><span class="pl">Czy język myślenia ma znaczenie?</span></h2>
+  <p><span class="en">Yes. In Tam et al. (arXiv 2505.17407), four open reasoning models solved MATH-500 with the reasoning trace started either in English or in the question's language. English thinking won in every language, and the gap grows as the language gets less resourced. PolyMath (QwQ-32B) shows the same direction with instruction-level control. Interpretability work (Wendler et al. 2024; Wu et al. 2025; Anthropic 2025) finds a shared, English-leaning concept space inside models.</span><span class="pl">Tak. W badaniu Tam i in. (arXiv 2505.17407) cztery otwarte modele rozumujące rozwiązywały MATH-500, zaczynając tok rozumowania po angielsku albo w języku pytania. Myślenie po angielsku wygrało w każdym języku, a różnica rośnie wraz ze spadkiem zasobności języka. PolyMath (QwQ-32B) pokazuje ten sam kierunek przy sterowaniu instrukcją. Badania interpretowalności (Wendler i in. 2024; Wu i in. 2025; Anthropic 2025) wskazują na wspólną przestrzeń pojęć wewnątrz modeli, przechyloną w stronę angielskiego.</span></p>
+  <div class="inst">
+    <div class="legend"><span><i style="background:var(--bg);border:2.5px solid var(--en)"></i><span class="en">Reasoning in English</span><span class="pl">Rozumowanie po angielsku</span></span><span><i style="background:var(--pl)"></i><span class="en">Reasoning in the question's language</span><span class="pl">Rozumowanie w języku pytania</span></span><span><i style="background:var(--muted)"></i><span class="en">No language control</span><span class="pl">Bez sterowania</span></span></div>
+    <div class="rows" id="thRows"></div>
+    <div class="axis"><span></span><div class="ax" id="thAxis"></div></div>
+    <p class="note"><span class="en">Polish was not included in these studies. Russian, the closest Slavic language, loses 5.1 points. Sources: Tam et al. Table 1 (average of R1-Distill-Llama-8B, R1-Distill-Qwen-14B, QwQ-32B, Qwen3-30B-A3B); PolyMath Table 7.</span><span class="pl">Polskiego nie było w tych badaniach. Rosyjski, najbliższy język słowiański, traci 5,1 pkt. Źródła: Tam i in., tab. 1 (średnia z R1-Distill-Llama-8B, R1-Distill-Qwen-14B, QwQ-32B, Qwen3-30B-A3B); PolyMath, tab. 7.</span></p>
+  </div>
+  <h3 style="margin-top:22px"><span class="en">Agents and tool calls</span><span class="pl">Agenci i wywołania narzędzi</span></h3>
+  <p><span class="en">No agent benchmark covers Polish or any Slavic language yet. The closest study, "Lost in Execution" (arXiv 2601.05366, Jan 2026), tested GPT-5, DeepSeek V3.2 and Qwen3 on BFCL v4. The main failure was parameter values written in the user's language where the tool expected canonical English values. Fully translating queries made errors more frequent.</span><span class="pl">Żaden benchmark agentowy nie obejmuje jeszcze polskiego ani innego języka słowiańskiego. Najbliższe badanie, „Lost in Execution” (arXiv 2601.05366, I 2026), testowało GPT-5, DeepSeek V3.2 i Qwen3 na BFCL v4. Główny błąd to wartości parametrów zapisane w języku użytkownika tam, gdzie narzędzie oczekiwało kanonicznych wartości po angielsku. Pełne tłumaczenie zapytań zwiększało liczbę błędów.</span></p>
+</section>
+
+<!-- 5 -->
+<section id="tokens">
+  <span class="eyebrow"><span class="en">Cost</span><span class="pl">Koszt</span></span>
+  <h2><span class="en">What Polish costs in tokens</span><span class="pl">Ile polski kosztuje w tokenach</span></h2>
+  <p><span class="en">Bielik v3 technical report (arXiv 2604.10799), Table 1, tokenized the Polish Constitution preamble and its English translation. This is one text, so treat the ratios as indicative.</span><span class="pl">Raport techniczny Bielik v3 (arXiv 2604.10799), tab. 1, tokenizuje preambułę Konstytucji RP i jej angielskie tłumaczenie. To jeden tekst, więc proporcje są orientacyjne.</span></p>
+  <div class="calc">
+    <div class="inst">
+      <div class="field"><label for="tk"><span class="en">Tokenizer</span><span class="pl">Tokenizer</span></label><select id="tk"></select></div>
+      <div class="field"><label for="mt"><span class="en">English input per month (million tokens)</span><span class="pl">Wejście po angielsku miesięcznie (mln tokenów)</span></label><input id="mt" type="number" min="0" step="1" value="200"></div>
+      <div class="field"><label for="pr"><span class="en">Price per million input tokens (USD)</span><span class="pl">Cena za mln tokenów wejścia (USD)</span></label><input id="pr" type="number" min="0" step="0.1" value="3"></div>
+      <div class="field"><label for="cw"><span class="en">Context window (tokens)</span><span class="pl">Okno kontekstu (tokeny)</span></label><input id="cw" type="number" min="1000" step="1000" value="200000"></div>
+    </div>
+    <div class="inst">
+      <div class="out" id="tkRatio"></div>
+      <p id="tkOut" style="margin-top:10px"></p>
+      <div id="tkBars" style="margin-top:14px;display:flex;flex-direction:column;gap:6px"></div>
+    </div>
+  </div>
+</section>
+
+<!-- 6 -->
+<section id="sources">
+  <span class="eyebrow"><span class="en">Evidence map</span><span class="pl">Mapa dowodów</span></span>
+  <h2><span class="en">Sources and their quality</span><span class="pl">Źródła i ich jakość</span></h2>
+  <p><span class="en">Quality 1–5 reflects sample size, parallel questions, statistics, peer review and how recent the models are. A second agent re-read every number listed here from the primary table.</span><span class="pl">Jakość 1–5 uwzględnia liczebność próby, równoległość pytań, statystykę, recenzję i aktualność modeli. Każdą liczbę podaną tutaj drugi agent ponownie odczytał z tabeli źródła pierwotnego.</span></p>
+  <div class="filters dsbar" id="filt" role="group" aria-label="Filter"></div>
+  <div class="cards" id="cards"></div>
+</section>
+
+<!-- 7 -->
+<section id="advice">
+  <span class="eyebrow"><span class="en">Practice</span><span class="pl">Praktyka</span></span>
+  <h2><span class="en">What to do in Claude Code and other agents</span><span class="pl">Co robić w Claude Code i innych agentach</span></h2>
+  <ol class="advice">
+    <li><span class="en">Write <code>CLAUDE.md</code>, <code>AGENTS.md</code>, skills, subagent prompts and tool descriptions <b>in English</b>. They use fewer tokens and adherence is equal or better.</span><span class="pl">Pisz <code>CLAUDE.md</code>, <code>AGENTS.md</code>, skille, prompty subagentów i opisy narzędzi <b>po angielsku</b>. Zużywają mniej tokenów, a instrukcje są przestrzegane tak samo dobrze albo lepiej.</span></li>
+    <li><span class="en">Do not force Polish chain-of-thought. Let the model reason in its default language.</span><span class="pl">Nie wymuszaj rozumowania po polsku. Pozwól modelowi myśleć w jego domyślnym języku.</span></li>
+    <li><span class="en">State the output language explicitly, e.g. "Reply in Polish" or "UI copy in Polish".</span><span class="pl">Wprost określ język odpowiedzi, np. „Odpowiadaj po polsku” albo „teksty UI po polsku”.</span></li>
+    <li><span class="en">Keep Polish domain data, such as law, medicine and local facts, in Polish. Keep tool parameter values canonical: English enums, ISO codes.</span><span class="pl">Polskie dane domenowe, takie jak prawo, medycyna czy lokalne fakty, zostaw po polsku. Wartości parametrów narzędzi utrzymuj w formie kanonicznej: angielskie enumy, kody ISO.</span></li>
+    <li><span class="en">Before trusting a benchmark headline, check N, confidence intervals, the exact setting and the model vintage.</span><span class="pl">Zanim uwierzysz w nagłówek o benchmarku, sprawdź N, przedziały ufności, dokładne ustawienia i rocznik modeli.</span></li>
+  </ol>
+  <h3 style="margin-top:22px"><span class="en">Known gaps</span><span class="pl">Znane luki</span></h3>
+  <p class="muted"><span class="en">No Polish long-context generative benchmark and no Polish agent or tool-use benchmark exist as of Nov 2026. OneRuler's per-language values for RU/UK/CS/SR appear only in heatmaps and are not quoted. Global-MMLU and INCLUDE include Polish but publish no per-model PL vs EN table.</span><span class="pl">Na listopad 2026 nie istnieje polski benchmark generatywny dla długiego kontekstu ani polski benchmark agentowy czy wywołań narzędzi. Wartości OneRuler dla RU/UK/CS/SR są tylko na mapach ciepła, więc ich nie cytujemy. Global-MMLU i INCLUDE zawierają polski, ale nie publikują tabeli PL vs EN dla poszczególnych modeli.</span></p>
+</section>
+
+<footer><span class="en">Method: 6 search agents and 5 verification agents (Claude Haiku), coordinated by Claude Opus. Each agent ran 11–18 search iterations in English and in national languages. Numbers were extracted from arXiv HTML and spot-check key cells before citing. Full reports in Markdown (EN and PL) are in the course repository.</span><span class="pl">Metoda: 6 agentów wyszukujących i 5 weryfikujących (Claude Haiku), koordynowanych przez Claude Opus. Każdy agent wykonał 11–18 iteracji wyszukiwania po angielsku i w językach narodowych. Liczby wyodrębniono z HTML arXiv; przed cytowaniem sprawdź kluczowe komórki. Pełne raporty w Markdown (EN i PL) są w repozytorium kursu.</span></footer>
+</div>
+
+<script>
+(function(){
+let LANG = document.body.classList.contains("pl") ? "pl" : "en";
+const t = (en, pl) => LANG === "pl" ? pl : en;
+const fmt = (x, d=1) => { const s = x.toFixed(d); return LANG === "pl" ? s.replace(".", ",") : s; };
+const sgn = x => (x > 0 ? "+" : x < 0 ? "−" : "±") + fmt(Math.abs(x));
+
+/* ---------- ruler ---------- */
+function drawRuler(){
+  const svg = document.getElementById("rulerSvg"), NS = "http://www.w3.org/2000/svg";
+  [...svg.querySelectorAll(":not(title)")].forEach(n => n.remove());
+  const x0 = 30, x1 = 870, lo = 55, hi = 100, X = v => x0 + (v - lo) / (hi - lo) * (x1 - x0);
+  const el = (tag, a) => { const e = document.createElementNS(NS, tag); for (const k in a) e.setAttribute(k, a[k]); svg.appendChild(e); return e; };
+  el("line", {x1:x0, x2:x1, y1:110, y2:110, class:"base"});
+  for (let v = lo; v <= hi; v++) {
+    const big = v % 5 === 0;
+    el("line", {x1:X(v), x2:X(v), y1:110, y2:big ? 96 : 103, class:"tick"});
+    if (big) { const tx = el("text", {x:X(v), y:130, "text-anchor":"middle", class:"tl"}); tx.textContent = v + "%"; }
+  }
+  const showCI = document.getElementById("ciToggle").checked;
+  const marks = [
+    {v:88, c:"var(--pl)", l:t("Polish 88%","polski 88%"), up:true},
+    {v:83.9, c:"var(--en)", l:t("English 83.9%","angielski 83,9%"), up:false},
+    {v:62.1, c:"var(--muted)", l:t("Chinese 62.1%","chiński 62,1%"), up:true}
+  ];
+  marks.forEach(m => {
+    if (showCI) { const [a,b] = wilson(m.v/100, 50); el("rect", {x:X(Math.max(lo,a*100)), y:m.up?62:74, width:X(Math.min(hi,b*100))-X(Math.max(lo,a*100)), height:10, rx:3, fill:m.c, "fill-opacity":.25, class:"mk"}); }
+    el("line", {x1:X(m.v), x2:X(m.v), y1:m.up?30:52, y2:110, stroke:m.c, "stroke-width":3, class:"mk"});
+    el("circle", {cx:X(m.v), cy:m.up?30:52, r:5, fill:m.c});
+    const tx = el("text", {x:X(m.v)+(m.v>95?-8:8), y:m.up?26:48, "text-anchor":m.v>95?"end":"start", fill:m.c, style:"font:600 15px var(--f-mono)"}); tx.textContent = m.l;
+  });
+}
+
+/* ---------- stats ---------- */
+function wilson(p, n, z=1.96){ const d=1+z*z/n, c=(p+z*z/(2*n))/d, h=z*Math.sqrt(p*(1-p)/n+z*z/(4*n*n))/d; return [Math.max(0,c-h), Math.min(1,c+h)]; }
+function erf(x){ const s=Math.sign(x); x=Math.abs(x); const a1=.254829592,a2=-.284496736,a3=1.421413741,a4=-1.453152027,a5=1.061405429,p=.3275911; const tt=1/(1+p*x); return s*(1-(((((a5*tt+a4)*tt)+a3)*tt+a2)*tt+a1)*tt*Math.exp(-x*x)); }
+const nFromLog = v => Math.round(Math.pow(10, +v));
+function updZ(){
+  const p1=+document.getElementById("p1").value/100, p2=+document.getElementById("p2").value/100, n=nFromLog(document.getElementById("nn").value);
+  document.getElementById("p1v").textContent = fmt(p1*100)+"%";
+  document.getElementById("p2v").textContent = fmt(p2*100)+"%";
+  document.getElementById("nnv").textContent = n.toLocaleString(LANG==="pl"?"pl-PL":"en-US");
+  const pp=(p1+p2)/2, se=Math.sqrt(2*pp*(1-pp)/n), z=se>0?(p1-p2)/se:0, pv=2*(1-0.5*(1+erf(Math.abs(z)/Math.SQRT2)));
+  const sig = pv < 0.05;
+  document.getElementById("zout").innerHTML = `<span style="color:${sig?"var(--good)":"var(--warn)"}">${sig?t("Likely real","Raczej realna"):t("Could be noise","Może być szumem")}</span>`;
+  document.getElementById("znote").textContent = t(`Gap ${sgn((p1-p2)*100)} pt · z = ${fmt(z,2)} · p ≈ ${pv<0.001?"<0.001":fmt(pv,3)} (two-proportion z-test, equal n)`,
+                                                     `Różnica ${sgn((p1-p2)*100)} pkt · z = ${fmt(z,2)} · p ≈ ${pv<0.001?"<0,001":fmt(pv,3)} (test z dla dwóch proporcji, równe n)`);
+}
+function updCI(){
+  const p=+document.getElementById("cp").value/100, n=nFromLog(document.getElementById("cn").value), [a,b]=wilson(p,n);
+  document.getElementById("cpv").textContent = fmt(p*100)+"%";
+  document.getElementById("cnv").textContent = n.toLocaleString(LANG==="pl"?"pl-PL":"en-US");
+  const bar=document.getElementById("ciBar");
+  bar.querySelector(".band").style.left=(a*100)+"%"; bar.querySelector(".band").style.width=((b-a)*100)+"%";
+  bar.querySelector(".pt").style.left=(p*100)+"%";
+  document.getElementById("ciout").textContent = `${fmt(a*100)}–${fmt(b*100)}% (±${fmt((b-a)*50)} ${t("pt","pkt")})`;
+}
+["p1","p2","nn"].forEach(id=>document.getElementById(id).addEventListener("input",updZ));
+["cp","cn"].forEach(id=>document.getElementById(id).addEventListener("input",updCI));
+document.querySelectorAll(".presets button").forEach(b=>b.addEventListener("click",()=>{
+  const [a,c,n]=b.dataset.p.split(",").map(Number);
+  document.getElementById("p1").value=a; document.getElementById("p2").value=c; document.getElementById("nn").value=Math.log10(n);
+  document.getElementById("cp").value=a; document.getElementById("cn").value=Math.log10(n);
+  updZ(); updCI();
+}));
+
+/* ---------- datasets ---------- */
+const SL = ["CS","SK","RU","UK","SR","HR","BS","SL","BG"];
+const DS = [
+ {id:"oneruler", name:["OneRuler (2025)","OneRuler (2025)"], title:["Long-context needle-in-a-haystack","Igła w stogu siana, długi kontekst"],
+  src:"arXiv 2503.01996 · Sec. 3.1", lo:50, hi:100,
+  rows:[{l:["7-model avg, 64K+128K","Średnia 7 modeli, 64K+128K"], v:{EN:83.9, PL:88}},
+        {l:["o3-mini-high, 128K","o3-mini-high, 128K"], v:{EN:67, PL:92, UK:89}}],
+  note:["The only study where Polish leads. Synthetic task, 2025 models, a different book per language, no significance test.","Jedyne badanie, w którym polski prowadzi. Zadanie syntetyczne, modele z 2025, inna książka dla każdego języka, brak testu istotności."]},
+ {id:"mkqa", name:["MKQA RAG","MKQA RAG"], title:["RAG with the gold passage in the question's language","RAG z poprawnym fragmentem w języku pytania"],
+  src:"arXiv 2504.00597v4 · Table 15 · N(PL)=3,594", lo:50, hi:100,
+  rows:[{l:["Aya-Expanse-8B"], v:{EN:87.5, PL:79.2, RU:79.6}},{l:["Llama-3.2-3B"], v:{EN:82.4, PL:60.6, RU:56.8}},
+        {l:["Gemma-2-9B"], v:{EN:79.8, PL:67.8, RU:68.8}},{l:["Qwen2.5-7B"], v:{EN:86.0, PL:68.9, RU:71.0}}],
+  note:["Parallel questions, large N. Small open models only. Polish trails English in every model.","Pytania równoległe, duże N. Tylko małe modele otwarte. Polski przegrywa z angielskim w każdym modelu."]},
+ {id:"gmmlu", name:["Global-MMLU + context","Global-MMLU + kontekst"], title:["Multiple-choice with a supporting passage","Test wyboru z fragmentem pomocniczym"],
+  src:"arXiv 2504.00597v4 · Table 18 · N(PL)=1,462", lo:50, hi:100,
+  rows:[{l:["Aya-Expanse-8B"], v:{EN:77.3, PL:68.9}},{l:["Llama-3.2-3B"], v:{EN:76.6, PL:55.2}},
+        {l:["Gemma-2-9B"], v:{EN:83.3, PL:75.1}},{l:["Qwen2.5-7B"], v:{EN:84.3, PL:71.6}}],
+  note:["Same pattern as MKQA: an 8–21 point deficit for Polish.","Ten sam wzór co w MKQA: polski traci 8–21 pkt."]},
+ {id:"lek", name:["Medical exams PL/EN","Egzaminy medyczne PL/EN"], title:["Polish medical licensing exam (LEK), official EN translation","Lekarski Egzamin Końcowy (LEK), oficjalne tłumaczenie EN"],
+  src:"arXiv 2412.00559v2 · Table 4 (N=4,312) · Sci Rep 2023 (N=585)", lo:45, hi:95,
+  rows:[{l:["GPT-4o"], v:{EN:88.69, PL:89.96}},{l:["GPT-4 (2023)"], v:{EN:79.7, PL:79.7}},{l:["Meditron3-70B"], v:{EN:66.75, PL:68.37}},
+        {l:["Bielik-11B-v2.2"], v:{EN:56.98, PL:62.36}},{l:["Qwen2.5-7B"], v:{EN:67.73, PL:51.92}},{l:["Llama-3.1-8B"], v:{EN:64.69, PL:51.25}},{l:["GPT-3.5 (2023)"], v:{EN:60.3, PL:54.8}}],
+  note:["Strong models are at parity or slightly better in Polish on Polish-sourced questions. The Polish-trained Bielik does better in Polish. Small general models lose 13–16 points.","Mocne modele są na równi lub nieco lepsze po polsku na pytaniach z polskiego źródła. Trenowany po polsku Bielik wypada lepiej po polsku. Małe modele ogólne tracą 13–16 pkt."]},
+ {id:"mmpisa", name:["mmPISA (2026)","mmPISA (2026)"], title:["PISA math and reading items, 43 languages","Zadania PISA z matematyki i czytania, 43 języki"],
+  src:"arXiv 2606.07069 · Table 1 · 25 items × 5 runs", lo:70, hi:100,
+  rows:[{l:["Claude Haiku 4.5, no reasoning","Claude Haiku 4.5, bez rozumowania"], v:{EN:90.4,PL:87.2,CS:84.8,SK:88.0,RU:85.6,SR:87.2,HR:88.8,BS:87.2,SL:89.6,BG:85.6}},
+        {l:["Claude Opus 4.5, high"], v:{EN:100,PL:94.4,CS:96.8,SK:96.0,RU:95.2,SR:99.2,HR:96.8,BS:99.2,SL:95.2,BG:96.8}},
+        {l:["GPT-5.1, no reasoning","GPT-5.1, bez rozumowania"], v:{EN:76.8,PL:78.4,CS:79.2,SK:74.4,RU:84.8,SR:77.6,HR:78.4,BS:75.2,SL:80.0,BG:84.0}},
+        {l:["GPT-5.1, high"], v:{EN:96.8,PL:96.0,CS:94.4,SK:95.2,RU:94.4,SR:96.0,HR:96.0,BS:96.8,SL:96.0,BG:90.4}}],
+  note:["The newest models tested. Only 25 unique public items, so 1 item ≈ 0.8 pt and contamination is likely. Gaps of a few points are 1–4 items.","Najnowsze testowane modele. Tylko 25 unikalnych, publicznych zadań, więc 1 zadanie ≈ 0,8 pkt i model mógł je znać z treningu. Kilka punktów różnicy to 1–4 zadania."]},
+ {id:"mmluprox", name:["MMLU-ProX","MMLU-ProX"], title:["Hard knowledge and reasoning MCQ, parallel translation","Trudny test wiedzy i rozumowania, tłumaczenie równoległe"],
+  src:"arXiv 2503.10497 · Table 3", lo:65, hi:85,
+  rows:[{l:["DeepSeek-R1"], v:{EN:79.5,CS:76.8,RU:76.4,UK:76.8,SR:80.9}},{l:["Qwen3-235B-Thinking"], v:{EN:80.7,CS:80.5,RU:77.0,UK:78.8,SR:80.2}},
+        {l:["Qwen3-235B"], v:{EN:73.5,CS:71.8,RU:72.9,UK:72.5,SR:71.1}},{l:["GPT-4.1"], v:{EN:79.8,CS:77.5,RU:71.2,UK:76.4,SR:76.9}}],
+  note:["No Polish in this benchmark. Slavic languages sit 0–3 points below English for reasoning models, with Serbian occasionally above.","Brak polskiego w tym benchmarku. Języki słowiańskie są 0–3 pkt poniżej angielskiego w modelach rozumujących; serbski czasem powyżej."]},
+ {id:"cusqa", name:["CUS-QA (2026)","CUS-QA (2026)"], title:["Regional-knowledge QA: Czech, Slovak, Ukrainian","Wiedza regionalna: czeski, słowacki, ukraiński"],
+  src:"arXiv 2507.22752v3 · Tables 11, 17 · LLM-judge", lo:40, hi:90,
+  rows:[{l:["GPT-5 · CZ"], v:{EN:80.7,CS:83.1}},{l:["GPT-5 · SK"], v:{EN:70.2,SK:73.3}},{l:["GPT-5 · UA"], v:{EN:72.2,UK:73.2}},
+        {l:["Llama 3.3 70B · CZ"], v:{EN:63.1,CS:60.0}},{l:["Llama 3.3 70B · SK"], v:{EN:48.3,SK:47.7}},{l:["Llama 3.3 70B · UA"], v:{EN:54.9,UK:52.2}},
+        {l:["Llama + RAG · CZ (dev)"], v:{EN:59.8,CS:65.9}},{l:["Llama + RAG · SK (dev)"], v:{EN:73.4,SK:76.9}},{l:["Llama + RAG · UA (dev)"], v:{EN:51.2,UK:58.7}}],
+  note:["Questions about local facts. The native language helps GPT-5 and helps with RAG. Plain Llama does slightly better in English.","Pytania o lokalne fakty. Język natywny pomaga GPT-5 i przy RAG. Llama bez RAG wypada nieco lepiej po angielsku."]},
+ {id:"polymath", name:["PolyMath","PolyMath"], title:["Olympiad-level math, top difficulty","Matematyka olimpijska, najwyższy poziom"],
+  src:"arXiv 2504.18428v4 · Table 5a · 125 items/level", lo:30, hi:45,
+  rows:[{l:["Qwen3-235B-Thinking"], v:{EN:40.0,RU:38.4}},{l:["Gemini 2.5 Pro"], v:{EN:39.2,RU:38.4}},{l:["DeepSeek-R1"], v:{EN:35.2,RU:37.6}}],
+  note:["Russian is within 1–2 items of English. Differences are within noise.","Rosyjski różni się od angielskiego o 1–2 zadania. Różnice mieszczą się w szumie."]}
+];
+
+function niceTicks(lo, hi){ const span=hi-lo, step=span<=20?5:10, out=[]; for(let v=Math.ceil(lo/step)*step; v<=hi; v+=step) out.push(v); return out; }
+function renderRows(container, axisEl, rows, lo, hi, opts){
+  container.innerHTML=""; axisEl.innerHTML="";
+  const P = v => ((v-lo)/(hi-lo)*100).toFixed(2)+"%";
+  const ticks = niceTicks(lo, hi);
+  rows.forEach(r=>{
+    const row=document.createElement("div"); row.className="row";
+    const keys=Object.keys(r.v), vals=keys.map(k=>r.v[k]);
+    const mn=Math.min(...vals), mx=Math.max(...vals);
+    const d = opts.delta(r.v);
+    const lab=document.createElement("div"); lab.className="rl";
+    lab.innerHTML = `${(r.l[LANG==="pl"?1:0]||r.l[0])}<span class="d" style="color:${d==null?"var(--muted)":d<-1?"var(--bad)":d>1?"var(--good)":"var(--muted)"}">${d==null?"":sgn(d)}</span>`;
+    const tr=document.createElement("div"); tr.className="track";
+    ticks.forEach(tk=>{ const g=document.createElement("div"); g.className="grid"; g.style.left=P(tk); tr.appendChild(g); });
+    const bar=document.createElement("div"); bar.className="bar"; bar.style.left=P(mn); bar.style.width=`calc(${P(mx)} - ${P(mn)})`; tr.appendChild(bar);
+    keys.sort((a,b)=>opts.order(a)-opts.order(b)).forEach(k=>{
+      const cls=opts.cls(k), v=r.v[k];
+      const dot=document.createElement("div"); dot.className="dot "+cls; dot.style.left=P(v); dot.title=`${opts.name(k)}: ${fmt(v)}`; tr.appendChild(dot);
+      if(cls==="ref"||cls==="pl"||cls==="slv"){ const dl=document.createElement("div"); dl.className="dl "+cls; dl.style.left=P(v); dl.textContent=`${opts.short(k)} ${fmt(v)}`; tr.appendChild(dl); }
+    });
+    // keep the two labels from colliding: nudge if close
+    const labs=[...tr.querySelectorAll(".dl")];
+    if(labs.length===2){ const a=parseFloat(labs[0].style.left), b=parseFloat(labs[1].style.left); if(Math.abs(a-b)<14){ const [l,rr]=a<b?[labs[0],labs[1]]:[labs[1],labs[0]]; l.style.transform="translateX(-100%)"; rr.style.transform="translateX(0)"; } }
+    row.append(lab,tr); container.appendChild(row);
+  });
+  ticks.forEach(tk=>{ const s=document.createElement("span"); s.style.left=P(tk); s.textContent=tk; axisEl.appendChild(s); });
+}
+const LNAME = {EN:["English","angielski"],PL:["Polish","polski"],CS:["Czech","czeski"],SK:["Slovak","słowacki"],RU:["Russian","rosyjski"],UK:["Ukrainian","ukraiński"],SR:["Serbian","serbski"],HR:["Croatian","chorwacki"],BS:["Bosnian","bośniacki"],SL:["Slovenian","słoweński"],BG:["Bulgarian","bułgarski"]};
+let cur="mkqa";
+function renderDS(){
+  const ds=DS.find(d=>d.id===cur), L=LANG==="pl"?1:0;
+  document.getElementById("dsTitle").textContent=ds.title[L];
+  document.getElementById("dsSrc").textContent=ds.src;
+  document.getElementById("dsNote").textContent=ds.note[L];
+  const present=new Set(ds.rows.flatMap(r=>Object.keys(r.v)));
+  const leg=[`<span><i style="background:var(--bg);border:2.5px solid var(--en)"></i>${LNAME.EN[L]}</span>`];
+  if(present.has("PL")) leg.push(`<span><i style="background:var(--pl)"></i>${LNAME.PL[L]}</span>`);
+  const sl=[...present].filter(k=>SL.includes(k)); if(sl.length) leg.push(`<span><i style="background:var(--slav)"></i>${sl.map(k=>LNAME[k][L]).join(", ")}</span>`);
+  document.getElementById("dsLegend").innerHTML=leg.join("");
+  const singleOther = ds.rows.every(r=>Object.keys(r.v).length===2);
+  renderRows(document.getElementById("dsRows"), document.getElementById("dsAxis"), ds.rows, ds.lo, ds.hi, {
+    delta:v=>{ if(v.PL!=null) return v.PL-v.EN; const o=Object.keys(v).filter(k=>k!=="EN"); return o.reduce((s,k)=>s+v[k],0)/o.length - v.EN; },
+    order:k=>k==="EN"?2:k==="PL"?3:1,
+    cls:k=>k==="EN"?"ref":k==="PL"?"pl":(singleOther?"slv":"oth"),
+    name:k=>LNAME[k][L], short:k=>k
+  });
+  const cols=[...present].sort((a,b)=>a==="EN"?-1:b==="EN"?1:a==="PL"?-1:b==="PL"?1:0);
+  document.getElementById("dsTable").innerHTML=`<table><thead><tr><th>${t("Model / setting","Model / ustawienie")}</th>${cols.map(c=>`<th>${c}</th>`).join("")}</tr></thead><tbody>${ds.rows.map(r=>`<tr><td>${r.l[L]||r.l[0]}</td>${cols.map(c=>`<td class="mono">${r.v[c]!=null?fmt(r.v[c]):"–"}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
+  document.querySelectorAll("#dsbar button").forEach(b=>b.setAttribute("aria-pressed", b.dataset.id===cur));
+}
+function buildDSBar(){
+  const bar=document.getElementById("dsbar"); bar.innerHTML="";
+  DS.forEach(d=>{ const b=document.createElement("button"); b.type="button"; b.dataset.id=d.id; b.textContent=d.name[LANG==="pl"?1:0]; b.addEventListener("click",()=>{cur=d.id; renderDS();}); bar.appendChild(b); });
+}
+
+/* ---------- thinking chart ---------- */
+const TH = [
+ {l:["Russian · MATH-500","rosyjski · MATH-500"], v:{EN:86.7, NAT:81.6}},
+ {l:["Spanish · MATH-500","hiszpański · MATH-500"], v:{EN:88.0, NAT:72.5}},
+ {l:["Japanese · MATH-500","japoński · MATH-500"], v:{EN:84.9, NAT:66.3}},
+ {l:["Swahili · MATH-500","suahili · MATH-500"], v:{EN:57.4, NAT:25.9}},
+ {l:["QwQ-32B · PolyMath avg","QwQ-32B · średnia PolyMath"], v:{EN:47.9, NAT:43.4, NONE:45.9}}
+];
+function renderTH(){
+  renderRows(document.getElementById("thRows"), document.getElementById("thAxis"), TH, 20, 100, {
+    delta:v=>v.NAT-v.EN, order:k=>k==="EN"?2:k==="NAT"?3:1,
+    cls:k=>k==="EN"?"ref":k==="NAT"?"pl":"alt",
+    name:k=>({EN:t("English reasoning","rozumowanie po angielsku"),NAT:t("question-language reasoning","rozumowanie w języku pytania"),NONE:t("no control","bez sterowania")})[k],
+    short:k=>({EN:"EN",NAT:t("native","nat."),NONE:t("none","brak")})[k]
+  });
+}
+
+/* ---------- tokens ---------- */
+const TK = [
+  {n:"Bielik 11B v3 (original)", pl:747, en:408},{n:"Llama 3.2 / SmolLM3", pl:653, en:371},{n:"Qwen3", pl:625, en:373},
+  {n:"Apertus / Mistral Small 3.1", pl:547, en:377},{n:"Gemma 3", pl:510, en:383},{n:"EuroLLM", pl:437, en:404},{n:"Bielik APT4 (PL-optimised)", pl:375, en:631}
+];
+function buildTK(){ const s=document.getElementById("tk"); s.innerHTML=TK.map((x,i)=>`<option value="${i}">${x.n} · ${fmt(x.pl/x.en,2)}×</option>`).join(""); s.value="2"; }
+function updTK(){
+  const x=TK[+document.getElementById("tk").value], r=x.pl/x.en;
+  const m=Math.max(0,+document.getElementById("mt").value||0), pr=Math.max(0,+document.getElementById("pr").value||0), cw=Math.max(1,+document.getElementById("cw").value||1);
+  const nf=new Intl.NumberFormat(LANG==="pl"?"pl-PL":"en-US",{maximumFractionDigits:0});
+  document.getElementById("tkRatio").textContent=`PL = ${fmt(r,2)}× EN`;
+  const extra=(m*r-m)*pr;
+  document.getElementById("tkOut").innerHTML=t(
+    `The same content in Polish is <b>${nf.format(m*r)}M</b> tokens instead of ${nf.format(m)}M, which is <b>${extra>=0?"+":"−"}$${nf.format(Math.abs(extra))}</b> per month. A ${nf.format(cw)}-token window holds about <b>${nf.format(cw/r)}</b> English-equivalent tokens of Polish text.`,
+    `Ta sama treść po polsku to <b>${nf.format(m*r)} mln</b> tokenów zamiast ${nf.format(m)} mln, czyli <b>${extra>=0?"+":"−"}${nf.format(Math.abs(extra))} USD</b> miesięcznie. Okno ${nf.format(cw)} tokenów mieści polski tekst odpowiadający około <b>${nf.format(cw/r)}</b> tokenom angielskim.`);
+  const mx=Math.max(...TK.map(k=>k.pl/k.en));
+  document.getElementById("tkBars").innerHTML=TK.map((k,i)=>{const rr=k.pl/k.en; return `<div style="display:grid;grid-template-columns:minmax(0,1fr) 3.5em;gap:8px;align-items:center;font-size:13px"><div style="min-width:0"><div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;${i==+document.getElementById("tk").value?"font-weight:600":""}">${k.n}</div><div style="height:7px;border-radius:3px;background:${rr>1?"var(--pl)":"var(--good)"};width:${(rr/mx*100).toFixed(1)}%;opacity:${i==+document.getElementById("tk").value?1:.45}"></div></div><span class="mono">${fmt(rr,2)}×</span></div>`;}).join("");
+}
+["tk","mt","pr","cw"].forEach(id=>document.getElementById(id).addEventListener("input",updTK));
+
+/* ---------- source cards ---------- */
+const AREAS={audit:["Source audit","Audyt źródła"],rag:["Retrieval / RAG","Wyszukiwanie / RAG"],reason:["Reasoning","Rozumowanie"],think:["Language of thought","Język myślenia"],agent:["Agents","Agenci"],tok:["Tokens","Tokeny"]};
+const VERD={lt:["PL/Slavic < EN","PL/słow. < EN","bad"],eq:["≈ parity","≈ parytet","neu"],gt:["PL > EN","PL > EN","good"],mix:["mixed","mieszane","warn"],na:["mechanism","mechanizm","neu"]};
+const SRC=[
+ {a:"audit",q:3,v:"gt",t:"OneRuler — Kim, Russell, Karpinska, Iyyer",m:"COLM 2025 · 26 lang · 7 models · 50/cell",u:"https://arxiv.org/abs/2503.01996",s:["PL 88% vs EN 83.9% (NIAH, 64K+128K). No significance test; different book per language.","PL 88% vs EN 83,9% (NIAH, 64K+128K). Brak testu istotności; inna książka dla każdego języka."]},
+ {a:"audit",q:4,v:"na",t:"Science in Poland — interview with M. Karpińska",m:"27 Nov 2025 · co-author statement",u:"https://scienceinpoland.pl/en/news/news,110407",s:["Co-author: the study did not test prompting, and the PL–EN differences were not statistically significant.","Współautorka: badanie nie dotyczyło promptowania, a różnice PL–EN nie były istotne statystycznie."]},
+ {a:"rag",q:4,v:"lt",t:"On the Consistency of Multilingual Context Utilization",m:"arXiv v4 Nov 2025 · MKQA N(PL)=3,594",u:"https://arxiv.org/abs/2504.00597",s:["Polish 8–22 pts below English with the in-language gold passage, across 4 open models.","Polski 8–22 pkt poniżej angielskiego z poprawnym fragmentem w języku pytania, w 4 modelach otwartych."]},
+ {a:"rag",q:3,v:"mix",t:"CUS-QA — Libovický et al.",m:"arXiv v3 Feb 2026 · CS/SK/UK · N 370–550",u:"https://arxiv.org/abs/2507.22752",s:["GPT-5 does 1–3 pts better in the native language on local-knowledge questions. Llama does slightly better in English, and better in the native language with RAG.","GPT-5 o 1–3 pkt lepiej w języku natywnym przy pytaniach o lokalną wiedzę. Llama nieco lepiej po angielsku, a z RAG lepiej w języku natywnym."]},
+ {a:"rag",q:3,v:"lt",t:"Linguistic Nepotism in RAG",m:"arXiv 2509.13930v2 · preprint",u:"https://arxiv.org/abs/2509.13930",s:["Citation accuracy is 8–11 pts lower for Russian than English (Qwen-3 14B, Llama-3.3 70B, Gemma-3 27B).","Trafność cytowań 8–11 pkt niższa dla rosyjskiego niż angielskiego (Qwen-3 14B, Llama-3.3 70B, Gemma-3 27B)."]},
+ {a:"rag",q:3,v:"lt",t:"All Languages Matter (LAURA)",m:"arXiv 2604.20199 · 13 languages",u:"https://arxiv.org/abs/2604.20199",s:["Over 70% of the top-5 retrieved documents come from English or the query language. The reranker prefers English.","Ponad 70% z 5 najlepszych dokumentów pochodzi z angielskiego lub z języka zapytania. Reranker preferuje angielski."]},
+ {a:"reason",q:2,v:"lt",t:"mmPISA-bench — Sapenov & Savelka",m:"arXiv Jun 2026 · 43 lang · 25 items",u:"https://arxiv.org/abs/2606.07069",s:["Newest models: Polish 0.8–5.6 pts below English, except GPT-5.1 without reasoning (+1.6). Very small item set.","Najnowsze modele: polski 0,8–5,6 pkt poniżej angielskiego, z wyjątkiem GPT-5.1 bez rozumowania (+1,6). Bardzo mały zbiór zadań."]},
+ {a:"reason",q:4,v:"lt",t:"MMLU-ProX",m:"arXiv 2503.10497 · 29 lang · no PL",u:"https://arxiv.org/abs/2503.10497",s:["CS/RU/UK/SR are 0–3 pts below English for reasoning models, and up to 8.6 below for GPT-4.1 in Russian.","CS/RU/UK/SR 0–3 pkt poniżej angielskiego w modelach rozumujących, do 8,6 pkt poniżej dla GPT-4.1 po rosyjsku."]},
+ {a:"reason",q:4,v:"eq",t:"PolyMath",m:"NeurIPS 2025 D&B · 18 lang · 125/level",u:"https://arxiv.org/abs/2504.18428",s:["Russian is within 1–2 items of English for Qwen3, Gemini 2.5 Pro and R1.","Rosyjski różni się od angielskiego o 1–2 zadania dla Qwen3, Gemini 2.5 Pro i R1."]},
+ {a:"reason",q:3,v:"mix",t:"Polish–English medical knowledge transfer — Grzybowski et al.",m:"arXiv v2 Sep 2025 · LEK N=4,312",u:"https://arxiv.org/abs/2412.00559",s:["GPT-4o and Bielik do slightly better in Polish. Small general models lose 13–16 pts in Polish.","GPT-4o i Bielik nieco lepiej po polsku. Małe modele ogólne tracą po polsku 13–16 pkt."]},
+ {a:"reason",q:4,v:"eq",t:"Rosoł et al., Scientific Reports",m:"2023 · peer-reviewed · N=585/lang",u:"https://pmc.ncbi.nlm.nih.gov/articles/PMC10665355/",s:["GPT-4 scores 79.7% in both Polish and English. GPT-3.5 scores 5.5 pts lower in Polish.","GPT-4: 79,7% po polsku i po angielsku. GPT-3.5 o 5,5 pkt niżej po polsku."]},
+ {a:"think",q:4,v:"lt",t:"Language Matters — Tam et al.",m:"arXiv 2505.17407 · 4 reasoning models",u:"https://arxiv.org/abs/2505.17407",s:["Reasoning in the question's language instead of English costs 5 pts (RU) up to 32 pts (SW) on MATH-500.","Rozumowanie w języku pytania zamiast po angielsku kosztuje od 5 pkt (RU) do 32 pkt (SW) na MATH-500."]},
+ {a:"think",q:3,v:"na",t:"Do Llamas Work in English? — Wendler et al.",m:"ACL 2024",u:"https://arxiv.org/abs/2402.10588",s:["Middle layers process meaning in a concept space close to English.","Warstwy środkowe przetwarzają znaczenie w przestrzeni pojęć bliskiej angielskiemu."]},
+ {a:"think",q:3,v:"na",t:"Semantic hub hypothesis — Wu et al.",m:"ICLR 2025",u:"https://arxiv.org/abs/2411.04986",s:["Models share a language-independent semantic hub, anchored in the dominant language.","Modele mają wspólne centrum semantyczne niezależne od języka, zakotwiczone w języku dominującym."]},
+ {a:"agent",q:3,v:"lt",t:"Lost in Execution — Luo et al.",m:"arXiv Jan 2026 · BFCL v4 · no Slavic",u:"https://arxiv.org/abs/2601.05366",s:["Tool calls fail mainly on parameter values written in the user's language. Mitigations do not fully close the gap.","Wywołania narzędzi zawodzą głównie przez wartości parametrów zapisane w języku użytkownika. Mitygacje nie zamykają całej luki."]},
+ {a:"tok",q:3,v:"na",t:"Bielik v3 technical report",m:"arXiv 2604.10799 · Apr 2026 · 1 text",u:"https://arxiv.org/abs/2604.10799",s:["Polish needs 1.08–1.83× more tokens than English with general tokenizers. A Polish-optimised tokenizer reverses this.","Polski potrzebuje 1,08–1,83× więcej tokenów niż angielski w tokenizerach ogólnych. Tokenizer zoptymalizowany pod polski odwraca tę proporcję."]},
+ {a:"tok",q:3,v:"na",t:"Tokenizer unfairness — Petrov et al.",m:"NeurIPS 2023",u:"https://arxiv.org/abs/2305.15425",s:["Tokenized length of the same text differs up to 15× between languages.","Długość tego samego tekstu po tokenizacji różni się między językami nawet 15-krotnie."]}
+];
+let fArea="all";
+function renderCards(){
+  const L=LANG==="pl"?1:0, f=document.getElementById("filt");
+  f.innerHTML=[["all",["All","Wszystkie"]],...Object.entries(AREAS)].map(([k,v])=>`<button type="button" data-a="${k}" aria-pressed="${k===fArea}">${v[L]}</button>`).join("");
+  f.querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>{fArea=b.dataset.a; renderCards();}));
+  document.getElementById("cards").innerHTML=SRC.filter(s=>fArea==="all"||s.a===fArea).map(s=>{
+    const vd=VERD[s.v];
+    return `<article class="card"><span class="eyebrow">${AREAS[s.a][L]}</span><h3>${s.t}</h3><div class="meta">${s.m}</div><p style="margin:0;font-size:15px">${s.s[L]}</p>
+    <div class="cardfoot"><span title="${t("Quality","Jakość")} ${s.q}/5"><span class="q">${[1,2,3,4,5].map(i=>`<b class="${i<=s.q?"on":""}"></b>`).join("")}</span> <span class="mono" style="font-size:12px;color:var(--muted)">${s.q}/5</span></span><span class="chip ${vd[2]}">${vd[L]}</span></div>
+    <a href="${s.u}" target="_blank" rel="noopener" style="font-size:13px">${s.u.replace("https://","")}</a></article>`;
+  }).join("");
+}
+
+/* ---------- language switch ---------- */
+function setLang(l){
+  LANG=l; document.body.classList.remove("en","pl"); document.body.classList.add(l);
+  document.getElementById("b-en").setAttribute("aria-pressed", l==="en"); document.getElementById("b-pl").setAttribute("aria-pressed", l==="pl");
+  document.documentElement.lang=l; renderAll();
+}
+document.getElementById("b-en").addEventListener("click",()=>setLang("en"));
+document.getElementById("b-pl").addEventListener("click",()=>setLang("pl"));
+document.getElementById("ciToggle").addEventListener("change",drawRuler);
+
+function renderAll(){ drawRuler(); updZ(); updCI(); buildDSBar(); renderDS(); renderTH(); const k=document.getElementById("tk").value; buildTK(); if(k) document.getElementById("tk").value=k; updTK(); renderCards(); }
+document.documentElement.lang=LANG;
+document.getElementById("b-en").setAttribute("aria-pressed", LANG==="en"); document.getElementById("b-pl").setAttribute("aria-pressed", LANG==="pl");
+renderAll();
+})();
+</script>
+
+</body>
+</html>
