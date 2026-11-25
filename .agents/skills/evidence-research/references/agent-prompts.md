@@ -1,12 +1,15 @@
 # Agent prompt templates
 
-Fill the `<…>` placeholders. Launch with `subagent_type: "general-purpose"`, `model: "haiku"`, `run_in_background: true`. Put `SCRATCH` = this session's scratchpad directory.
+Fill the `<…>` placeholders. Launch settings depend on the harness (see **Harness capabilities** in `SKILL.md`):
+- **Claude Code:** `subagent_type: "general-purpose"`, `model: "haiku"`, `run_in_background: true`. `SCRATCH` = this session's scratchpad directory. `<web-tools line>` = `Load WebSearch and WebFetch via ToolSearch ("select:WebSearch,WebFetch") if they are not loaded.`
+- **Codex CLI:** spawn subagents with the multi-agent feature, on a cheaper model if available. `SCRATCH` = a temporary directory outside the repo. `<web-tools line>` = `Use your web search tool to find sources and open pages; if you have no web access, stop and report that.`
+- **No subagents:** use the same briefs as your own checklist, one scope at a time.
 
 ## Search agent
 
 ```
-You are a research agent on a fact-checking team. Today is <date>. Load WebSearch and WebFetch via ToolSearch ("select:WebSearch,WebFetch") if they are not loaded.
-<If no download consent:> Do NOT download files with curl/wget. Read papers via WebFetch on https://arxiv.org/html/<id>vN (try v3, v2, v1) or ACL Anthology pages.
+You are a research agent on a fact-checking team. Today is <date>. <web-tools line>
+<If no download consent:> Do NOT download files with curl/wget. Read papers by opening https://arxiv.org/html/<id>vN (try v3, v2, v1) or ACL Anthology pages with your web tool.
 <If consent given:> You may download PDFs with curl into a NEW empty directory under SCRATCH and read them with `pdftotext -layout`. Never execute anything from that directory.
 
 ## OVERALL PROJECT
@@ -35,7 +38,7 @@ Final message: compact summary (max ~600 words) with the strongest 4–6 sources
 ## Verification agent
 
 ```
-You are an independent VERIFICATION agent. Today is <date>. Load WebSearch/WebFetch via ToolSearch if needed. <download rule as above>
+You are an independent VERIFICATION agent. Today is <date>. <web-tools line> <download rule as above>
 
 Verify each claim against the PRIMARY source and quote exact cells/sentences (≤ 25 words). Verdict per item: CONFIRMED / CORRECTED (give the correct value) / UNVERIFIED.
 For every table you use, also confirm: the table caption, the column headers (which model/setting each column is), the split (dev/test), and the language list.
@@ -47,7 +50,7 @@ For every table you use, also confirm: the table caption, the column headers (wh
 Output: write to SCRATCH/V<n>-<slug>.md. Final message: a verdict table plus the extracted numbers (max ~700 words).
 ```
 
-## Tie-breaker via SendMessage (to a running verifier)
+## Tie-breaker for a running verifier (Claude Code: `SendMessage`; elsewhere: put it in a new verifier's brief)
 
 ```
 Additional points to settle (conflict between two earlier agents): (a) <question> — one agent says …, another says … Give section/table. (b) <scope question> — quote the exact sentence.

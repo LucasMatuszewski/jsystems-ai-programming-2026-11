@@ -12,9 +12,24 @@ Reference files (read when you reach that step):
 - `references/report-structure.md`: Markdown report outline and quality rubric
 - `assets/report-template.html`: working bilingual artifact (PL/EN toggle, dumbbell chart, significance and CI calculators, cost calculator, filterable source cards). Adapt it; do not start from scratch.
 
-## Step 0: Ask first, in one AskUserQuestion call
+## Harness capabilities
 
-Ask everything that blocks later steps **before** launching agents:
+This skill is shared by Claude Code and Codex CLI (`.claude/skills/` links to `.agents/skills/`). The steps name a capability, not a tool. Use the column for the harness you run in, and check which tools you actually have before Step 1.
+
+| Capability | Claude Code | Codex CLI | No subagents available |
+|---|---|---|---|
+| Ask the user before starting | `AskUserQuestion` (one call) | One chat message with all questions; wait for the answer | Same as Codex |
+| Parallel search and verify agents | `Agent` tool, `subagent_type: "general-purpose"`, `model: "haiku"`, `run_in_background: true` | Subagents via the `multi_agent` feature (on by default since 0.162.1; check with `codex features list`). Pick a cheaper model if your setup allows it | Run the scopes one by one yourself. Keep the verification pass separate from the search pass |
+| Web search and page reading | `WebSearch` / `WebFetch` (load via `ToolSearch` if deferred) | Start Codex with `--search` for live web search. Without it, ask the user to restart with search or to provide sources | Whatever web tools exist |
+| Follow-up to a running agent | `SendMessage` | Send the follow-up to the subagent if the harness allows it; otherwise start a new verifier with the conflict in its brief | New verification pass |
+| Scratch files | Session scratchpad directory | A temporary directory outside the repo (`mktemp -d`) | Same as Codex |
+| Shareable page | `Artifact` tool (Step 5) | No artifact tool: skip publishing, save the HTML in the repo and tell the user its path | Same as Codex |
+
+If a capability is missing, use the fallback and say so in the final summary (Step 7). Do not stop the workflow because one tool is unavailable.
+
+## Step 0: Ask first, in one message
+
+Ask everything that blocks later steps **before** launching agents (Claude Code: one `AskUserQuestion` call; Codex: one chat message):
 1. **Target folder** in the repo for reports and HTML (e.g. `course-materials/Research/`). Offer the folders that already exist.
 2. **Languages** of the deliverables (default: EN + PL).
 3. **PDF downloads**: may agents download PDFs with curl to read tables and figures? In auto mode the classifier blocks downloads without explicit consent. If the user agrees, record it and pass it to the agents. If not, use arXiv HTML only and mark figure-only values as UNVERIFIED.
@@ -24,7 +39,7 @@ Then check the target folder and `git status` for files on the same topic, so yo
 
 ## Step 1: Decompose and launch the search agents in parallel
 
-Split the question into 5–7 non-overlapping scopes and launch them **in one message**, each with `model: "haiku"` and `run_in_background: true`. Typical scopes:
+Split the question into 5–7 non-overlapping scopes and launch them **in parallel**, each on a cheap, fast model (see **Harness capabilities**: Claude Code uses `model: "haiku"` and `run_in_background: true`). Without subagents, work through the scopes in order. Typical scopes:
 - **A1 Source audit:** the article, then the primary paper. Extract methodology, N, models and exact numbers with their table or section, and compare the article's claims with the paper's findings.
 - **A2 Newer evidence, area 1** (e.g. retrieval/RAG)
 - **A3 Newer evidence, area 2** (e.g. reasoning/agents)
@@ -40,7 +55,7 @@ Use the template in `references/agent-prompts.md`. Every brief must contain:
 - example queries and venues;
 - the rule of **at least N search iterations** before concluding "no data";
 - the evidence rules;
-- an output file path in the scratchpad with a fixed section schema;
+- an output file path in the scratch directory (see **Harness capabilities**) with a fixed section schema;
 - a compact final message.
 
 ## Step 2: Triage each report as it arrives
@@ -48,9 +63,9 @@ Use the template in `references/agent-prompts.md`. Every brief must contain:
 Do not wait for all agents. For each report:
 - List the claims you will rely on.
 - Flag **conflicts between agents**, figure-only numbers, "UNVERIFIED" items, and surprising or headline numbers.
-- Launch a **verification agent** (also Haiku) for each cluster of such claims, with exact cells to confirm and the instruction CONFIRMED / CORRECTED / UNVERIFIED. When two agents disagree, send the conflict to the verifier; use SendMessage if a relevant verifier is already running.
+- Launch a **verification agent** (same cheap model) for each cluster of such claims, with exact cells to confirm and the instruction CONFIRMED / CORRECTED / UNVERIFIED. When two agents disagree, send the conflict to a verifier. If a relevant verifier is already running, send it a follow-up (Claude Code: `SendMessage`); otherwise start a new one.
 
-Never read a subagent's `.output` transcript file, because it floods your context. Read only the report files they write, and only when the summary is not enough.
+Never read a subagent's raw transcript (in Claude Code, the `.output` file), because it floods your context. Read only the report files they write, and only when the summary is not enough.
 
 ## Step 3: Iterate (max N rounds, default 5)
 
@@ -65,6 +80,8 @@ Write the Markdown files into the user's folder: `<topic-slug>-<YYYY-MM-DD>-EN.m
 - Quotes stay short (≤ 25 words) and attributed.
 
 ## Step 5: Build the artifact
+
+Steps 1, 2 and 5 use the Claude Code `Artifact` tool and its `artifact-design` skill. In Codex or any harness without them, skip those three steps: write the page directly as a complete HTML document from the template (steps 3, 4 and 6 still apply) and give the user the file path instead of a link.
 
 1. Load the `artifact-design` skill before writing the page.
 2. Copy `assets/report-template.html` to the scratchpad and **strip its skeleton**: delete everything up to and including `<head>` except `<title>`, `<link>` and `<style>`, plus the `</head><body>` and `</body></html>` tags. The Artifact tool adds its own skeleton. Then replace its data arrays (`DS`, `TH`, `TK`, `SRC`) and texts. Keep the bilingual pattern: every text exists twice as `<span class="en">` and `<span class="pl">`, the body class sets the default language, and buttons toggle it.
@@ -95,12 +112,13 @@ Answer the user's question directly in the first sentence. Then give:
 
 | Problem | Prevention |
 |---|---|
-| A verifier using `curl` for a PDF was blocked by the auto-mode classifier, and one round was lost | Ask for download consent in Step 0. Otherwise instruct agents: "use WebFetch on `arxiv.org/html/<id>vN`; no curl/wget". |
+| A verifier using `curl` for a PDF was blocked by the auto-mode classifier, and one round was lost | Ask for download consent in Step 0. Otherwise instruct agents: "read `arxiv.org/html/<id>vN` with your web tool (Claude Code: WebFetch); no curl/wget". |
 | Haiku reversed a finding (claimed out-language passages beat in-language; the table showed the opposite) | Verify every number you will publish against the table with a second agent. |
 | Wrong model attribution (a "no reasoning" column belonged to a different model) | Ask verifiers to confirm column headers and table captions, not only the cells. |
 | Wrong scope of a headline number (88% was 64K+128K only) | Ask for the exact sentence that defines scope, model set and averaging. |
 | A source assumed to include the target language did not | Ask verifiers to confirm the language list explicitly. |
-| Two agents gave contradictory model lists | Send the conflict to the running verifier via SendMessage instead of guessing. |
+| Two agents gave contradictory model lists | Send the conflict to a verifier (Claude Code: `SendMessage` to the running one) instead of guessing. |
+| A headline average was described as "across N models" although one model ran in English only (found in PR review) | Ask verifiers which models have results in **every** compared language, not only which models the paper evaluated. Recompute any per-model arithmetic with that count. |
 | Values exist only in figures or heatmaps | Do not estimate from images. Mark UNVERIFIED and offer the PDF route. |
 | Agents cite mirrors (alphaxiv, aggregators) | Accept them only as pointers. The final citation must be arXiv, ACL Anthology, a journal or an official leaderboard. |
 | Small-N "rankings" presented as facts | Report N per cell and whether significance was tested; use the CI calculator in the artifact. |
