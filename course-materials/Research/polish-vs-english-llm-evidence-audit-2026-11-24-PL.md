@@ -5,7 +5,7 @@ Data: 2026-11-24 · Metoda: 6 agentów wyszukujących i 5 agentów weryfikujący
 ## W skrócie
 
 1. Artykuł na cryps.pl („nasz język zdeklasował angielski w najnowszym rankingu”, 25.10.2025) opiera się na jednej publikacji: **OneRuler** (Kim, Russell, Karpinska, Iyyer; UMD, Microsoft, UMass Amherst; COLM 2025; [arXiv 2503.01996](https://arxiv.org/abs/2503.01996)).
-2. Publikacja rzeczywiście podaje, że **polski jest 1. z 26 języków (88%), a angielski 6. (83,9%)**. Wynik dotyczy jednak **syntetycznego zadania „igła w stogu siana”**. To średnia z **7 modeli z początku 2025 r.**, liczona **tylko dla kontekstów 64K i 128K**. Badanie nie mierzyło ani „wyszukiwania informacji” ogólnie, ani RAG, ani jakości promptowania.
+2. Publikacja rzeczywiście podaje, że **polski jest 1. z 26 języków (88%), a angielski 6. (83,9%)**. Wynik dotyczy jednak **syntetycznego zadania „igła w stogu siana”**. To średnia z **6 modeli z początku 2025 r., które mają wyniki wielojęzyczne** (autorzy testowali 7, ale DeepSeek-R1 tylko po angielsku), liczona **tylko dla kontekstów 64K i 128K**. Badanie nie mierzyło ani „wyszukiwania informacji” ogólnie, ani RAG, ani jakości promptowania.
 3. Współautorka, Marzena Karpińska, powiedziała, że różnica PL–EN **nie była istotna statystycznie**. Jej zdaniem badanie **nie pozwala stwierdzić, że polski jest najlepszy do promptowania**. Zwróciła też uwagę, że każdy język miał **inną książkę** jako „stóg siana” ([Science in Poland, 27.11.2025](https://scienceinpoland.pl/en/news/news,110407)).
 4. **Żadne badanie z lat 2025–2026 nie powtórzyło wyniku „polski > angielski”.** Tam, gdzie te same pytania zadano po polsku i po angielsku, zwykle wygrywa angielski:
    - wielojęzyczny RAG (MKQA, 4 otwarte modele): polski **o 8–22 pkt niżej**;
@@ -27,7 +27,7 @@ Data: 2026-11-24 · Metoda: 6 agentów wyszukujących i 5 agentów weryfikujący
 | Afiliacje | University of Maryland, Microsoft, UMass Amherst | Zweryfikowane w nagłówku HTML |
 | Zadania | 7 syntetycznych zadań na bazie RULER: warianty NIAH (pojedyncza igła, wiele kluczy, wiele wartości, wiele zapytań, wariant „brak igły”) oraz ekstrakcja najczęstszych słów (agregacja) | Zweryfikowane |
 | Języki | 26 | Zweryfikowane |
-| Modele | 7: Gemini 1.5 Flash, o3-mini-high, DeepSeek-R1, Llama 3.3 70B, Llama 3.1 8B, Qwen2.5-72B, Qwen2.5-7B (Tabela 5, Dodatek B.1) | Zweryfikowane |
+| Modele | 7: Gemini 1.5 Flash, o3-mini-high, DeepSeek-R1, Llama 3.3 70B, Llama 3.1 8B, Qwen2.5-72B, Qwen2.5-7B (Tabela 5, Dodatek B.1). DeepSeek-R1 testowano tylko po angielsku (rozdz. 3, przypis 11), więc wyniki w pozostałych 25 językach ma 6 modeli. | Zweryfikowane |
 | Długości kontekstu | 8K, 32K, 64K, 128K | Zweryfikowane |
 | Liczebność próby | 50 przykładów na zadanie × język × długość | Zweryfikowane |
 | Tekst-wypełniacz | Inna książka z domeny publicznej dla każdego języka (PL: *Noce i dnie*, EN: *Little Women*) | Zweryfikowane |
@@ -37,7 +37,7 @@ Data: 2026-11-24 · Metoda: 6 agentów wyszukujących i 5 agentów weryfikujący
 
 | Ustawienie | Polski | Angielski | Inne |
 |---|---|---|---|
-| Średnia NIAH z 7 modeli, **64K + 128K** | **88%** (1. miejsce) | **83,9%** (6. z 26) | chiński 62,1% (4. od końca) |
+| Średnia NIAH z 6 modeli wielojęzycznych, **64K + 128K** (praca pisze „all models”, nie wymieniając ich) | **88%** (1. miejsce) | **83,9%** (6. z 26) | chiński 62,1% (4. od końca) |
 | o3-mini-high, tylko 128K | 92% | 67% | ukraiński 89% |
 | Wpływ instrukcji „odpowiedz none, jeśli brak”, EN, 128K | — | trafność S-NIAH spada o 32% | — |
 
@@ -50,12 +50,12 @@ Rosyjski, czeski, ukraiński i serbski są w czołówce, ale ich dokładne śred
 | Polski jest najlepszym językiem dla AI / do promptowania | Badano wyszukiwanie w długim kontekście na zadaniach syntetycznych, a nie promptowanie. Współautorka zaprzecza takiej interpretacji. | **Wyolbrzymione** |
 | Polski pokonał angielski | 88% vs 83,9%, czyli 4,1 pkt różnicy. Brak testu istotności; według współautorki różnica nie była istotna. | **Wyolbrzymione** |
 | Polski wygrał mimo małej ilości danych treningowych | Tego nie ma w publikacji. Polski nie należy w niej do języków niskozasobowych. | **Bez pokrycia** |
-| Wynik dotyczy „najnowszych modeli” | 7 modeli z początku 2025 r. Żaden nie jest modelem obecnej generacji (stan na XI 2026). | **Nieaktualne** |
+| Wynik dotyczy „najnowszych modeli” | 7 modeli z początku 2025 r., w tym 6 testowanych poza angielskim. Żaden nie jest modelem obecnej generacji (stan na XI 2026). | **Nieaktualne** |
 
 ### Dlaczego polski mógł wygrać: trzy czynniki zakłócające
 
 1. **Każdy język miał inną książkę jako wypełniacz.** Trudność tekstu nie była kontrolowana. Współautorka sama wskazała ten czynnik.
-2. **Jeden model może przesunąć średnią.** o3-mini-high uzyskał 67% po angielsku wobec 92% po polsku przy 128K. Autorzy piszą, że ten model często błędnie odpowiadał „none”. *To nasz rachunek, nie teza autorów:* 25 pkt różnicy w jednym z siedmiu modeli daje około 3,6 pkt w średniej z siedmiu modeli dla tej długości. Cała różnica w nagłówku to 4,1 pkt.
+2. **Jeden model może przesunąć średnią.** o3-mini-high uzyskał 67% po angielsku wobec 92% po polsku przy 128K. Autorzy piszą, że ten model często błędnie odpowiadał „none”. *To nasz rachunek, nie teza autorów:* 25 pkt różnicy w jednym z sześciu modeli z wynikami po polsku daje około 4,2 pkt (25 / 6) w średniej z sześciu modeli dla tej długości. To tyle, ile cała różnica 4,1 pkt z nagłówka.
 3. **Małe komórki.** Przy 50 przykładach 95-procentowy przedział ufności wokół 85% to około ±10 pkt na komórkę. Interaktywny artefakt zawiera kalkulator, który to pokazuje.
 
 Autorzy **nie podają przyczyny** pierwszego miejsca polskiego. Stawiają jedynie hipotezę, że różnice wynikają z „dostępności danych pretreningowych, pisma, rodziny językowej i tokenizera”.
@@ -168,5 +168,6 @@ Nie znaleziono źródła pierwotnego z danymi dla polskiego w tokenizerach OpenA
   - CulturALL nie zawiera polskiego, więc źródło zostało usunięte;
   - teza o MKQA („fragment w innym języku wygrywa”) okazała się odwrotna;
   - kolumna „none” w mmPISA dotyczy Haiku 4.5, a nie Opusa;
-  - 88% w OneRuler dotyczy tylko kontekstów 64K i 128K.
+  - 88% w OneRuler dotyczy tylko kontekstów 64K i 128K;
+  - średnia wielojęzyczna w OneRuler obejmuje 6 modeli, nie 7, bo DeepSeek-R1 testowano tylko po angielsku. Wkład jednego modelu przeliczono z 25 / 7 ≈ 3,6 na 25 / 6 ≈ 4,2 pkt (znalezione w przeglądzie PR, 2026-11-25).
 - **Ograniczenia:** liczby wyodrębniono z HTML arXiv za pomocą narzędzia opartego na LLM, a nie z surowych plików PDF. Przed cytowaniem w publikacjach sprawdź wybrane komórki ręcznie.

@@ -5,7 +5,7 @@ Date: 2026-11-24 · Research method: 6 search agents + 5 verification agents (Cl
 ## TL;DR
 
 1. The cryps.pl article ("Polish beat English in the newest ranking", 25 Oct 2025) is based on one paper: **OneRuler** (Kim, Russell, Karpinska, Iyyer; UMD, Microsoft, UMass Amherst; COLM 2025; [arXiv 2503.01996](https://arxiv.org/abs/2503.01996)).
-2. The paper does report **Polish 1st of 26 languages (88%) and English 6th (83.9%)**. The test was a **synthetic needle-in-a-haystack task**, averaged over **7 models from early 2025** and **only the 64K and 128K context lengths**. It did not measure "information retrieval" in general, RAG, or prompting quality.
+2. The paper does report **Polish 1st of 26 languages (88%) and English 6th (83.9%)**. The test was a **synthetic needle-in-a-haystack task**, averaged over **the 6 early-2025 models with multilingual results** (the paper evaluated 7, but ran DeepSeek-R1 in English only) and **only the 64K and 128K context lengths**. It did not measure "information retrieval" in general, RAG, or prompting quality.
 3. Co-author Marzena Karpińska said the Polish–English difference was **not statistically significant** and that the study **does not show Polish is the best language for prompting**. She also noted that each language used a **different book** as the haystack ([Science in Poland, 27 Nov 2025](https://scienceinpoland.pl/en/news/news,110407)).
 4. **No 2025–2026 study replicates "Polish > English".** Where Polish is measured against English on the same questions, English usually wins:
    - Multilingual RAG (MKQA, 4 open models): Polish **8–22 points lower** than English.
@@ -27,7 +27,7 @@ Date: 2026-11-24 · Research method: 6 search agents + 5 verification agents (Cl
 | Affiliations | University of Maryland, Microsoft, UMass Amherst | Verified from HTML header |
 | Tasks | 7 synthetic tasks adapted from RULER: needle-in-a-haystack variants (single, multi-key, multi-value, multi-query, "none" needle) + common-word extraction (aggregation) | Verified |
 | Languages | 26 | Verified |
-| Models | 7: Gemini 1.5 Flash, o3-mini-high, DeepSeek-R1, Llama 3.3 70B, Llama 3.1 8B, Qwen2.5-72B, Qwen2.5-7B (Table 5, App. B.1) | Verified |
+| Models | 7: Gemini 1.5 Flash, o3-mini-high, DeepSeek-R1, Llama 3.3 70B, Llama 3.1 8B, Qwen2.5-72B, Qwen2.5-7B (Table 5, App. B.1). DeepSeek-R1 was run in English only (Sec. 3, fn. 11), so 6 models have results in the other 25 languages. | Verified |
 | Context lengths | 8K, 32K, 64K, 128K | Verified |
 | Sample size | 50 examples per task × language × length | Verified |
 | Haystack text | A different public-domain book per language (Polish: *Noce i dnie*; English: *Little Women*) | Verified |
@@ -37,7 +37,7 @@ Date: 2026-11-24 · Research method: 6 search agents + 5 verification agents (Cl
 
 | Setting | Polish | English | Other |
 |---|---|---|---|
-| NIAH average across 7 models, **64K + 128K** | **88%** (rank 1) | **83.9%** (rank 6 of 26) | Chinese 62.1% (4th worst) |
+| NIAH average across the 6 multilingual models, **64K + 128K** (the paper says "all models" without listing them) | **88%** (rank 1) | **83.9%** (rank 6 of 26) | Chinese 62.1% (4th worst) |
 | o3-mini-high, 128K only | 92% | 67% | Ukrainian 89% |
 | Effect of the "answer none if absent" instruction, English, 128K | — | S-NIAH accuracy drops by 32% | — |
 
@@ -50,12 +50,12 @@ Russian, Czech, Ukrainian and Serbian appear in the top group, but their exact a
 | Polish is the best language for AI / prompting | The paper measures long-context retrieval on synthetic tasks, not prompting. The co-author denies the prompting interpretation. | **Overstated** |
 | Polish beat English | 88% vs 83.9%: a 4.1-point gap. No significance test; the co-author says the gap was not significant. | **Overstated** |
 | Polish wins despite having little training data | Not in the paper. Polish is not among its low-resource languages. | **Unsupported** |
-| Applies to the "newest models" | 7 models from early 2025. None are current-generation models as of Nov 2026. | **Outdated** |
+| Applies to the "newest models" | 7 models from early 2025, 6 of them tested beyond English. None are current-generation models as of Nov 2026. | **Outdated** |
 
 ### Why Polish might have come first: three confounders
 
 1. **Different haystack book per language.** Difficulty of the filler text is not controlled. The co-author named this as a possible reason.
-2. **One model can move the average.** o3-mini-high scored 67% in English vs 92% in Polish at 128K, and the authors report it often wrongly answered "none". *Our arithmetic, not the authors' claim:* a 25-point gap in one of seven models alone contributes about 3.6 points to a seven-model average at that length. The headline gap is 4.1 points.
+2. **One model can move the average.** o3-mini-high scored 67% in English vs 92% in Polish at 128K, and the authors report it often wrongly answered "none". *Our arithmetic, not the authors' claim:* a 25-point gap in one of the six models with Polish results alone contributes about 4.2 points (25 / 6) to the six-model average at that length. That is as much as the whole 4.1-point headline gap.
 3. **Small cells.** With 50 items per cell, the 95% interval around 85% is roughly ±10 points per cell. The interactive artifact includes a calculator for this.
 
 The authors give **no causal explanation** for Polish's rank. They hypothesise that differences between languages "stem from factors such as pretraining data availability, script, language family, and tokenizer specifications".
@@ -157,4 +157,5 @@ No primary source with Polish numbers was found for OpenAI o200k or Claude token
   - The MKQA "out-language beats in-language" claim was reversed.
   - The mmPISA "none" column is Haiku 4.5, not Opus.
   - The OneRuler 88% figure covers only 64K+128K.
+  - The OneRuler multilingual average covers 6 models, not 7: DeepSeek-R1 ran in English only. The one-model contribution was recalculated from 25 / 7 ≈ 3.6 to 25 / 6 ≈ 4.2 points (found in PR review, 2026-11-25).
 - **Limitations:** numbers were extracted from arXiv HTML through an LLM-based fetch, not from raw PDFs. Spot-check cells before citing in publications.

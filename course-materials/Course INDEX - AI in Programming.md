@@ -293,7 +293,7 @@ How AI changes developer careers - key insights from the 2026 future-of-work res
 - Terminal Bench: [Terminal-Bench](https://www.tbench.ai/leaderboard/terminal-bench/2.0)
 - Tool Calling: [Berkeley Function Calling Leaderboard (BFCL) V4](https://gorilla.cs.berkeley.edu/leaderboard.html)
 - **Polish vs English in LLMs (evidence audit 24.11.2026):**
-  - **The headline:** "Polish beat English" comes from OneRuler (COLM 2025). That benchmark measured only a synthetic needle-in-a-haystack task at 64K-128K, on 7 early-2025 models, with 50 items per cell and a different book per language. The co-author says the gap is not statistically significant.
+  - **The headline:** "Polish beat English" comes from OneRuler (COLM 2025). That benchmark measured only a synthetic needle-in-a-haystack task at 64K-128K, on 6 early-2025 models (a 7th ran in English only), with 50 items per cell and a different book per language. The co-author says the gap is not statistically significant.
   - **No replication:** no 2025-2026 study repeats the result for RAG, reasoning or agents.
   - **Where Polish loses:** small open models score 8-22 pts lower in Polish on RAG. On frontier models (GPT-5.1, Opus 4.5) the gap is 0-6 pts. Forcing non-English reasoning lowers accuracy.
   - **Cost:** Polish takes 1.3-1.8x more tokens.
