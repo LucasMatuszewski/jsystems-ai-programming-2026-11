@@ -1,0 +1,254 @@
+{
+  "$source": "https://devpowers.com/ (extracted 2026-11-25 with Playwright CLI, light theme default + html.dark)",
+  "colors": {
+    "brand": {
+      "primary": "#d30f10",
+      "accent": "#ffd447",
+      "strong": "#004581",
+      "strongDeep": "#002d52",
+      "info": "#038bfe",
+      "error": "#d30f10",
+      "success": "#167a3e"
+    },
+    "background": {
+      "default": "#fff9eb",
+      "raised": "#ffffff",
+      "strong": "#004581",
+      "footer": "#002d52",
+      "softRed": "#fff0ed",
+      "softBlue": "#eaf5ff",
+      "chatClient": "#fff1b8",
+      "chatAgent": "#d9ecff",
+      "overlay": "rgba(0, 31, 57, 0.88)"
+    },
+    "text": {
+      "primary": "#101820",
+      "muted": "#4c5b66",
+      "onDark": "#ffffff",
+      "onAccent": "#ffffff",
+      "onAccentWarm": "#101820",
+      "link": "#101820"
+    },
+    "border": {
+      "hairline": "#101820"
+    },
+    "shadow": {
+      "default": "#101820"
+    },
+    "dark": {
+      "surface": "#17121d",
+      "surfaceRaised": "#241c2e",
+      "surfaceStrong": "#0d3b66",
+      "onSurface": "#f7efe1",
+      "onSurfaceStrong": "#ffffff",
+      "muted": "#c3b4a6",
+      "accent": "#ff3b30",
+      "onAccent": "#1a0d0c",
+      "accentWarm": "#ffd233",
+      "onAccentWarm": "#191016",
+      "positive": "#6bdd97",
+      "negative": "#ff5a4d",
+      "chatClient": "#4a3a12",
+      "chatAgent": "#14395c",
+      "hairline": "#f7efe1",
+      "hairlineStrong": "#ffffff",
+      "shadow": "#000000",
+      "softRed": "#3b1a1a",
+      "softBlue": "#132c44"
+    }
+  },
+  "cssVariables": {
+    "light": {
+      "--surface": "#fff9eb",
+      "--surface-raised": "#fff",
+      "--surface-strong": "#004581",
+      "--on-surface": "#101820",
+      "--on-surface-strong": "#fff",
+      "--muted": "#4c5b66",
+      "--accent": "#d30f10",
+      "--on-accent": "#fff",
+      "--accent-warm": "#ffd447",
+      "--on-accent-warm": "#101820",
+      "--positive": "#167a3e",
+      "--negative": "#d30f10",
+      "--chat-client": "#fff1b8",
+      "--chat-agent": "#d9ecff",
+      "--hairline": "#101820",
+      "--shadow": "#101820",
+      "--soft-red": "#fff0ed",
+      "--soft-blue": "#eaf5ff"
+    },
+    "dark (html.dark)": {
+      "--surface": "#17121d",
+      "--surface-raised": "#241c2e",
+      "--surface-strong": "#0d3b66",
+      "--on-surface": "#f7efe1",
+      "--on-surface-strong": "#fff",
+      "--muted": "#c3b4a6",
+      "--accent": "#ff3b30",
+      "--on-accent": "#1a0d0c",
+      "--accent-warm": "#ffd233",
+      "--on-accent-warm": "#191016",
+      "--positive": "#6bdd97",
+      "--negative": "#ff5a4d",
+      "--chat-client": "#4a3a12",
+      "--chat-agent": "#14395c",
+      "--hairline": "#f7efe1",
+      "--hairline-strong": "#fff",
+      "--shadow": "#000",
+      "--soft-red": "#3b1a1a",
+      "--soft-blue": "#132c44"
+    }
+  },
+  "typography": {
+    "fontFamily": {
+      "display": "Bangers, sans-serif",
+      "body": "\"Atkinson Hyperlegible\", sans-serif",
+      "mono": "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, \"Liberation Mono\", \"Courier New\", monospace"
+    },
+    "fontSource": "https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bangers&display=swap",
+    "fontWeights": {
+      "regular": 400,
+      "bold": 700
+    },
+    "fontSize": {
+      "sm": "14px",
+      "base": "16px",
+      "button": "20px",
+      "lead": "21.6px",
+      "h2": "28px",
+      "h3": "29.6px",
+      "h1": "53.867px",
+      "code": "14px"
+    },
+    "lineHeight": {
+      "display": "1",
+      "heading": "1.14",
+      "base": "1.5",
+      "lead": "1.625"
+    },
+    "letterSpacing": {
+      "display": "0.02em",
+      "body": "normal"
+    }
+  },
+  "spacing": {
+    "1": "4px",
+    "2": "8px",
+    "3": "12px",
+    "4": "16px",
+    "5": "20px",
+    "6": "24px",
+    "8": "32px",
+    "12": "48px",
+    "16": "64px"
+  },
+  "borderWidth": {
+    "thin": "2px",
+    "default": "3px",
+    "heavy": "4px"
+  },
+  "borderRadius": {
+    "none": "0px",
+    "sm": "6px",
+    "button": "7px",
+    "md": "8px",
+    "card": "10px",
+    "lg": "16px",
+    "bubbleClient": "14px 14px 4px 14px",
+    "bubbleAgent": "14px 14px 14px 4px",
+    "circle": "50%"
+  },
+  "shadows": {
+    "xs": "1px 1px 0 0 var(--shadow)",
+    "sm": "3px 3px 0 0 var(--shadow)",
+    "md": "4px 4px 0 0 var(--shadow)",
+    "lg": "6px 6px 0 0 var(--shadow)",
+    "accent": "6px 6px 0 0 var(--accent)",
+    "warm": "6px 6px 0 0 var(--accent-warm)",
+    "navActive": "inset 0 -3px 0 0 var(--accent-warm)"
+  },
+  "breakpoints": {
+    "mobile": "max-width: 767px",
+    "tablet": "max-width: 1023px"
+  },
+  "components": {
+    "button": {
+      "base": {
+        "fontFamily": "Bangers, sans-serif",
+        "fontSize": "20px",
+        "letterSpacing": "0.4px",
+        "padding": "10.4px 16px",
+        "borderRadius": "7px",
+        "border": "3px solid var(--hairline)",
+        "boxShadow": "4px 4px 0 0 var(--shadow)"
+      },
+      "primary": {
+        "backgroundColor": "#d30f10",
+        "color": "#ffffff"
+      },
+      "light": {
+        "backgroundColor": "#ffffff",
+        "color": "#101820"
+      },
+      "icon": {
+        "backgroundColor": "#ffffff",
+        "color": "#101820",
+        "note": "square icon buttons (theme toggle, palette)"
+      }
+    },
+    "header": {
+      "position": "sticky",
+      "backgroundColor": "#fff9eb",
+      "height": "79px",
+      "borderBottom": "3px solid #101820"
+    },
+    "nav": {
+      "fontFamily": "\"Atkinson Hyperlegible\", sans-serif",
+      "color": "#101820",
+      "fontSize": "14px",
+      "fontWeight": 700,
+      "activeIndicator": "inset 0 -3px 0 0 #ffd447"
+    },
+    "card": {
+      "backgroundColor": "#ffffff",
+      "border": "3px solid #101820",
+      "borderRadius": "10px",
+      "padding": "24px",
+      "boxShadow": "6px 6px 0 0 #101820"
+    },
+    "eyebrow": {
+      "fontFamily": "Bangers, sans-serif",
+      "fontSize": "20px",
+      "letterSpacing": "0.4px",
+      "backgroundColor": "#ffd447",
+      "color": "#101820",
+      "padding": "5.6px 11.2px",
+      "borderRadius": "10px",
+      "border": "3px solid #101820",
+      "example": "CHAPTER 01 - MEET THE VILLAIN"
+    },
+    "section": {
+      "paddingBlock": "64px",
+      "strongBand": {
+        "backgroundColor": "#004581",
+        "color": "#ffffff"
+      }
+    },
+    "chatBubble": {
+      "client": {
+        "backgroundColor": "#fff1b8",
+        "borderRadius": "14px 14px 4px 14px"
+      },
+      "agent": {
+        "backgroundColor": "#d9ecff",
+        "borderRadius": "14px 14px 14px 4px"
+      }
+    },
+    "footer": {
+      "backgroundColor": "#002d52",
+      "color": "#ffffff",
+      "padding": "48px 0"
+    }
+  }
+}
