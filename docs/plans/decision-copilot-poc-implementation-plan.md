@@ -44,6 +44,11 @@
 - **T06/T10/T26 descriptions** now refer to the decision model generically; the 0.8 fast-path threshold is uncalibrated for Jev and is tuned via T26.
 - **§6 fallback row** renamed "decision model unusable".
 
+**Rev. 6 — verification limits (2026-11-26):**
+- **AC-28 and the fast path were not reproducible in real runs** with `typesafe/jev-1.14` and `openai/gpt-6-luna`: about 10 complaint submissions were never accepted, and the gate opened in 0 of 15 returns (T26 and G4b). Both are covered by tests on recorded and derived outputs; see [G4b report](../qa/G4b/report.md) and [T26 report](../qa/T26/report.md). Calibrating the 0.8 threshold is an open product decision.
+- **AC-07:** the native camera picker needs a physical phone; everything else was verified by emulation (G4b B3, [G4b report](../qa/G4b/report.md)).
+- **G4b is the post-fix gate, and G4b-1 is its follow-up** (singular "1 dzień" in the justification).
+
 ---
 
 ## 1. Current state (inspected 2026-11-25/26)
