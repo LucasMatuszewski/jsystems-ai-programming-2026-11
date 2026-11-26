@@ -1,4 +1,4 @@
-# ADR-001: AI Decision Pipeline (Luna Decisions pre-check, escalation, chat agent)
+# ADR-001: AI Decision Pipeline (decision model (Jev 1.14) pre-check, escalation, chat agent)
 
 **Date:** 2026-11-25
 **Status:** Accepted
@@ -8,7 +8,7 @@
 
 ## 1. Scope
 
-Covers everything that talks to a model: the two OpenRouter models, the staged decision pipeline (deterministic rules → Luna Decisions pre-check → fast path or escalation to the reasoning LLM), the structure of model inputs and outputs, prompt and policy management, guard rails applied in code, the chat agent and its decision-update tool, and the decision evaluation log.
+Covers everything that talks to a model: the two OpenRouter models, the staged decision pipeline (deterministic rules → decision model (Jev 1.14) pre-check → fast path or escalation to the reasoning LLM), the structure of model inputs and outputs, prompt and policy management, guard rails applied in code, the chat agent and its decision-update tool, and the decision evaluation log.
 
 Not covered: HTTP contracts and image preprocessing (ADR-002), UI rendering and browser session (ADR-003), project initialization and tooling (ADR-004).
 
@@ -21,6 +21,8 @@ Not covered: HTTP contracts and image preprocessing (ADR-002), UI rendering and 
 | Vercel AI SDK 7 (`ai` 7.x) | `/vercel/ai/ai_7.0.0` | `generateText` + `Output.object`, `streamText`, tools, `experimental_decide`, `ai/test` mocks |
 | AI SDK `experimental_decide` reference | https://ai-sdk.dev/docs/reference/ai-sdk-core/decide | Typed decision questions (boolean, choice, score) |
 | OpenRouter AI SDK provider (`@openrouter/ai-sdk-provider` 3.x) | https://github.com/OpenRouterTeam/ai-sdk-provider | `openrouter.chat(id)`, `openrouter.decisionModel(id)`, `providerOptions.openrouter` |
+| TypeSafe Jev 1.14 model page | https://openrouter.ai/typesafe/jev-1.14 | Model id, price, endpoints, image limits |
+| OpenRouter multimodal Decisions guide | https://openrouter.ai/docs/guides/community/multimodal-decisions | Image input rules (JPEG/PNG only, size limits) |
 | OpenRouter Decisions API (alpha) | https://openrouter.ai/docs/guides/features/decisions, https://openrouter.ai/docs/guides/community/multimodal-decisions | Question types, image rules, refusals, `usage.cost` |
 | OpenAI Decisions guide (upstream) | https://developers.openai.com/api/docs/guides/decisions | Semantics of probabilities and `confidence` |
 | OpenRouter structured outputs | https://openrouter.ai/docs/guides/features/structured-outputs | `require_parameters`, per-endpoint support |
@@ -37,7 +39,7 @@ Versions verified on 2026-11-25: `ai` 7.0.181, `@ai-sdk/react` 4.0.186, `@openro
 
 | Role | Model (env var) | Called through | Why |
 |---|---|---|---|
-| **Signal model** — typed photo pre-check | `openai/gpt-6-luna-decisions` (`DECISION_MODEL`) | `openrouter.decisionModel()` + `experimental_decide` (OpenRouter `/api/alpha/decisions`) | Returns typed answers with per-option probabilities and `confidence` from the endpoint itself (not self-reported text). Input $0.10 / 1M tokens, output free; "about 10x faster than the Responses API" (OpenAI). Accepts images as base64 data URLs only, in top-level `state`. |
+| **Signal model** — typed photo pre-check | `typesafe/jev-1.14` (`DECISION_MODEL`; exactly 1.14, never `~typesafe/jev-latest`) | `openrouter.evaluationModel()` + `experimental_evaluate` (OpenRouter `/api/alpha/decisions`; A1, A2) | Returns typed answers with per-option probabilities and, for choice and score, a `confidence` from the endpoint itself (not self-reported text). Input about $0.042 / 1M tokens, output free; provider TypeSafe only. Images as base64 data URLs in top-level `state`; **JPEG or PNG only (no WebP)**, each side 256–1568 px, total 78,400–2,458,624 px (below the minimum HTTP 400, above HTTP 413). No latency claim from the provider (A2). The image feature is "early and may change". |
 | **Reasoning LLM** — escalated decision, message writer, chat | `openai/gpt-6-luna` (`LLM_MODEL`) | `openrouter.chat()` with `generateText`/`streamText` | Multimodal (image + text), supports `reasoning_effort`, `response_format`/`structured_outputs`, `tools`. $0.10 / $0.50 per 1M tokens (standard tier). Does **not** expose `logprobs`, so its confidence can never gate automation. |
 
 The same `LLM_MODEL` is used at three reasoning efforts (configurable): `high` for the escalated decision, `low` for the message writer (the user's "cheap LLM writes it, decision locked"), `medium` for chat. Efforts are set through the AI SDK provider-agnostic `reasoning` option; do not also set them in `providerOptions` (provider options silently win in v7).
@@ -79,7 +81,7 @@ The question set depends on the case type. Every question carries a Polish-indep
 - choice → the endpoint's `confidence` for the top option (fallback: top probability);
 - score → the endpoint's `confidence` (fallback: probability of the top level).
 
-The exact OpenRouter question-type names (`noul` vs AI SDK `boolean`) and the confidence field name must be confirmed with one real captured call before the adapter is written (see 8, TAC-001-01).
+Confirmed with real recordings (A1, A2): the wire type for `boolean` is `noul`; choice and score carry `confidence`, **boolean answers carry none with Jev 1.14**, so `max(p, 1 − p)` is the boolean rule. Criteria (A2): every choice option has a short description (required by the model), booleans carry explicit `criteria {true, false}`, score levels are an ordered array of descriptions. The descriptions state the meaning of an option only, never photo content.
 
 ### 3.4 Fast-path conditions (`Akceptacja` only)
 
@@ -91,7 +93,7 @@ Threshold `T = FAST_PATH_THRESHOLD` (default `0.8`). All of these must be true; 
 
 **Complaint** (`daysSincePurchase ≤ 730`): `damage_visible = true` ≥ T; `damage_cause = manufacturing_defect` with confidence ≥ T; `damage_type` not in {`crack`, `liquid`, `burn_or_melt`, `opened_or_modified`, `dent_or_bend`} (these are the C-5 exclusion classes and must be judged by the LLM).
 
-Any signal pointing to `Odrzucenie` or `Weryfikacja ręczna` always escalates, whatever its confidence — fast rejections are the costliest error for customers. The 0.8 default is a starting point: OpenAI states the probabilities are "the model's estimate" and recommends thresholds from labelled examples; the evaluation log and script (3.7) exist to tune it.
+Any signal pointing to `Odrzucenie` or `Weryfikacja ręczna` always escalates, whatever its confidence — fast rejections are the costliest error for customers. The 0.8 default is a starting point and is **uncalibrated for Jev 1.14** (its confidences differ from the earlier model; it is tuned via plan task T26 on labelled examples): OpenAI states the probabilities are "the model's estimate" and recommends thresholds from labelled examples; the evaluation log and script (3.7) exist to tune it.
 
 ### 3.5 Guards applied in code (all routes)
 
@@ -184,12 +186,12 @@ Internal module interfaces (consumed by the route handlers in ADR-002):
 ### Use the OpenRouter AI SDK provider for both models
 **Status:** Accepted · **Date:** 2026-11-25
 **Context:** We need streaming chat, structured outputs, multimodal input and the Decisions API through OpenRouter, from a Next.js app built on AI SDK 7.
-**Decision:** `@openrouter/ai-sdk-provider` 3.x: `openrouter.chat()` for `gpt-6-luna`, `openrouter.decisionModel()` with `experimental_decide` for `gpt-6-luna-decisions`. It is the only option where one SDK covers both stages and keeps typed `providerOptions.openrouter` (provider routing, `require_parameters`, usage cost).
+**Decision:** `@openrouter/ai-sdk-provider` 3.x: `openrouter.chat()` for `gpt-6-luna`, `openrouter.evaluationModel()` with `experimental_evaluate` for the decision model `typesafe/jev-1.14` (names per A1, model per A2). It is the only option where one SDK covers both stages and keeps typed `providerOptions.openrouter` (provider routing, `require_parameters`, usage cost).
 **Rejected alternatives:**
 - OpenRouter Responses API called directly: stateless on OpenRouter (`previous_response_id` returns 400), no decisions support, and we would reimplement AI SDK streaming to `useChat`.
 - `@ai-sdk/openai-compatible` / `@ai-sdk/openai` with the OpenRouter base URL: cannot call `/api/alpha/decisions`, loses typed OpenRouter options.
 **Consequences:** (+) one dependency path, `ai/test` mocks work for all calls; (−) Decisions is alpha on OpenRouter and `experimental_*` in the SDK — wrapped behind the `getDecisionSignals` adapter so a breaking change touches one module.
-**Review trigger:** OpenRouter Decisions leaves alpha or changes shape; AI SDK renames `experimental_decide`.
+**Review trigger:** OpenRouter Decisions leaves alpha or changes shape; AI SDK renames `experimental_evaluate`.
 
 ### Staged pipeline with fast path ON for clear acceptances only
 **Status:** Accepted · **Date:** 2026-11-25
@@ -244,7 +246,7 @@ flowchart LR
         end
     end
     OR[(OpenRouter)]
-    LD[gpt-6-luna-decisions]
+    LD[typesafe/jev-1.14]
     LL[gpt-6-luna]
     Cases --> Facts --> Sig --> Rules --> Gate
     Gate -- fast --> Wr
@@ -267,7 +269,7 @@ flowchart LR
 ```mermaid
 flowchart TD
     S[Start: validated case + JPEG] --> D[Compute daysSincePurchase]
-    D --> Q[Luna Decisions: question set by case type]
+    D --> Q[Decision model Jev 1.14: question set by case type]
     Q --> QA{Signals available?}
     QA -- No --> E[Escalate]
     QA -- Yes --> R{Date rule hit?<br/>return > 30 d / complaint > 730 d}
@@ -294,7 +296,7 @@ sequenceDiagram
     participant LG as Decision log
     H->>P: runCasePipeline(case, jpeg, abortSignal 90 s)
     P->>P: daysSincePurchase
-    P->>OR: decide(gpt-6-luna-decisions, state=[photo, case text], questions)
+    P->>OR: evaluate(typesafe/jev-1.14, state=[photo, case text], questions)
     OR-->>P: answers + probabilities + confidence + cost
     P->>P: rules? no. fast-path gate? fails (e.g. damage_cause undetermined 0.55)
     P->>OR: generateText(gpt-6-luna, reasoning high, Output.object EscalatedDecisionOutput, photo + signals + policy)
@@ -310,7 +312,7 @@ sequenceDiagram
 sequenceDiagram
     participant P as Pipeline
     participant OR as OpenRouter
-    P->>OR: decide(gpt-6-luna-decisions)
+    P->>OR: evaluate(typesafe/jev-1.14)
     OR-->>P: all conditions >= 0.8, like_new, no damage
     P->>P: decision = Akceptacja (locked), ruleRefs = [R-2]
     P->>OR: generateText(gpt-6-luna, reasoning low, Output.object WriterOutput)
@@ -360,7 +362,7 @@ Tests first (TDD). Model calls in unit and integration tests are replaced **only
 
 ### Technical acceptance criteria
 
-- TAC-001-01: One real Luna Decisions response per case type is captured and committed as a fixture before the adapter is implemented; adapter tests run against it.
+- TAC-001-01: One real decision-model (Jev 1.14) response per case type is captured and committed as a fixture before the adapter is implemented; adapter tests run against it.
 - TAC-001-02: Pure-function tests (no model involved), the fast-path gate unit tests cover each condition in 3.4 with a value just below and just above `T`.
 - TAC-001-03: No code path returns `Odrzucenie` or `Weryfikacja ręczna` with route `fast`.
 - TAC-001-04: For a return with `daysSincePurchase ≤ 14`, no pipeline or chat-tool output contains `Odrzucenie` (property test over recording-derived variants, ADR-006 §3.1).
@@ -368,3 +370,26 @@ Tests first (TDD). Model calls in unit and integration tests are replaced **only
 - TAC-001-06: The decision log file never contains the customer's `reason`, `model`, any base64 data or message text (asserted by a test that scans the line).
 - TAC-001-07: Reasoning content never appears in the UI message stream sent to the client (asserted on a recorded `gpt-6-luna` stream containing reasoning chunks; if the model emits none, recorded as a gap in `tests/fixtures/GAPS.md`).
 - TAC-001-08: `pnpm eval:decisions` completes for all 5 example photos × 2 case types and prints an agreement rate.
+
+---
+
+## 9. Amendment A1 (2026-11-26) — Status: Proposed
+
+Found during plan tasks T06/T06b (`ai` 7.0.118, `@openrouter/ai-sdk-provider` 3.1.0). Recordings: `app/tests/fixtures/openrouter/decisions/*.json`; notes: `app/tests/fixtures/openrouter/decisions/NOTES.md`.
+
+1. **API names and wire format (confirmed by real recordings).** The installed SDK has no `experimental_decide` / `openrouter.decisionModel()`. The equivalents are `experimental_evaluate` and `openrouter.evaluationModel(id)`, which call `POST /api/alpha/decisions`. Wherever this ADR set says `experimental_decide` / `decisionModel`, read `experimental_evaluate` / `evaluationModel`. Images go in the top-level `state` array as `image_url` data URLs. The wire type of a boolean question is `noul` (answer `{type:"noul", noul: p}`; the SDK maps it to `boolean` with `probability`). `confidence` exists only on choice and score answers: on the wire as `answers[key].confidence`, in the SDK as `providerMetadata.openrouter.answers[key].confidence`. Boolean confidence stays `max(p, 1 − p)` as in §3.3. Score probabilities use zero-based level indices. Cost is in `usage.cost` (0 on this BYOK route; the upstream cost is in `usage.cost_details`).
+2. **Availability.** On 2026-11-26 around 11:00 the endpoint returned HTTP 401 `account_deactivated` from OpenRouter's upstream account. This was temporary and has been resolved: by about 12:15 the same call returned HTTP 200 and all four success recordings were captured. The fast path therefore stays ON by default (`FAST_PATH_ENABLED` default `true`, §3.4); the fail-closed signals adapter still escalates on any future outage.
+
+## 10. Amendment A2 (2026-11-26) — Status: Accepted by user decision: switch to Jev 1.14
+
+(Numbered §10 because §9 holds A1; the plan refers to it as "§9 Amendment A2".) A1 is unchanged and still defines the API names.
+
+1. **Why.** User decision on 2026-11-26: replace `openai/gpt-6-luna-decisions` with `typesafe/jev-1.14` as the decision model (`DECISION_MODEL` default). The version is pinned to exactly 1.14; `~typesafe/jev-latest` is never used. Sources: https://openrouter.ai/typesafe/jev-1.14, https://openrouter.ai/docs/guides/features/decisions, https://openrouter.ai/docs/guides/community/multimodal-decisions.
+2. **Request object change.** The shape `{ model, state, questions }` is unchanged. Only the `questions` content changed (keys, option values and the question set per case type stay as in §3.3). Before (Luna) → after (Jev), one question per type:
+   - choice `damage_type`: `criteria: { none: null, crack: null, … }` → `criteria: { none: "No physical damage of any kind is visible.", crack: "A crack or shattered glass, plastic or casing.", … }` (descriptions are mandatory for Jev).
+   - boolean `damage_visible`: `{ type: "noul", instructions }` → `{ type: "noul", instructions, criteria: { true: "Physical damage is visible on the device.", false: "No physical damage is visible on the device." } }`.
+   - score `condition`: `criteria: ["1 broken", …]` → `criteria: ["1 broken: The device is broken or unusable.", …]` (ordered array; probabilities keyed "0".."N-1").
+3. **Image constraints and consequence.** Jev takes JPEG and PNG only; our model image is always JPEG (`prepareForModel`, ADR-002 rule 4). Each side must be 256–1568 px (our 1536 px maximum fits) and the total 78,400–2,458,624 px; below the minimum the endpoint answers 400, above it 413. Smaller uploads are not enlarged (PRD AC-14), so a very small photo gets HTTP 400, the adapter reason `upstream` and an escalation. This is fail-closed and accepted.
+4. **Confidence.** Checked on 4 recordings: boolean (`noul`) answers carry no `confidence` in Jev 1.14 either. Boolean confidence therefore stays `max(p, 1 − p)`; choice and score use the provider `confidence`, falling back to the top probability. `normalize.ts` did not change. Should a later build return a boolean `confidence`, prefer it and keep `max(p, 1 − p)` as fallback.
+5. **Unverified / open.** Latency has no provider claim (four single samples 236–468 ms, `NOTES.md`). The 0.8 threshold and the signals' calibration are open (T26). The image feature is early and may change. A refusal answer was not produced (one attempt). Jev is less confident than Luna on the clean return photo, which makes fast-path eligibility rarer. Cost is about USD 0.00009–0.0003 per call, upstream, not billed to the key (BYOK, `usage.cost` 0).
+6. **Recordings refresh.** The four Luna success recordings are archived in `app/tests/fixtures/openrouter/decisions/archive-luna/` (notes "superseded by Jev 1.14"); the same four cases were re-recorded with Jev under the original file names; the model build reported in the response is `typesafe/jev-1.14-20261014`. All replaying tests use the Jev recordings; none of the four is fast-path eligible, so no `writer-fast-*` recording was made.
