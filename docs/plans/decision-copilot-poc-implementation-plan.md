@@ -31,6 +31,13 @@
   - The error-code mapping is explicit.
   - ADR-004 pnpm/README steps no longer need root or `rm`.
 
+**Rev. 4 changes (user feedback 2026-11-26, during execution):**
+- **ORCH only orchestrates:** it writes briefs, reads diffs and evidence, accepts or rejects, commits and updates the tracker. It edits no app code, runs no long commands and does no browser QA.
+- **Owner override:** every row marked ORCH is executed by a worker: Sonnet subagents for shared or risky rows (T03–T06, T12, T13, T16, T18, T22–T25, T27, T29, T30), Haiku/OpenCode as before. Only one worker at a time edits `app/package.json` / lockfile, and its brief names those files.
+- **Gates G1–G4 and the final check:** run by a fresh QA subagent (Sonnet) following §4, writing `docs/qa/<gate>/report.md` plus screenshots. ORCH spot-checks screenshots and call counts before accepting.
+- **Briefs reference document sections** instead of pasting them; ORCH asks a doc-reader subagent when it needs facts.
+- **Secrets:** nobody reads `.env`. The app and scripts load the repository-root `.env` (then `app/.env.local`) at runtime.
+
 ---
 
 ## 1. Current state (inspected 2026-11-25/26)
