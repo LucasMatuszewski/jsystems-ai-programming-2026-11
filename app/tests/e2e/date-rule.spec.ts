@@ -4,7 +4,6 @@ import { COMPLAINT_REASON, daysAgo, expect, expectFirstMessageInvariants, fillCa
 // Date rules (ADR 000 section 10): deterministic rejection by the policy, not by the model's taste.
 
 test("return 45 days after purchase is rejected (Odrzucenie) citing R-4", async ({ page }) => {
-  test.fail()
   await page.goto("/")
   await fillCaseForm(page, {
     caseType: "return",
@@ -22,7 +21,6 @@ test("return 45 days after purchase is rejected (Odrzucenie) citing R-4", async 
 })
 
 test("complaint 800 days after purchase is rejected citing C-2", async ({ page }) => {
-  test.fail()
   await page.goto("/")
   await fillCaseForm(page, {
     caseType: "complaint",

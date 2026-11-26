@@ -14,7 +14,6 @@ import {
 // PRD 4.2 happy path: complaint. Structure and invariants only.
 
 test("complaint case: decision in the enum, a C- rule, and a remedy when accepted", async ({ page }) => {
-  test.fail()
   await page.goto("/")
   await fillCaseForm(page, {
     caseType: "complaint",

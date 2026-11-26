@@ -55,7 +55,10 @@ export async function fillCaseForm(
   },
 ): Promise<void> {
   await expect(page.getByRole("heading", { name: pl.form.title })).toBeVisible()
-  await caseTypeRadio(page, values.caseType).check()
+  // The radio input is visually hidden (sr-only) inside its label card; Playwright's check() reports the
+  // label text as intercepting the click, so click the card like a user and assert the result.
+  await page.locator("label").filter({ has: caseTypeRadio(page, values.caseType) }).click()
+  await expect(caseTypeRadio(page, values.caseType)).toBeChecked()
 
   const category = page.getByLabel(pl.labels.category)
   await expect(category).toBeVisible()

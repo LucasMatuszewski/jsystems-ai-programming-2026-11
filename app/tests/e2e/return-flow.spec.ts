@@ -5,7 +5,6 @@ import { daysAgo, expect, expectFirstMessageInvariants, fillCaseForm, photo, sub
 // PRD 4.1 happy path: return within the time limit. Structure and invariants only, never a verdict.
 
 test("return case: progress texts, then chat with a decision, disclaimer and rule reference within 90 s", async ({ page }) => {
-  test.fail()
   await page.goto("/")
   await fillCaseForm(page, {
     caseType: "return",

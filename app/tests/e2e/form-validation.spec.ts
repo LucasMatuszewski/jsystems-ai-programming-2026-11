@@ -15,10 +15,8 @@ import {
 test.use({ locale: "pl-PL" })
 
 // PRD 4.4 Alternative: validation errors on the form (AC-04..AC-13, AC-46).
-// Red phase: the case form does not exist yet, so each test is annotated with test.fail().
 
 test("empty submit shows errors, focuses the first invalid field and sends no request (AC-12)", async ({ page }) => {
-  test.fail()
   const apiRequests: string[] = []
   page.on("request", (req) => {
     if (req.url().includes("/api/cases")) apiRequests.push(req.url())
@@ -33,7 +31,6 @@ test("empty submit shows errors, focuses the first invalid field and sends no re
 })
 
 test("complaint without a reason shows the reason error (AC-06)", async ({ page }) => {
-  test.fail()
   await page.goto("/")
   await fillCaseForm(page, {
     caseType: "complaint",
@@ -48,7 +45,6 @@ test("complaint without a reason shows the reason error (AC-06)", async ({ page 
 })
 
 test("future purchase date is rejected (AC-05)", async ({ page }) => {
-  test.fail()
   await page.goto("/")
   await fillCaseForm(page, {
     caseType: "return",
@@ -62,7 +58,6 @@ test("future purchase date is rejected (AC-05)", async ({ page }) => {
 })
 
 test("SVG logo is rejected with the unsupported type message (AC-09)", async ({ page }) => {
-  test.fail()
   await page.goto("/")
   await expect(photoInput(page)).toBeAttached()
   await photoInput(page).setInputFiles(photo.logoSvg)
@@ -72,7 +67,6 @@ test("SVG logo is rejected with the unsupported type message (AC-09)", async ({ 
 })
 
 test("JPEG named .png is accepted with thumbnail, file name and change action (AC-08, AC-10)", async ({ page }) => {
-  test.fail()
   await page.goto("/")
   // Fail fast (5 s) if the photo input is missing, instead of waiting for the 120 s test timeout.
   await expect(photoInput(page)).toBeAttached()
@@ -85,7 +79,6 @@ test("JPEG named .png is accepted with thumbnail, file name and change action (A
 })
 
 test("entered values and the selected photo are kept after a validation error (AC-12)", async ({ page }) => {
-  test.fail()
   await page.goto("/")
   await fillCaseForm(page, {
     caseType: "return",
@@ -103,7 +96,6 @@ test("entered values and the selected photo are kept after a validation error (A
 })
 
 test("whole form can be completed with the keyboard only (AC-46)", async ({ page }) => {
-  test.fail()
   await page.goto("/")
 
   // Every step first waits (5 s) for its element, so a missing form fails fast.
