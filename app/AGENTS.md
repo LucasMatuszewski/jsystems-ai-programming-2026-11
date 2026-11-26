@@ -36,7 +36,7 @@ The Next.js router lives in `app/app/` (outer `app/` = course project folder).
 
 | Path | Role |
 |---|---|
-| `app/` | Routes, `layout.tsx`, `globals.css`; `api/chat/route.ts` (temporary template chat, replaced by T23) |
+| `app/` | Routes, `layout.tsx`, `globals.css`; `api/cases/route.ts` (multipart → NDJSON), `api/chat/route.ts` (case chat agent, SSE) |
 | `components/ui/` | shadcn primitives (add from the shadcn registry only) |
 | `components/` | Feature components (`chat`, `prompt-form`, `parts/text-part`); markdown via `react-markdown` + `remark-gfm` (not Streamdown) |
 | `lib/` | Shared code: `utils.ts` (`cn`), `chat-types.ts` (`ChatUIMessage = UIMessage`), later `schemas/`, `i18n/`, `ndjson` |
@@ -59,7 +59,7 @@ The Next.js router lives in `app/app/` (outer `app/` = course project folder).
 
 - `instructions`, not `system`, in `streamText` / `generateText` / agents.
 - `generateText({ output: Output.object({ schema }) })` and read `result.output`; `generateObject` is deprecated.
-- Chat route: `createUIMessageStreamResponse({ stream: toUIMessageStream({ stream: result.stream }) })`, not `result.toUIMessageStreamResponse()`. Reasoning reaches the client only with `sendReasoning: true` (we keep it off).
+- Chat route: `createUIMessageStreamResponse({ stream: toUIMessageStream({ stream: result.stream }) })`, not `result.toUIMessageStreamResponse()`. `sendReasoning` defaults to true in ai 7.0.118, so we pass `false` explicitly (no reasoning parts reach the client).
 - Multi-step limit: `stopWhen: isStepCount(n)`.
 - Files/images in messages are parts with `mediaType` (e.g. `{ type: "file", mediaType: "image/jpeg", data }`).
 - `onEnd` replaces `onFinish` for core calls (`generateText`, `streamText`, agents).
