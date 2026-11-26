@@ -2,6 +2,7 @@ import fs from "node:fs"
 import path from "node:path"
 import { createOpenRouter } from "@openrouter/ai-sdk-provider"
 import type { CaseFormValues, CaseDecision } from "@/lib/schemas"
+import { withJustificationDays } from "../../helpers/day-count-variant"
 import { loadFixture, replayFetch, type Fixture } from "../../helpers/replay-fetch"
 
 export const fixturesDir = path.resolve(__dirname, "../../fixtures/openrouter")
@@ -27,8 +28,8 @@ export function caseFrom(fixtureName: string, dir: "llm" | "errors" = "llm"): Ca
  * Derived variant of a real recording: same exchange, one field of the model's JSON output changed.
  * Only the `mutate` callback changes data; everything else (headers, usage, ids) stays as recorded.
  */
-export function deriveVariant(base: string, mutate: (output: Record<string, unknown>) => void): Fixture {
-  const fixture = loadFixture(base)
+export function deriveVariant(base: string | Fixture, mutate: (output: Record<string, unknown>) => void): Fixture {
+  const fixture = typeof base === "string" ? loadFixture(base) : base
   const exchange = fixture.exchanges[0]!
   const body = JSON.parse(exchange.response!.body.trim()) as { choices: Array<{ message: { content: string } }> }
   const output = JSON.parse(body.choices[0]!.message.content) as Record<string, unknown>
@@ -61,3 +62,6 @@ export function setup(sources: Array<string | Fixture>) {
 
 /** TAC-001-03 registry: every decision produced anywhere in the suite. */
 export const produced: CaseDecision[] = []
+
+/** The recorded output with the day count added to the justification (AC-23); see `withJustificationDays`. */
+export const withDays = (name: string) => withJustificationDays(llmFixture(name))

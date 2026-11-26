@@ -96,6 +96,24 @@ describe("ChatRequestSchema", () => {
     expect(req([user("   \n ")]).success).toBe(false)
     expect(req([user(` ${"a".repeat(2000)} `)]).success).toBe(true)
   })
+  it("accepts the assistant parts our UI produces (step-start, text with state, data-decision, update tool part)", () => {
+    const produced = {
+      id: "a1",
+      role: "assistant",
+      parts: [
+        { type: "step-start" },
+        { type: "tool-update_recommendation", toolCallId: "t1", state: "output-available", input: {}, output: {} },
+        { type: "step-start" },
+        { type: "text", text: "Ok", state: "done" },
+        { type: "data-decision", data: { decision: "Akceptacja", ruleRefs: ["R-2"], kind: "initial", remedy: null } },
+      ],
+    }
+    expect(req([produced, user("Cześć", 1)]).success).toBe(true)
+  })
+  it("rejects a system role and non-text parts from the client (T28 F2)", () => {
+    expect(req([{ id: "s", role: "system", parts: [{ type: "text", text: "x" }] }, user("Cześć", 1)]).success).toBe(false)
+    expect(req([{ id: "u", role: "user", parts: [{ type: "text", text: "x" }, { type: "file", mediaType: "image/png", url: "data:image/png;base64,AA" }] }]).success).toBe(false)
+  })
   it("rejects when the last message is not from the user or list is empty", () => {
     expect(req([user("x"), assistant(1)]).success).toBe(false)
     expect(req([]).success).toBe(false)

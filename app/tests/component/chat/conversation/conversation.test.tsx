@@ -3,7 +3,7 @@ import userEvent from "@testing-library/user-event"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { pl } from "@/lib/i18n/pl"
 import { SESSION_KEY } from "@/lib/session-store"
-import { readStored, renderChat, replayChatFetch, storedSession } from "./harness"
+import { chatErrorChunk, readStored, renderChat, replayChatFetch, storedSession } from "./harness"
 
 const input = () => screen.getByPlaceholderText(pl.chat.inputPlaceholder)
 const sendButton = () => screen.getByRole("button", { name: pl.chat.send })
@@ -129,6 +129,51 @@ describe("failure and retry (AC-42, AC-43)", () => {
   })
 })
 
+describe("stream cut short (T28 F1, AC-42/43)", () => {
+  // DERIVED from plain-return: its first events verbatim, then a failure.
+  const cutAfter = (events: number) => (body: string) => body.split("\n\n").slice(0, events).join("\n\n") + "\n\n"
+
+  it("partial reply followed by the recorded error chunk: partial text stays, error row with Ponów, no technical text", async () => {
+    const user = userEvent.setup()
+    const errorChunk = chatErrorChunk()
+    const replay = replayChatFetch({ name: "plain-return", derive: (body) => cutAfter(6)(body) + errorChunk + "data: [DONE]\n\n" })
+    renderChat(replay.fetch)
+    await user.type(input(), "Jak mam zapakować laptopa?")
+    await user.click(sendButton())
+
+    const alert = await screen.findByRole("alert")
+    expect(alert).toHaveTextContent(pl.chat.errorMessage)
+    expect(within(alert).getByRole("button", { name: pl.chat.retry })).toBeInTheDocument()
+    expect(within(log()).getByText("Jak mam zapakować laptopa?")).toBeInTheDocument()
+    expect(log().children.length).toBe(4) // first message, user, partial reply (error row is the 4th child)
+    expect(alert.textContent).not.toMatch(/chat_failed|timeout|abort|error/i)
+    await waitFor(() => expect(input()).toBeEnabled())
+  })
+
+  it("connection dropped mid-stream (derived from plain-return: body errors after 6 events): error row with Ponów", async () => {
+    const user = userEvent.setup()
+    const replay = replayChatFetch({ name: "plain-return", dropAfter: (body) => cutAfter(6)(body) })
+    renderChat(replay.fetch)
+    await user.type(input(), "Jak mam zapakować laptopa?")
+    await user.click(sendButton())
+
+    const alert = await screen.findByRole("alert")
+    expect(alert).toHaveTextContent(pl.chat.errorMessage)
+    expect(within(alert).getByRole("button", { name: pl.chat.retry })).toBeInTheDocument()
+    await waitFor(() => expect(input()).toBeEnabled())
+  })
+
+  it("an error before any text (recorded upstream-failure): error row, the empty reply is not shown as a bubble", async () => {
+    const user = userEvent.setup()
+    const replay = replayChatFetch({ name: "upstream-failure" })
+    renderChat(replay.fetch)
+    await user.type(input(), "Pytanie")
+    await user.click(sendButton())
+    await screen.findByRole("alert")
+    expect(log().children.length).toBe(3) // first message, user message, error row
+  })
+})
+
 describe("input rules (AC-32)", () => {
   it("cannot send empty or whitespace-only messages", async () => {
     const user = userEvent.setup()
@@ -215,6 +260,13 @@ describe("persistence (AC-38)", () => {
     expect(await screen.findByText(pl.chat.storageFailed)).toBeInTheDocument()
     await waitFor(() => expect(input()).toBeEnabled())
     expect(log().children.length).toBe(3)
+  })
+
+  it("shows the storage notice at once when the session lives in memory only (T28 F6)", () => {
+    const replay = replayChatFetch({ name: "plain-return" })
+    renderChat(replay.fetch, storedSession(), { storageUnavailable: true })
+    expect(screen.getByRole("status")).toHaveTextContent(pl.chat.storageUnavailable)
+    expect(replay.calls).not.toHaveBeenCalled()
   })
 
   it("restores the stored conversation on a fresh mount without a request", async () => {

@@ -5,6 +5,7 @@ import { PipelineError } from "@/server/ai/pipeline/run-case-pipeline"
 import {
   buildRequest, COMPLAINT_FORM, EXAMPLES, fixture, harness, imageFile, NOW, readNdjson, RETURN_FORM, SIGNALS_UNAVAILABLE,
 } from "./helpers"
+import { withJustificationDays } from "../../helpers/day-count-variant"
 import { loadFixture } from "../../helpers/replay-fetch"
 
 vi.mock("server-only", () => ({}))
@@ -23,7 +24,7 @@ const terminal = (events: Array<Record<string, unknown>>) =>
 
 describe("POST /api/cases stream: success", () => {
   it("streams analysis, decision, then one result that validates against CaseSessionPayloadSchema", async () => {
-    const h = harness([SIGNALS_UNAVAILABLE, RETURN_ESCALATED])
+    const h = harness([SIGNALS_UNAVAILABLE, withJustificationDays(RETURN_ESCALATED)])
     const res = await handleCasesRequest(buildRequest(RETURN_FORM, { image: laptop() }), h.deps)
 
     expect(res.status).toBe(200)
@@ -62,7 +63,7 @@ describe("POST /api/cases stream: success", () => {
   })
 
   it("logs one 200 incoming line and exactly two upstream calls (signals, escalated)", async () => {
-    const h = harness([SIGNALS_UNAVAILABLE, RETURN_ESCALATED])
+    const h = harness([SIGNALS_UNAVAILABLE, withJustificationDays(RETURN_ESCALATED)])
     const res = await handleCasesRequest(buildRequest(RETURN_FORM, { image: laptop() }), h.deps)
     await res.text()
     expect(h.incomingLines()).toEqual([expect.objectContaining({ status: 200 })])

@@ -5,7 +5,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest"
 import { AnalysisErrorBanner } from "@/components/case-submission/analysis-error-banner"
 import { useCaseSubmission, type SubmissionState } from "@/components/case-submission/use-case-submission"
 import { pl } from "@/lib/i18n/pl"
-import { SESSION_KEY } from "@/lib/session-store"
+import { clearSession, readMemorySession, SESSION_KEY } from "@/lib/session-store"
 import type { CaseFormFields, CaseSessionPayload, StoredSession } from "@/lib/schemas"
 import { replayAppResponse } from "@/tests/helpers/replay-app"
 import { steppedRecording } from "./stepped-response"
@@ -35,6 +35,8 @@ async function recordedResult(): Promise<CaseSessionPayload> {
 
 beforeEach(() => {
   window.sessionStorage.clear()
+  clearSession()
+  vi.restoreAllMocks()
 })
 
 describe("useCaseSubmission", () => {
@@ -78,6 +80,30 @@ describe("useCaseSubmission", () => {
     expect(stored.version).toBe(1)
     expect(stored.case).toEqual(expected)
     expect(stored.messages).toEqual([expected.firstMessage])
+  })
+
+  // T28 F6: a storage failure after a successful (paid) analysis must not lose the result or report analysis_failed.
+  it.each([
+    ["quota exceeded", new DOMException("full", "QuotaExceededError")],
+    ["blocked storage (SecurityError)", new DOMException("insecure", "SecurityError")],
+  ])("%s after a successful analysis: the case is kept in memory and still delivered, no analysis_failed", async (_name, failure) => {
+    const expected = await recordedResult()
+    vi.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
+      throw failure
+    })
+    const fetchImpl = vi.fn(async () => replayAppResponse(cases("escalated-return-laptop-2.ndjson.json")))
+    const onSuccess = vi.fn()
+    const { result } = renderHook(() => useCaseSubmission({ fetchImpl, onSuccess }))
+
+    await act(async () => {
+      await result.current.submit(values, photo)
+    })
+
+    expect(result.current.state).toEqual({ status: "idle" })
+    expect(onSuccess).toHaveBeenCalledTimes(1)
+    expect(onSuccess).toHaveBeenCalledWith(expected)
+    expect(readMemorySession()).toEqual({ version: 1, case: expected, messages: [expected.firstMessage] })
+    expect(fetchImpl).toHaveBeenCalledTimes(1) // no second (paid) analysis
   })
 
   it("posts multipart FormData with the form fields, consent and the image", async () => {

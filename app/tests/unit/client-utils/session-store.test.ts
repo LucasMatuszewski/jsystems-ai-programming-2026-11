@@ -4,7 +4,9 @@ import {
   SESSION_KEY,
   clearSession,
   deriveCurrentDecision,
+  readMemorySession,
   readSession,
+  rememberSessionInMemory,
   writeSession,
 } from "@/lib/session-store"
 import type { StoredSession } from "@/lib/schemas"
@@ -94,6 +96,29 @@ describe("session store", () => {
     const caseData = await recordedCase()
     const session: StoredSession = { version: 1, case: caseData, messages: [caseData.firstMessage] }
     expect(writeSession(session, quotaStorage())).toEqual({ ok: false, reason: "quota" })
+  })
+
+  it("reports a non-quota storage error (blocked storage) as its own reason, not as a throw (T28 F6)", async () => {
+    const caseData = await recordedCase()
+    const session: StoredSession = { version: 1, case: caseData, messages: [caseData.firstMessage] }
+    const blocked = {
+      getItem: () => null,
+      setItem: () => {
+        throw new DOMException("The operation is insecure.", "SecurityError")
+      },
+      removeItem: () => {},
+    }
+    expect(writeSession(session, blocked)).toEqual({ ok: false, reason: "unavailable" })
+  })
+
+  it("keeps a session in memory when storage fails, and clearSession drops it (T28 F6)", async () => {
+    const caseData = await recordedCase()
+    const session: StoredSession = { version: 1, case: caseData, messages: [caseData.firstMessage] }
+    expect(readMemorySession()).toBeNull()
+    rememberSessionInMemory(session)
+    expect(readMemorySession()).toEqual(session)
+    clearSession(memoryStorage())
+    expect(readMemorySession()).toBeNull()
   })
 
   it("clearSession removes the stored session", async () => {

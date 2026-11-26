@@ -8,7 +8,7 @@ import {
   type CaseFormFields,
   type CaseSessionPayload,
 } from "@/lib/schemas"
-import { writeSession } from "@/lib/session-store"
+import { rememberSessionInMemory, writeSession } from "@/lib/session-store"
 
 export type SubmissionStage = "upload" | "analysis" | "decision"
 
@@ -85,8 +85,9 @@ export function useCaseSubmission({ fetchImpl = fetch, onSuccess }: UseCaseSubmi
           } else if (event.type === "error") {
             return fail(event.code)
           } else {
-            // A quota failure does not block the case; the chat notice covers it (ADR-003 3.3).
-            writeSession({ version: 1, case: event.case, messages: [event.case.firstMessage] })
+            // A storage failure never loses the paid-for result: it stays in memory and the chat shows a notice (ADR-003 3.3, T28 F6).
+            const session = { version: 1 as const, case: event.case, messages: [event.case.firstMessage] }
+            if (!writeSession(session).ok) rememberSessionInMemory(session)
             setState({ status: "idle" })
             onSuccess(event.case)
             return

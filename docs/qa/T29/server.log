@@ -1,0 +1,16 @@
+$ next start
+▲ Next.js 16.4.6
+- Local:         http://localhost:3000
+- Network:       http://10.123.4.35:3000
+✓ Ready in 532ms
+✓ Running next.config.ts took 83ms
+[hsdc] {"type":"incoming","requestId":"b4e5ffa2-5145-40ad-9bf5-fc82dc302349","route":"/api/cases","status":200}
+[hsdc] {"type":"upstream","requestId":"b4e5ffa2-5145-40ad-9bf5-fc82dc302349","stage":"signals","modelId":"typesafe/jev-1.14","outcome":"ok","latencyMs":503,"costUsd":0}
+[hsdc] {"type":"upstream","requestId":"b4e5ffa2-5145-40ad-9bf5-fc82dc302349","stage":"escalated","modelId":"openai/gpt-6-luna","outcome":"ok","latencyMs":20067,"costUsd":0}
+[hsdc] {"type":"incoming","requestId":"b04d8654-0a6d-4a65-a86f-affc14ddabad","route":"/api/cases","status":200}
+[hsdc] {"type":"upstream","requestId":"b04d8654-0a6d-4a65-a86f-affc14ddabad","stage":"signals","modelId":"typesafe/jev-1.14","outcome":"ok","latencyMs":396,"costUsd":0}
+[hsdc] {"type":"upstream","requestId":"b04d8654-0a6d-4a65-a86f-affc14ddabad","stage":"escalated","modelId":"openai/gpt-6-luna","outcome":"ok","latencyMs":23515,"costUsd":0}
+[hsdc] {"type":"incoming","requestId":"bad82a78-2334-4105-9b81-5df3369a0123","route":"/api/chat","status":200}
+[hsdc] {"type":"upstream","requestId":"bad82a78-2334-4105-9b81-5df3369a0123","stage":"chat-step","modelId":"openai/gpt-6-luna","outcome":"ok","latencyMs":3117,"costUsd":0}
+[hsdc] {"type":"incoming","requestId":"2abf3645-7294-4159-9b02-5be6b0811cb4","route":"/api/chat","status":200}
+[hsdc] {"type":"upstream","requestId":"2abf3645-7294-4159-9b02-5be6b0811cb4","stage":"chat-step","modelId":"openai/gpt-6-luna","outcome":"ok","latencyMs":6121,"costUsd":0}

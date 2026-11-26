@@ -38,4 +38,11 @@ describe("buildWriterCall", () => {
     expect(text).toContain("Laptop widoczny w całości")
     expect(text).toContain("Signals summary: unavailable")
   })
+
+  it("gives the Polish category label and a dd.mm.yyyy date, never the raw enum or the ISO date (G4 D2)", () => {
+    const text = (buildWriterCall({ ...args, caseInput: { ...args.caseInput, category: "tv", purchaseDate: "2026-11-21" } }).messages[0]!.content[0] as { text: string }).text
+    expect(text).toContain("Category: Telewizor")
+    expect(text).toContain("Purchase date: 21.11.2026")
+    expect(text).not.toMatch(/Category: tv\b|2026-11-21/)
+  })
 })

@@ -9,6 +9,7 @@ import { todayInWarsaw } from "@/lib/dates"
 import { PipelineError, runCasePipeline, type PipelineDeps, type PipelineCaseInput, type PipelineResult } from "@/server/ai/pipeline/run-case-pipeline"
 import { createRequestId, defaultSink, logIncoming, type LogSink } from "@/server/ai/log/call-log"
 import { EnvError, getEnv, type AppEnv } from "@/server/env"
+import { readBodyLimited } from "@/server/http/read-limited-body"
 import { checkSize, inspectImage, makeThumbnail, prepareForModel } from "@/server/image"
 
 // ADR-002 3-5: POST /api/cases. Pre-stream errors are JSON; the stream holds one terminal event.
@@ -83,10 +84,9 @@ export async function handleCasesRequest(request: Request, deps: HandleCasesDeps
     return response
   }
 
-  const declared = Number(request.headers.get("content-length"))
-  if (request.headers.get("content-length") !== null && declared > MAX_BODY_BYTES) {
-    return respond(jsonError(413, { code: "file_too_large" }))
-  }
+  // Limit enforced while reading, so a missing Content-Length does not bypass it (T28 F5).
+  const bytes = await readBodyLimited(request, MAX_BODY_BYTES)
+  if (bytes === null) return respond(jsonError(413, { code: "file_too_large" }))
 
   let env: AppEnv
   try {
@@ -98,7 +98,10 @@ export async function handleCasesRequest(request: Request, deps: HandleCasesDeps
 
   let formData: FormData
   try {
-    formData = await request.formData()
+    const headers = new Headers()
+    const contentType = request.headers.get("content-type")
+    if (contentType) headers.set("content-type", contentType)
+    formData = await new Response(bytes as BodyInit, { headers }).formData()
   } catch {
     return respond(jsonError(400, { code: "validation_failed", fieldErrors: { _form: "required" } }))
   }

@@ -30,7 +30,8 @@ export interface WithCallLogOptions<T> {
   extractCost?: (result: T) => number | undefined
 }
 
-function httpStatusOf(error: unknown): number | undefined {
+/** HTTP status carried by an SDK or fetch error, when it has one. */
+export function httpStatusOf(error: unknown): number | undefined {
   if (typeof error !== "object" || error === null) return undefined
   const candidate = error as { statusCode?: unknown; status?: unknown }
   if (typeof candidate.statusCode === "number") return candidate.statusCode

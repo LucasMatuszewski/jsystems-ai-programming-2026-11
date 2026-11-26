@@ -69,6 +69,31 @@ describe("POST /api/cases pre-stream errors", () => {
     expect(h.fetchCalls()).toBe(0)
   })
 
+  // T28 F5: the 11 MB limit holds while reading the body, even without Content-Length (chunked upload).
+  it("413 file_too_large for a streamed body over 11 MB without Content-Length, reading stops at the limit", async () => {
+    const h = harness()
+    const head = new Request("http://localhost:3000/api/cases", { method: "POST", body: (() => { const f = new FormData(); f.append("caseType", "return"); f.append("image", photo()); return f })() })
+    const contentType = head.headers.get("content-type") as string
+    const headBytes = new Uint8Array(await head.arrayBuffer())
+    const filler = new Uint8Array(256 * 1024).fill(0x78)
+    let pulled = 0
+    const body = new ReadableStream<Uint8Array>({
+      pull(controller) {
+        pulled += 1
+        if (pulled === 1) controller.enqueue(headBytes)
+        else if (pulled > 200) controller.close()
+        else controller.enqueue(filler)
+      },
+    })
+    const request = new Request("http://localhost:3000/api/cases", { method: "POST", headers: { "content-type": contentType }, body, duplex: "half" } as RequestInit)
+    expect(request.headers.get("content-length")).toBeNull()
+    const res = await handleCasesRequest(request, h.deps)
+    expect(res.status).toBe(413)
+    expect(await res.json()).toEqual({ code: "file_too_large" })
+    expect(h.fetchCalls()).toBe(0)
+    expect(pulled).toBeLessThan(60) // 11 MB = 44 chunks of 256 KB
+  })
+
   it("500 server_misconfigured without leaking variable values when OPENROUTER_API_KEY is absent", async () => {
     const saved = process.env.OPENROUTER_API_KEY
     delete process.env.OPENROUTER_API_KEY

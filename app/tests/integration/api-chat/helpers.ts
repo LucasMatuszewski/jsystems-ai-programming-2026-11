@@ -79,3 +79,42 @@ export const jsonRequest = (body: unknown, headers: Record<string, string> = {})
     headers: { "content-type": "application/json", ...headers },
     body: typeof body === "string" ? body : JSON.stringify(body),
   })
+
+/** DERIVED variant of a recording: step 2 repeats the tool-call exchange of step 1 (a model that calls the tool twice). */
+export function withRepeatedToolCall(base: string, input: unknown): Fixture {
+  const fixture = withToolInput(base, input)
+  const first = fixture.exchanges[0]!
+  return { ...fixture, exchanges: [first, first] }
+}
+
+/** A `fetch` whose upstream never answers: it only rejects when the request signal aborts (a stalled provider). */
+export const hangingFetch = ((_input: RequestInfo | URL, init?: RequestInit) =>
+  new Promise<Response>((_resolve, reject) => {
+    const signal = init?.signal
+    if (!signal) return
+    const fail = () => reject(signal.reason)
+    if (signal.aborted) fail()
+    else signal.addEventListener("abort", fail, { once: true })
+  })) as typeof fetch
+
+/**
+ * DERIVED variant of a recording: the first `events` SSE events of exchange 1 are delivered verbatim,
+ * then the connection stalls until the request signal aborts (a provider that dies mid-answer).
+ */
+export function stallingFetchAfter(base: string, events: number): typeof fetch {
+  const body = loadFixture(base).exchanges[0]!.response!.body
+  const head = body.split("\n\n").slice(0, events).join("\n\n") + "\n\n"
+  return ((_input: RequestInfo | URL, init?: RequestInit) => {
+    const encoder = new TextEncoder()
+    const stream = new ReadableStream<Uint8Array>({
+      start(controller) {
+        controller.enqueue(encoder.encode(head))
+        const signal = init?.signal
+        const fail = () => controller.error(signal?.reason)
+        if (signal?.aborted) fail()
+        else signal?.addEventListener("abort", fail, { once: true })
+      },
+    })
+    return Promise.resolve(new Response(stream, { status: 200, headers: { "content-type": "text/event-stream" } }))
+  }) as typeof fetch
+}

@@ -1,5 +1,5 @@
 import { z } from "zod"
-import { addYears, isValidIsoDate } from "@/lib/dates"
+import { addYears, isValidIsoDate, todayInWarsaw } from "@/lib/dates"
 import { CASE_TYPES, CATEGORIES } from "./enums"
 
 export const MAX_IMAGE_BYTES = 10 * 1024 * 1024
@@ -31,9 +31,13 @@ export type FormErrorCode =
 const optionError = (iss: { input?: unknown }) =>
   iss.input === undefined || iss.input === "" ? "required" : "invalid_option"
 
+/** A fixed day (the form and the API use one per request) or a clock read at parse time. */
+export type TodaySource = string | (() => string)
+
 /** Error messages are error codes; the UI maps them to Polish via `pl.errors`. */
-export function makeCaseFormFieldsSchema(today: string) {
-  const oldest = addYears(today, -5)
+export function makeCaseFormFieldsSchema(todaySource: TodaySource) {
+  const today = () => (typeof todaySource === "function" ? todaySource() : todaySource)
+  const oldest = () => addYears(today(), -5)
   return z
     .object({
       caseType: z.enum(CASE_TYPES, { error: optionError }),
@@ -48,8 +52,8 @@ export function makeCaseFormFieldsSchema(today: string) {
         .string({ error: "required" })
         .min(1, "required")
         .refine(isValidIsoDate, "required")
-        .refine((d) => !isValidIsoDate(d) || d <= today, "date_future")
-        .refine((d) => !isValidIsoDate(d) || d >= oldest, "date_too_old"),
+        .refine((d) => !isValidIsoDate(d) || d <= today(), "date_future")
+        .refine((d) => !isValidIsoDate(d) || d >= oldest(), "date_too_old"),
       reason: z.string().trim().max(REASON_MAX, "reason_too_long").default(""),
       consent: z.literal(true, { error: "consent_required" }),
     })
@@ -68,6 +72,12 @@ export function makeCaseFormFieldsSchema(today: string) {
 }
 
 export type CaseFormFields = z.infer<ReturnType<typeof makeCaseFormFieldsSchema>>
+
+/**
+ * The form values stored in the session and sent as chat case context: the form schema itself,
+ * with "today" read at parse time (one source of limits and formats, T28 F3).
+ */
+export const CaseFormValuesSchema = makeCaseFormFieldsSchema(() => todayInWarsaw())
 export type FieldErrors = Record<string, string>
 
 /** First error code per field. */

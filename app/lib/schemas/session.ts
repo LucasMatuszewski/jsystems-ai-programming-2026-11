@@ -1,26 +1,19 @@
 import { z } from "zod"
-import { CaseTypeSchema, CategorySchema } from "./enums"
+import { todayInWarsaw } from "@/lib/dates"
+import { makeCaseFormFieldsSchema, CaseFormValuesSchema, type TodaySource } from "./case-form"
 import {
   CaseDecisionSchema,
   DecisionDataSchema,
   ImageFindingsSchema,
-  RuleRefsSchema,
-  SignalsSummarySchema,
+  LIKELY_CAUSES,
+  PHOTO_QUALITIES,
 } from "./decision"
 import { DecisionSchema } from "./enums"
 
 export const CHAT_MESSAGE_MAX = 2000
 export const CHAT_MAX_MESSAGES = 60
 
-/** Form values without the image (stored and sent as case context). */
-export const CaseFormValuesSchema = z.object({
-  caseType: CaseTypeSchema,
-  category: CategorySchema,
-  model: z.string().min(1),
-  purchaseDate: z.string().min(1),
-  reason: z.string(),
-  consent: z.literal(true),
-})
+/** Form values without the image (stored and sent as case context): derived from the form schema. */
 export type CaseFormValues = z.infer<typeof CaseFormValuesSchema>
 
 const TextPartSchema = z.object({ type: z.literal("text"), text: z.string() })
@@ -50,21 +43,55 @@ export const CaseSessionPayloadSchema = z.object({
 })
 export type CaseSessionPayload = z.infer<typeof CaseSessionPayloadSchema>
 
-export const CaseContextSchema = z.object({
-  caseId: z.uuid(),
-  form: CaseFormValuesSchema,
-  daysSincePurchase: z.number().int().min(0),
-  imageFindings: ImageFindingsSchema,
-  signalsSummary: SignalsSummarySchema,
-  currentDecision: z.object({
-    decision: DecisionSchema,
-    ruleRefs: RuleRefsSchema,
-    source: z.enum(["initial", "update"]),
-  }),
-})
+// Limits for the strings of the client-supplied case context: they end up in the system prompt (T28 F3).
+export const CONTEXT_TEXT_MAX = 1000
+export const CONTEXT_EVIDENCE_MAX = 30
+export const CONTEXT_EVIDENCE_ITEM_MAX = 500
+export const CONTEXT_SIGNALS_MAX = 20
+export const CONTEXT_RULE_REFS_MAX = 10
+
+/** Image findings as sent back by the client: same fields as `ImageFindingsSchema`, with limits. */
+const ContextImageFindingsSchema = z.object({
+  deviceVisible: z.boolean(),
+  categoryMatches: z.boolean(),
+  photoQuality: z.enum(PHOTO_QUALITIES),
+  damage: z.string().max(CONTEXT_TEXT_MAX),
+  signsOfUse: z.string().max(CONTEXT_TEXT_MAX).nullable(),
+  likelyCause: z.enum(LIKELY_CAUSES).nullable(),
+  evidence: z.array(z.string().max(CONTEXT_EVIDENCE_ITEM_MAX)).max(CONTEXT_EVIDENCE_MAX),
+  contradictsDescription: z.boolean(),
+}) satisfies z.ZodType<z.infer<typeof ImageFindingsSchema>>
+
+const ContextSignalsSummarySchema = z
+  .record(
+    z.string().max(40),
+    z.object({
+      value: z.union([z.boolean(), z.string().max(100), z.number()]),
+      confidence: z.number().min(0).max(1),
+    }),
+  )
+  .refine((summary) => Object.keys(summary).length <= CONTEXT_SIGNALS_MAX, "too_many_signals")
+
+const ContextRuleRefsSchema = z.array(z.string().min(1).max(20)).min(1).max(CONTEXT_RULE_REFS_MAX)
+
+function makeCaseContextSchema(today: TodaySource) {
+  return z.object({
+    caseId: z.uuid(),
+    form: makeCaseFormFieldsSchema(today),
+    daysSincePurchase: z.number().int().min(0), // advisory only: the server recomputes it from form.purchaseDate
+    imageFindings: ContextImageFindingsSchema,
+    signalsSummary: ContextSignalsSummarySchema,
+    currentDecision: z.object({
+      decision: DecisionSchema,
+      ruleRefs: ContextRuleRefsSchema,
+      source: z.enum(["initial", "update"]),
+    }),
+  })
+}
+export const CaseContextSchema = makeCaseContextSchema(() => todayInWarsaw())
 export type CaseContext = z.infer<typeof CaseContextSchema>
 
-/** Shape check only; full content is validated with `validateUIMessages`. */
+/** Shape check only; used for the stored session. Chat requests use `ChatMessageSchema`. */
 export const UIMessageLikeSchema = z.looseObject({
   id: z.string(),
   role: z.enum(["user", "assistant", "system"]),
@@ -72,29 +99,43 @@ export const UIMessageLikeSchema = z.looseObject({
 })
 export type UIMessageLike = z.infer<typeof UIMessageLikeSchema>
 
-export const ChatRequestSchema = z
-  .object({
-    id: z.string().min(1),
-    messages: z.array(UIMessageLikeSchema).min(1).max(CHAT_MAX_MESSAGES, "too_many_messages"),
-    caseContext: CaseContextSchema,
-  })
-  .superRefine((value, ctx) => {
-    const last = value.messages[value.messages.length - 1]
-    if (!last) return
-    if (last.role !== "user") {
-      ctx.addIssue({ code: "custom", path: ["messages"], message: "last_message_not_user" })
-      return
-    }
-    const text = last.parts
-      .map((p) => (p.type === "text" && typeof p.text === "string" ? p.text : ""))
-      .join("")
-      .trim()
-    if (text.length < 1) {
-      ctx.addIssue({ code: "custom", path: ["messages"], message: "message_empty" })
-    } else if (text.length > CHAT_MESSAGE_MAX) {
-      ctx.addIssue({ code: "custom", path: ["messages"], message: "message_too_long" })
-    }
-  })
+// T28 F2: the client may send only its own text and the parts our UI produces.
+const UserTextPartSchema = z.looseObject({ type: z.literal("text"), text: z.string() })
+const ChatAssistantPartSchema = z.union([
+  z.looseObject({ type: z.literal("text"), text: z.string() }),
+  z.looseObject({ type: z.literal("step-start") }),
+  z.looseObject({ type: z.literal("data-decision"), data: DecisionDataSchema }),
+  z.looseObject({ type: z.literal("tool-update_recommendation") }), // content checked by validateUIMessages
+])
+
+export const ChatMessageSchema = z.discriminatedUnion("role", [
+  z.looseObject({ id: z.string(), role: z.literal("user"), parts: z.array(UserTextPartSchema).min(1) }),
+  z.looseObject({ id: z.string(), role: z.literal("assistant"), parts: z.array(ChatAssistantPartSchema) }),
+])
+
+export function makeChatRequestSchema(today: TodaySource) {
+  return z
+    .object({
+      id: z.string().min(1),
+      messages: z.array(ChatMessageSchema).min(1).max(CHAT_MAX_MESSAGES, "too_many_messages"),
+      caseContext: makeCaseContextSchema(today),
+    })
+    .superRefine((value, ctx) => {
+      const last = value.messages[value.messages.length - 1]
+      if (!last) return
+      if (last.role !== "user") {
+        ctx.addIssue({ code: "custom", path: ["messages"], message: "last_message_not_user" })
+        return
+      }
+      const text = last.parts.map((p) => p.text).join("").trim()
+      if (text.length < 1) {
+        ctx.addIssue({ code: "custom", path: ["messages"], message: "message_empty" })
+      } else if (text.length > CHAT_MESSAGE_MAX) {
+        ctx.addIssue({ code: "custom", path: ["messages"], message: "message_too_long" })
+      }
+    })
+}
+export const ChatRequestSchema = makeChatRequestSchema(() => todayInWarsaw())
 export type ChatRequest = z.infer<typeof ChatRequestSchema>
 
 export const CASES_ERROR_CODES = [

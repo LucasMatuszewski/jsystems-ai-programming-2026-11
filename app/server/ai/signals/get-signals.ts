@@ -7,7 +7,7 @@ import { createProvider } from "@/server/ai/provider"
 import { buildSignalQuestions, buildSignalStateText } from "@/server/ai/signals/questions"
 import { InvalidAnswerError, normalizeDecisionAnswers, type RawAnswer } from "@/server/ai/signals/normalize"
 import { getEnv } from "@/server/env"
-import { openRouterCostOf, withCallLog } from "@/server/ai/upstream"
+import { httpStatusOf, openRouterCostOf, withCallLog } from "@/server/ai/upstream"
 
 // ADR-001 3.2 step 2 and A1. Never throws: every failure returns
 // status "unavailable" with a fixed reason code. Reason codes never contain
@@ -26,6 +26,8 @@ export type GetSignalsDeps = {
   callLogSink?: (line: string) => void
   /** Monotonic clock in milliseconds; defaults to `performance.now`. */
   now?: () => number
+  /** The request or pipeline signal: aborting it cancels the signals call (T28 F8). */
+  abortSignal?: AbortSignal
 }
 
 /** Upper bound for one signals call. Not configurable in this slice. */
@@ -39,14 +41,6 @@ const INVALID_ERROR_NAMES = new Set([
   "EvaluationUnsupportedQuestionTypeError",
 ])
 
-function statusOf(error: unknown): number | undefined {
-  if (typeof error !== "object" || error === null) return undefined
-  const candidate = error as { statusCode?: unknown; status?: unknown }
-  if (typeof candidate.statusCode === "number") return candidate.statusCode
-  if (typeof candidate.status === "number") return candidate.status
-  return undefined
-}
-
 /** Maps an error to a fixed reason code. The message text is never used. */
 export function classifySignalsError(error: unknown, timedOut: boolean): SignalsReason {
   if (timedOut) return "timeout"
@@ -54,7 +48,7 @@ export function classifySignalsError(error: unknown, timedOut: boolean): Signals
   if (INVALID_ERROR_NAMES.has(name) || error instanceof InvalidAnswerError) return "invalid_answer"
   if (/refus/i.test(name)) return "refusal"
   if (name === "AbortError" || name === "TimeoutError") return "timeout"
-  const status = statusOf(error)
+  const status = httpStatusOf(error)
   if (status === 401 || status === 403) return "auth"
   if (status !== undefined) return status === 408 ? "timeout" : "upstream"
   // Transport failure: fetch rejected or the SDK wrapped a connection error without a status.
@@ -114,7 +108,7 @@ export async function getDecisionSignals(
           state: [stateText, { type: "image_url", image_url: { url: imageUrl } }],
           questions,
           maxRetries: 0,
-          abortSignal: timeout,
+          abortSignal: deps.abortSignal ? AbortSignal.any([timeout, deps.abortSignal]) : timeout,
         })
     )
 

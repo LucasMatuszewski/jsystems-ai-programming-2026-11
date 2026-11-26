@@ -10,7 +10,7 @@ import { useStoredSession } from "./use-stored-session"
 /** `/chat`: reads the tab session and hands it to the conversation (PRD 4.3). */
 export function ChatScreen() {
   const router = useRouter()
-  const { checked, session } = useStoredSession()
+  const { checked, session, memoryOnly } = useStoredSession()
 
   // Navigation only, no requests: no session means back to the form.
   useEffect(() => {
@@ -26,5 +26,5 @@ export function ChatScreen() {
     router.replace("/")
   }
 
-  return <ChatSession session={session} onNewCase={newCase} />
+  return <ChatSession session={session} onNewCase={newCase} storageUnavailable={memoryOnly} />
 }

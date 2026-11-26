@@ -14,6 +14,7 @@ import { evaluateFastPath } from "@/server/ai/logic/fast-path"
 import { applyGuards } from "@/server/ai/logic/guards"
 import { loadPolicy } from "@/server/ai/logic/policy"
 import { applyDateRules } from "@/server/ai/logic/rules"
+import { checkBody, ensureDayCount } from "@/server/ai/pipeline/body-checks"
 import { findingsFromSignals } from "@/server/ai/pipeline/image-findings"
 import { createProvider } from "@/server/ai/provider"
 import { loadPrompt } from "@/server/ai/prompts"
@@ -149,6 +150,7 @@ async function run(
     provider,
     modelId: env.decisionModel,
     requestId,
+    abortSignal: signal,
     ...(deps.callLogSink ? { callLogSink: deps.callLogSink } : {}),
   })
   signal.throwIfAborted()
@@ -239,6 +241,23 @@ async function run(
     return guarded
   }
 
+  /**
+   * AC-23: the justification states the system day count and cites only policy rules. A violation
+   * uses the existing single retry; a day count still missing after it is inserted by the server.
+   */
+  const checkBodyFacts = (bodyMarkdown: string, attemptNo: number) => {
+    const body = checkBody(bodyMarkdown, days, policy.ruleIds)
+    if (body.unknownRuleIds.length > 0) throw new OutputViolation("rule_id_not_in_policy")
+    if (body.daysMissing && attemptNo < 2) throw new OutputViolation("day_count_missing")
+  }
+  const withDayCount = <T extends { bodyMarkdown: string }>(parsed: T, guardsApplied: string[]) => {
+    const fixed = ensureDayCount(parsed.bodyMarkdown, days)
+    return {
+      parsed: { ...parsed, bodyMarkdown: fixed.bodyMarkdown },
+      guardsApplied: fixed.inserted ? [...guardsApplied, "day_count_inserted"] : guardsApplied,
+    }
+  }
+
   // Writer for the rule and fast routes: the decision is locked, the model only writes the message.
   const writeMessage = async (route: "rule" | "fast", escalationReasons: string[], locked: Decision, lockedRefs: string[]) => {
     // A1: the date rule does not depend on the photo, so neutral findings are valid when signals are unavailable.
@@ -247,7 +266,9 @@ async function run(
     state.reasons = escalationReasons
     promptVersions.writer = loadPrompt("writer").version
     const startedAt = performance.now()
+    let attempts = 0
     const attempt = async () => {
+      attempts += 1
       const result = await withCallLog(
         { requestId, stage: "writer", modelId: env.llmModel, ...callLogSink, extractCost: (r) => openRouterCostOf(r.providerMetadata) },
         () =>
@@ -264,14 +285,17 @@ async function run(
       const parsed = WriterOutputSchema.safeParse(result.output)
       if (!parsed.success) throw new OutputViolation("schema")
       const guarded = guard(route, locked, lockedRefs, imageFindings, parsed.data.photoAdvice)
+      checkBodyFacts(parsed.data.bodyMarkdown, attempts)
       return { parsed: parsed.data, guarded }
     }
-    const { parsed, guarded } = await withOneRetry(attempt, signal)
+    const attempted = await withOneRetry(attempt, signal)
+    const { guarded } = attempted
+    const { parsed, guardsApplied } = withDayCount(attempted.parsed, guarded.guardsApplied)
     durations.writer = Math.round(performance.now() - startedAt)
     return finish(
       route, escalationReasons,
       { decision: guarded.decision, ruleRefs: guarded.ruleRefs, remedy: null, imageFindings, ...parsed, photoAdvice: guarded.photoAdvice },
-      guarded.guardsApplied, guarded.decision, guarded.ruleRefs,
+      guardsApplied, guarded.decision, guarded.ruleRefs,
     )
   }
 
@@ -298,7 +322,9 @@ async function run(
   // Stage 5: escalated decision.
   promptVersions.decision = loadPrompt(caseType === "return" ? "decision-return" : "decision-complaint").version
   const startedAt = performance.now()
+  let attempts = 0
   const attempt = async () => {
+    attempts += 1
     const result = await withCallLog(
       { requestId, stage: "escalated", modelId: env.llmModel, ...callLogSink, extractCost: (r) => openRouterCostOf(r.providerMetadata) },
       () =>
@@ -314,9 +340,12 @@ async function run(
     const parsed = EscalatedDecisionOutputSchema.safeParse(result.output)
     if (!parsed.success) throw new OutputViolation("schema")
     const guarded = guard("escalated", parsed.data.decision, parsed.data.ruleRefs, parsed.data.imageFindings, parsed.data.photoAdvice)
+    checkBodyFacts(parsed.data.bodyMarkdown, attempts)
     return { parsed: parsed.data, guarded }
   }
-  const { parsed, guarded } = await withOneRetry(attempt, signal)
+  const attempted = await withOneRetry(attempt, signal)
+  const { guarded } = attempted
+  const { parsed, guardsApplied } = withDayCount(attempted.parsed, guarded.guardsApplied)
   durations.decision = Math.round(performance.now() - startedAt)
-  return finish("escalated", escalationReasons, { ...parsed, photoAdvice: guarded.photoAdvice }, guarded.guardsApplied, guarded.decision, guarded.ruleRefs)
+  return finish("escalated", escalationReasons, { ...parsed, photoAdvice: guarded.photoAdvice }, guardsApplied, guarded.decision, guarded.ruleRefs)
 }

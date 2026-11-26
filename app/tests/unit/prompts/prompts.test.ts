@@ -148,3 +148,16 @@ describe("chat prompts", () => {
     expect(loadPrompt(name).version).toBe(`${name}@1.1.0`)
   })
 })
+
+// AC-23 (T28 F4): the first-message prompts require the system day count in the justification.
+describe.each(["writer", "decision-return", "decision-complaint"] as const)("prompt %s: day count in the justification", (name) => {
+  it("is version 1.1.0 and states the given daysSincePurchase with the word dni", () => {
+    const prompt = loadPrompt(name)
+    expect(prompt.version).toBe(`${name}@1.1.0`)
+    expect(prompt.text).toMatch(/`daysSincePurchase` as a number with the word "dni"/)
+    expect(prompt.text).toContain("### Uzasadnienie")
+    expect(prompt.text).toMatch(/Polish label[^\n]*dd\.mm\.yyyy/)
+    expect(prompt.text).toContain("Nowe zgłoszenie") // G4 D4: a correct photo needs a new case
+    expect(prompt.text).toContain("powyższą wskazówką") // named only as the forbidden phrasing
+  })
+})

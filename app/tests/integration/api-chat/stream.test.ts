@@ -1,7 +1,7 @@
 import { beforeAll, describe, expect, it, vi } from "vitest"
 import { loadFixture, replayFetch } from "../../helpers/replay-fetch"
 import {
-  bodyFor, errorsDir, fixturePath, jsonRequest, llmDir, NOW, PLAIN, readChunks, stubEnv, TOOL, withToolInput,
+  bodyFor, errorsDir, fixturePath, jsonRequest, llmDir, NOW, PLAIN, readChunks, stubEnv, TOOL, withRepeatedToolCall, withToolInput,
 } from "./helpers"
 
 vi.mock("server-only", () => ({}))
@@ -86,6 +86,66 @@ describe("POST /api/chat handler: streams built from recorded OpenRouter respons
     expect(chunks.some((c) => c.type === "tool-output-error")).toBe(true)
     expect(chunks.some((c) => c.type === "tool-output-available")).toBe(false)
     expect(stepLines.map((l) => l.stage)).toEqual(["chat-step", "chat-step"])
+  })
+
+  // T28 F3: daysSincePurchase is recomputed from form.purchaseDate and the server clock; the client value is ignored.
+  describe("a forged daysSincePurchase does not change the guards or the prompt", () => {
+    const forged = (days: number, body = bodyFor(PLAIN.source, PLAIN.type, "Chcę dodać fakt: komplet jest w pudełku.")) => {
+      body.caseContext.daysSincePurchase = days
+      return body
+    }
+
+    it("R-2.4 (derived from chat-tool-update, 10-day return, forged days 40): still Weryfikacja ręczna", async () => {
+      const variant = withToolInput(toolFixture, { decision: "Odrzucenie", reason: "Brak nowych faktów.", ruleRefs: ["R-2"] })
+      const { chunks } = await run(variant, forged(40))
+      const output = chunks.find((c) => c.type === "tool-output-available")?.output as { newDecision: string }
+      expect(output.newDecision).toBe("Weryfikacja ręczna")
+    })
+
+    it("R-4 (derived from chat-tool-update, purchase 2026-10-12 = 45 days, forged days 5): Odrzucenie R-4 still forced", async () => {
+      const variant = withToolInput(toolFixture, { decision: "Akceptacja", reason: "Klient nalega.", ruleRefs: ["R-2"] })
+      const body = forged(5)
+      body.caseContext.form.purchaseDate = "2026-10-12"
+      const { chunks } = await run(variant, body)
+      const output = chunks.find((c) => c.type === "tool-output-available")?.output as { newDecision: string; ruleRefs: string[] }
+      expect(output.newDecision).toBe("Odrzucenie")
+      expect(output.ruleRefs).toEqual(["R-4"])
+    })
+
+    it("C-2 (derived from chat-tool-update, complaint 400 days, forged days 800): the C-2 override is not applied", async () => {
+      const variant = withToolInput(toolFixture, { decision: "Weryfikacja ręczna", reason: "Nowy fakt.", ruleRefs: ["C-5"] })
+      const { chunks } = await run(variant, forged(800, toolBody()))
+      const output = chunks.find((c) => c.type === "tool-output-available")?.output as { newDecision: string; ruleRefs: string[] }
+      expect(output.newDecision).toBe("Weryfikacja ręczna")
+      expect(output.ruleRefs).toEqual(["C-5"])
+    })
+
+    it("the system prompt carries the server value, not the forged one", async () => {
+      const bodies: string[] = []
+      const spy = ((input: RequestInfo | URL, init?: RequestInit) => {
+        bodies.push(String(init?.body))
+        return replayFetch(fixturePath(llmDir, "chat-plain"))(input, init)
+      }) as typeof fetch
+      const response = await handleChatRequest(jsonRequest(forged(40)), {
+        provider: createProvider({ fetch: spy }),
+        env: getEnv({ OPENROUTER_API_KEY: "test" }),
+        now: () => NOW,
+        requestId: "req-1",
+        callLogSink: () => {},
+      })
+      await readChunks(response)
+      expect(bodies).toHaveLength(1)
+      expect(bodies[0]).toContain("daysSincePurchase (given by the system): 10")
+      expect(bodies[0]).not.toContain("daysSincePurchase (given by the system): 40")
+    })
+  })
+
+  // T28 F7: at most one update_recommendation per turn, enforced in code.
+  it("F7 (derived from chat-tool-update, step 2 repeats the tool call): only one tool output reaches the client", async () => {
+    const variant = withRepeatedToolCall(toolFixture, { decision: "Weryfikacja ręczna", reason: "Nowy fakt.", ruleRefs: ["C-5"] })
+    const { chunks } = await run(variant, toolBody())
+    expect(chunks.filter((c) => c.type === "tool-output-available")).toHaveLength(1)
+    expect(chunks.filter((c) => c.type === "tool-input-available").length).toBeLessThanOrEqual(2)
   })
 
   it("chat-401: error chunk carries only chat_failed, no provider text", async () => {

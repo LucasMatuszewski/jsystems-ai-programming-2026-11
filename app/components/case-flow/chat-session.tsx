@@ -17,6 +17,8 @@ import { cn } from "@/lib/utils"
 type ChatSessionProps = {
   session: StoredSession
   onNewCase: () => void
+  /** The case could not be written to sessionStorage and lives in memory only (T28 F6). */
+  storageUnavailable?: boolean
   /** Tests inject a replay of the recorded /api/chat responses (ADR-006). */
   fetch?: typeof fetch
 }
@@ -48,9 +50,10 @@ const hasVisibleParts = (message: CaseUIMessage) =>
   message.parts.some((part) => part.type !== "step-start" && !(part.type === "text" && !part.text.trim()))
 
 /** Summary panel plus the live conversation. A request is only ever sent from a user action (ADR-006 3.2). */
-export function ChatSession({ session, onNewCase, fetch: fetchImpl }: ChatSessionProps) {
+export function ChatSession({ session, onNewCase, storageUnavailable = false, fetch: fetchImpl }: ChatSessionProps) {
   const [initial] = useState(session)
   const [storageFailed, setStorageFailed] = useState(false)
+  const noticeText = storageUnavailable ? pl.chat.storageUnavailable : pl.chat.storageFailed
 
   const [chat] = useState(() => {
     const persist = () => {
@@ -114,9 +117,9 @@ export function ChatSession({ session, onNewCase, fetch: fetchImpl }: ChatSessio
           ))}
           {showError ? <ChatErrorRow onRetry={() => void regenerate()} /> : null}
         </section>
-        {storageFailed ? (
+        {storageFailed || storageUnavailable ? (
           <p role="status" className="text-sm text-muted-foreground">
-            {pl.chat.storageFailed}
+            {noticeText}
           </p>
         ) : null}
         <ChatInput disabled={busy} onSend={(text) => void sendMessage({ text })} />

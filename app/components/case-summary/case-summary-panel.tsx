@@ -4,6 +4,7 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
+import { formatPlDate } from "@/lib/dates"
 import { pl } from "@/lib/i18n/pl"
 import type { CaseSessionPayload } from "@/lib/schemas/session"
 import type { Decision } from "@/lib/schemas/enums"
@@ -18,11 +19,6 @@ export type CaseSummaryPanelProps = {
   onNewCase: () => void
   /** desktop: static column (PRD 9.3). mobile: collapsible, collapsed by default. */
   variant?: "desktop" | "mobile"
-}
-
-const formatPurchaseDate = (iso: string) => {
-  const [year, month, day] = iso.split("-")
-  return `${day}.${month}.${year}`
 }
 
 export function CaseSummaryPanel({
@@ -87,7 +83,7 @@ function CaseSummaryBody({
         <Field term={pl.summary.caseType} value={pl.caseTypes[form.caseType].label} />
         <Field term={pl.summary.category} value={pl.categories[form.category]} />
         <Field term={pl.summary.model} value={form.model} />
-        <Field term={pl.summary.purchaseDate} value={formatPurchaseDate(form.purchaseDate)} />
+        <Field term={pl.summary.purchaseDate} value={formatPlDate(form.purchaseDate)} />
         <Field term={pl.summary.daysSincePurchase} value={String(payload.daysSincePurchase)} />
       </dl>
 

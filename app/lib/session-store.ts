@@ -8,7 +8,8 @@ const SESSION_VERSION = 1
 
 export type SessionStorageLike = Pick<Storage, "getItem" | "setItem" | "removeItem">
 
-export type WriteSessionResult = { ok: true } | { ok: false; reason: "quota" }
+/** `quota`: storage is full. `unavailable`: any other storage error (blocked, private window, disabled). */
+export type WriteSessionResult = { ok: true } | { ok: false; reason: "quota" | "unavailable" }
 
 export type CurrentDecision = {
   decision: Decision
@@ -53,7 +54,18 @@ export function readSession(storage: SessionStorageLike = sessionStorage): Store
   return result.data
 }
 
-/** Writes the session; a full storage quota is reported, not thrown (ADR-003 3.3). */
+// A session that could not be stored stays available for this page's lifetime (T28 F6).
+let memorySession: StoredSession | null = null
+
+export function rememberSessionInMemory(session: StoredSession): void {
+  memorySession = session
+}
+
+export function readMemorySession(): StoredSession | null {
+  return memorySession
+}
+
+/** Writes the session; a storage failure is reported, never thrown (ADR-003 3.3, T28 F6). */
 export function writeSession(
   session: StoredSession,
   storage: SessionStorageLike = sessionStorage,
@@ -67,11 +79,12 @@ export function writeSession(
         return { ok: false, reason: "quota" }
       }
     }
-    throw error
+    return { ok: false, reason: "unavailable" }
   }
 }
 
 export function clearSession(storage: SessionStorageLike = sessionStorage): void {
+  memorySession = null
   safeClear(storage)
 }
 

@@ -86,6 +86,8 @@ export const pl = {
     send: "Wyślij",
     updatingRecommendation: "Aktualizuję rekomendację…",
     storageFailed: "Nie udało się zapisać rozmowy w przeglądarce.",
+    storageUnavailable:
+      "Nie udało się zapisać zgłoszenia w przeglądarce. Rozmowa działa, ale odświeżenie strony ją usunie.",
     tooLong: "Wiadomość może mieć najwyżej 2000 znaków.",
     inputLabel: "Twoja wiadomość",
   },

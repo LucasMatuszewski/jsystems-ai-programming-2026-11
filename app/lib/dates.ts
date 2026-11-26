@@ -31,3 +31,9 @@ export function addYears(isoDate: string, years: number): string {
   if (d > lastDay) d = lastDay
   return `${String(y).padStart(4, "0")}-${String(mo).padStart(2, "0")}-${String(d).padStart(2, "0")}`
 }
+
+/** ISO date (YYYY-MM-DD) as dd.mm.yyyy, the format shown in the panel. */
+export function formatPlDate(isoDate: string): string {
+  const m = ISO_DATE.exec(isoDate)
+  return m ? `${m[3]}.${m[2]}.${m[1]}` : isoDate
+}

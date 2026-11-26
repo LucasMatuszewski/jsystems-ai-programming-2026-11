@@ -1,3 +1,5 @@
+import { formatPlDate } from "@/lib/dates"
+import { pl } from "@/lib/i18n/pl"
 import type { CaseFormValues, DecisionSignals } from "@/lib/schemas"
 
 export type CaseInputText = Pick<
@@ -10,9 +12,9 @@ export function renderCaseData(caseInput: CaseInputText, days: number): string {
   const reason = caseInput.reason.trim()
   return [
     `Case type: ${caseInput.caseType}`,
-    `Category: ${caseInput.category}`,
+    `Category: ${pl.categories[caseInput.category]}`,
     `Model: ${caseInput.model}`,
-    `Purchase date: ${caseInput.purchaseDate}`,
+    `Purchase date: ${formatPlDate(caseInput.purchaseDate)}`,
     `daysSincePurchase (given by the system): ${days}`,
     `Customer reason: <customer_reason>${reason.length > 0 ? reason : "(not provided)"}</customer_reason>`,
   ].join("\n")

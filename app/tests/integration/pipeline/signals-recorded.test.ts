@@ -3,7 +3,7 @@ import path from "node:path"
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest"
 import { evaluateFastPath } from "@/server/ai/logic/fast-path"
 import { normalizeDecisionAnswers } from "@/server/ai/signals/normalize"
-import { caseFrom, fixturesDir, IMAGE, llmFixture, produced, recordedOutput, setup } from "./helpers"
+import { caseFrom, fixturesDir, IMAGE, produced, recordedOutput, setup, withDays } from "./helpers"
 
 vi.mock("server-only", () => ({}))
 
@@ -24,7 +24,7 @@ describe("runCasePipeline: signals ok + escalated model", () => {
   it("return-laptop-2 signals + escalated-return-laptop-2: route escalated, reasons from the gate", async () => {
     const signalsFile = path.join(fixturesDir, "decisions", "return-laptop-2.json")
     const base = "escalated-return-laptop-2"
-    const ctx = setup([signalsFile, llmFixture(base)])
+    const ctx = setup([signalsFile, withDays(base)])
     const env = getEnv({ OPENROUTER_API_KEY: "test", DECISION_LOG_PATH: "" })
     expect(env.fastPathEnabled).toBe(true)
 
