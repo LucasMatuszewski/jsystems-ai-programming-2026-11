@@ -9,7 +9,7 @@ Not provoked, so there is no recording. They are covered only through the generi
 | OpenRouter 503 / upstream outage | not provoked per ADR-006 §3.1 |
 | Mid-stream errors | not provoked per ADR-006 §3.1 |
 | Own endpoint 413 (file > 10 MB) | no real photo exceeds 10 MB and generated files are forbidden |
-| Successful Luna Decisions answers (4 cases) | CAPTURED 2026-11-26 (endpoint recovered after the temporary 401), see `openrouter/decisions/NOTES.md` |
+| Successful decision-model answers (4 cases) | CAPTURED 2026-11-26 with `typesafe/jev-1.14` (Luna recordings archived in `openrouter/decisions/archive-luna/`), see `openrouter/decisions/NOTES.md` |
 | Decisions refusal (`type: "refusal"`) | attempted once (harmless personal-name question), the model answered normally; not provoked further per ADR-006 §3.1 |
 | Fast-route writer recording (`writer-fast-*`) | not needed: none of the 4 real signal recordings is fast-path eligible, so no fast acceptance was produced |
 

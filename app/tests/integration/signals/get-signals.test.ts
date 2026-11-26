@@ -32,7 +32,7 @@ function setup(fixture: string) {
   const call = () =>
     getDecisionSignals(CASE, IMAGE, {
       provider,
-      modelId: "openai/gpt-6-luna-decisions",
+      modelId: "typesafe/jev-1.14",
       requestId: "req-test-1",
       callLogSink: (line) => lines.push(line),
     })
@@ -55,7 +55,7 @@ describe("getDecisionSignals on recorded failures (fail-closed)", () => {
       type: "upstream",
       requestId: "req-test-1",
       stage: "signals",
-      modelId: "openai/gpt-6-luna-decisions",
+      modelId: "typesafe/jev-1.14",
       outcome: "error",
       status: 401,
     })
@@ -108,7 +108,7 @@ describe("getDecisionSignals success path (real recordings, 2026-11-26)", () => 
       { buffer: Buffer.from("synthetic-image-bytes"), mediaType: "image/jpeg" },
       {
         provider: createOpenRouter({ fetch: replayFetch(fixturePath), apiKey: "test" }),
-        modelId: "openai/gpt-6-luna-decisions",
+        modelId: "typesafe/jev-1.14",
         requestId: "req-test-ok",
         callLogSink: (line) => lines.push(line),
       }
@@ -126,7 +126,7 @@ describe("getDecisionSignals success path (real recordings, 2026-11-26)", () => 
       type: "upstream",
       requestId: "req-test-ok",
       stage: "signals",
-      modelId: "openai/gpt-6-luna-decisions",
+      modelId: "typesafe/jev-1.14",
       outcome: "ok",
     })
     expect(JSON.parse(lines[0]!)).toHaveProperty("costUsd")
@@ -138,7 +138,7 @@ describe("getDecisionSignals success path (real recordings, 2026-11-26)", () => 
       IMAGE,
       {
         provider: createOpenRouter({ fetch: replayFetch(path.join(DECISIONS, "complaint-laptop-1.json")), apiKey: "test" }),
-        modelId: "openai/gpt-6-luna-decisions",
+        modelId: "typesafe/jev-1.14",
       }
     )
     expect(out.answers.damage_cause?.value).toBe("user_caused")

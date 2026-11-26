@@ -43,7 +43,7 @@ describe("evaluateFastPath on recording-derived signals", () => {
   it.each(NAMES)("%s: eligible or carries at least one reason; nothing escapes the gate silently", (name) => {
     const result = gate(name)
     if (!result.eligible) expect(result.reasons.length).toBeGreaterThanOrEqual(1)
-    // The eligibility report: with the 2026-11-26 recordings none is eligible.
+    // The eligibility report: with the 2026-11-26 Jev 1.14 recordings none is eligible.
     expect(result.eligible).toBe(false)
   })
 
@@ -53,7 +53,7 @@ describe("evaluateFastPath on recording-derived signals", () => {
     if (!result.eligible) expect(result.reasons).toContain("fast_path_disabled")
   })
 
-  it("return-laptop-2 is blocked by condition (3 of 5) and signs_of_use, not by photo or category", () => {
+  it("return-laptop-2 is blocked by condition (4 of 5, low confidence) and signs_of_use, not by photo or category", () => {
     const result = gate("return-laptop-2")
     expect(result.eligible).toBe(false)
     if (!result.eligible) {

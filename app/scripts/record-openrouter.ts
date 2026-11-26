@@ -25,7 +25,7 @@ const here = path.dirname(fileURLToPath(import.meta.url))
 const appDir = path.resolve(here, "..")
 const imagesDir = path.resolve(appDir, "..", "assets", "example-images")
 const fixturesDir = path.join(appDir, "tests", "fixtures", "openrouter")
-const MODEL = process.env.DECISION_MODEL ?? "openai/gpt-6-luna-decisions"
+const MODEL = process.env.DECISION_MODEL ?? "typesafe/jev-1.14"
 const REAL_KEY = process.env.OPENROUTER_API_KEY
 
 type Exchange = {

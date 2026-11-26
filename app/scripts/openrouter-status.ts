@@ -71,7 +71,7 @@ const wanted = [
   ["LLM_MODEL", process.env.LLM_MODEL ?? "openai/gpt-6-luna"],
   [
     "DECISION_MODEL",
-    process.env.DECISION_MODEL ?? "openai/gpt-6-luna-decisions",
+    process.env.DECISION_MODEL ?? "typesafe/jev-1.14",
   ],
 ] as const
 console.log(`Models (${ids.size} listed by OpenRouter)`)

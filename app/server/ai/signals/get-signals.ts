@@ -66,7 +66,7 @@ function unavailable(reason: SignalsReason, durationMs: number): DecisionSignals
 }
 
 /**
- * Asks the Luna Decisions endpoint for the photo signals of one case.
+ * Asks the decision model (Jev 1.14) endpoint for the photo signals of one case.
  * Fail-closed: any error returns `{ status: "unavailable", reason }`.
  */
 export async function getDecisionSignals(

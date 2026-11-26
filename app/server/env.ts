@@ -38,7 +38,7 @@ const optional = <T extends z.ZodType>(schema: T) =>
 const EnvSchema = z.object({
   OPENROUTER_API_KEY: z.string().min(1),
   LLM_MODEL: optional(z.string().min(1).default("openai/gpt-6-luna")),
-  DECISION_MODEL: optional(z.string().min(1).default("openai/gpt-6-luna-decisions")),
+  DECISION_MODEL: optional(z.string().min(1).default("typesafe/jev-1.14")),
   FAST_PATH_ENABLED: z.string().optional().transform((value) => value === undefined || value === "" || value === "true"),
   FAST_PATH_THRESHOLD: optional(z.coerce.number().min(0).max(1).default(0.8)),
   LLM_REASONING_DECISION: optional(z.enum(EFFORTS).default("high")),

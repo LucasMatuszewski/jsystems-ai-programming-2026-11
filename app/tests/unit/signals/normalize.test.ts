@@ -172,19 +172,21 @@ describe("normalizeDecisionAnswers on the four real recordings", () => {
   it("return-laptop-2: booleans, choice with provider confidence, score level is 1-based", () => {
     const rec = load("return-laptop-2")
     const out = normalizeDecisionAnswers(rec.sdkResult.answers, rec.sdkResult.providerMetadata.openrouter.answers)
-    expect(out.device_visible).toMatchObject({ value: true, confidence: 1 })
+    expect(out.device_visible).toMatchObject({ value: true, confidence: 0.99 })
     expect(out.damage_visible!.value).toBe(false)
-    expect(out.damage_visible!.confidence).toBeCloseTo(0.97, 10)
-    expect(out.damage_type).toMatchObject({ value: "none", confidence: 0.9 })
-    // Recorded score 2.48 with top distribution index 2 -> level 3, provider confidence 0.58.
-    expect(out.condition).toMatchObject({ value: 3, confidence: 0.58 })
+    // Jev 1.14 gives booleans no confidence: max(p, 1 - p) of the recorded 0.2.
+    expect(out.damage_visible!.confidence).toBeCloseTo(0.8, 10)
+    expect(out.damage_type!.value).toBe("none")
+    expect(out.damage_type!.confidence).toBe(0.68)
+    // Recorded score 2.35 with top distribution index 3 -> level 4, provider confidence 0.31.
+    expect(out.condition).toMatchObject({ value: 4, confidence: 0.31 })
     expect(out.description_consistent).toBeUndefined()
   })
 
   it("return-phone-1: description_consistent present and a cracked screen", () => {
     const rec = load("return-phone-1")
     const out = normalizeDecisionAnswers(rec.sdkResult.answers, rec.sdkResult.providerMetadata.openrouter.answers)
-    expect(out.damage_type).toMatchObject({ value: "crack", confidence: 1 })
+    expect(out.damage_type).toMatchObject({ value: "crack", confidence: 0.96 })
     expect(out.damage_location!.value).toBe("screen")
     expect(out.condition!.value).toBe(1)
     expect(out.description_consistent).toBeDefined()
@@ -195,9 +197,9 @@ describe("normalizeDecisionAnswers on the four real recordings", () => {
     const phone = load("complaint-phone-3")
     const l = normalizeDecisionAnswers(laptop.sdkResult.answers, laptop.sdkResult.providerMetadata.openrouter.answers)
     const p = normalizeDecisionAnswers(phone.sdkResult.answers, phone.sdkResult.providerMetadata.openrouter.answers)
-    expect(l.damage_cause).toMatchObject({ value: "user_caused", confidence: 0.97 })
-    expect(p.damage_cause).toMatchObject({ value: "manufacturing_defect", confidence: 0.43 })
+    expect(l.damage_cause).toMatchObject({ value: "user_caused", confidence: 0.8 })
+    expect(p.damage_cause).toMatchObject({ value: "undetermined", confidence: 0.59 })
     // A zero provider confidence is kept as 0 (fail-closed), not replaced by the top probability.
-    expect(p.condition).toMatchObject({ value: 5, confidence: 0 })
+    expect(p.condition).toMatchObject({ value: 1, confidence: 0 })
   })
 })

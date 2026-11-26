@@ -13,7 +13,7 @@ describe("getEnv defaults (ADR-000 section 7)", () => {
     const env = getEnv({ ...base })
     expect(env.openrouterApiKey).toBe(KEY)
     expect(env.llmModel).toBe("openai/gpt-6-luna")
-    expect(env.decisionModel).toBe("openai/gpt-6-luna-decisions")
+    expect(env.decisionModel).toBe("typesafe/jev-1.14")
     expect(env.fastPathEnabled).toBe(true)
     expect(env.fastPathThreshold).toBe(0.8)
     expect(env.reasoning).toEqual({ decision: "high", writer: "low", chat: "medium" })
