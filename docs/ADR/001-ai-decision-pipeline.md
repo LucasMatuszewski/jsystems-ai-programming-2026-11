@@ -368,3 +368,15 @@ Tests first (TDD). Model calls in unit and integration tests are replaced **only
 - TAC-001-06: The decision log file never contains the customer's `reason`, `model`, any base64 data or message text (asserted by a test that scans the line).
 - TAC-001-07: Reasoning content never appears in the UI message stream sent to the client (asserted on a recorded `gpt-6-luna` stream containing reasoning chunks; if the model emits none, recorded as a gap in `tests/fixtures/GAPS.md`).
 - TAC-001-08: `pnpm eval:decisions` completes for all 5 example photos × 2 case types and prints an agreement rate.
+
+---
+
+## 9. Amendment A1 (2026-11-26) — Status: Proposed
+
+Found during plan task T06 (first real captures, `ai` 7.0.118, `@openrouter/ai-sdk-provider` 3.1.0). Recordings: `app/tests/fixtures/openrouter/errors/decisions-*.json`, notes: `app/tests/fixtures/openrouter/decisions/NOTES.md`.
+
+1. **API names.** The installed SDK has no `experimental_decide` / `openrouter.decisionModel()`. The equivalents are `experimental_evaluate` and `openrouter.evaluationModel(id)`, which call `POST /api/alpha/decisions`. Wherever this ADR set says `experimental_decide` / `decisionModel`, read `experimental_evaluate` / `evaluationModel`. Images go in the top-level `state` array as `image_url` data URLs. The wire type of a boolean question is `noul`. `confidence` is reported for choice and score answers only (in `providerMetadata.openrouter.answers[key].confidence`); boolean confidence stays `max(p, 1 − p)` as in §3.3. Cost is in `usage.cost`.
+2. **Availability.** On 2026-11-26 every real call to `openai/gpt-6-luna-decisions` returned HTTP 401 `account_deactivated`, originating from OpenRouter's upstream OpenAI account, not from our key (`gpt-6-luna` chat on the same key works). `/models` does not list the model; `/models/{id}/endpoints` lists one endpoint.
+3. **Proposed decision:** follow the plan's fallback (§6 "Luna Decisions unusable"): ship with `FAST_PATH_ENABLED=false`. The signals adapter keeps its fail-closed contract and returns `status: unavailable` on this error, so every case escalates to `gpt-6-luna` (route `escalated`), and date rules still route `rule`. The PRD is still met because image findings come from the escalated LLM (§4.3). The adapter, the gate and the tests stay in the codebase. Gate and normalizer unit tests use boundary values over the internal types (§3.1 of ADR-006 allows this for pure functions) until a success recording exists.
+4. **Recovery:** when the decisions endpoint works again (or a BYOK OpenAI key is attached to the OpenRouter account), run `pnpm record:openrouter decisions`, then `refusal` and `--compare`, then add the normalizer table, and re-enable the fast path after the evaluation (§3.7).
+5. **Call budget impact (ADR-006 §3.2):** every valid submission is "signals unavailable": 1 failed signals call + 1 escalated call (rule route: 1 failed signals + 1 writer).
