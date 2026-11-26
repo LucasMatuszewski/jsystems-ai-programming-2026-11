@@ -15,6 +15,7 @@ secrets
 # .claude/skills/ holds the CLI's links to .agents/skills/.
 .agents/skills/*
 !.agents/skills/evidence-research/
+!.agents/skills/orchestrate-gated-fixes/
 .claude/skills/
 __pycache__/
 *.pyc
