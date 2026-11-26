@@ -7,8 +7,6 @@ import { MODEL, createCase, daysAgo, expect, photo } from "./helpers"
 const QUESTION = "Jaki model urządzenia zgłosiłem?"
 
 test.beforeEach(async ({ page }) => {
-  // Hooks run inside each test, so the expected failure is declared here as well.
-  test.fail()
   await createCase(page, {
     caseType: "return",
     category: "laptop",
@@ -19,7 +17,6 @@ test.beforeEach(async ({ page }) => {
 })
 
 test("agent answers a follow-up using the model from the form (AC-34)", async ({ page }) => {
-  test.fail()
   const input = page.getByPlaceholder(pl.chat.inputPlaceholder)
   await input.fill(QUESTION)
   await page.getByRole("button", { name: pl.chat.send }).click()
@@ -32,7 +29,6 @@ test("agent answers a follow-up using the model from the form (AC-34)", async ({
 })
 
 test("Enter sends the message, Shift+Enter inserts a newline (AC-32)", async ({ page }) => {
-  test.fail()
   const input = page.getByPlaceholder(pl.chat.inputPlaceholder)
   await input.click()
   await input.pressSequentially("linia 1")
@@ -48,14 +44,12 @@ test("Enter sends the message, Shift+Enter inserts a newline (AC-32)", async ({ 
 })
 
 test("empty or whitespace-only message cannot be sent (AC-32)", async ({ page }) => {
-  test.fail()
   const input = page.getByPlaceholder(pl.chat.inputPlaceholder)
   await input.fill("   ")
   await expect(page.getByRole("button", { name: pl.chat.send })).toBeDisabled()
 })
 
 test("input is disabled while the reply streams (AC-33)", async ({ page }) => {
-  test.fail()
   const input = page.getByPlaceholder(pl.chat.inputPlaceholder)
   await input.fill(QUESTION)
   await input.press("Enter")
@@ -65,7 +59,6 @@ test("input is disabled while the reply streams (AC-33)", async ({ page }) => {
 })
 
 test("newest message is scrolled into view (AC-37)", async ({ page }) => {
-  test.fail()
   const marker = "Test widoczności 1"
   const input = page.getByPlaceholder(pl.chat.inputPlaceholder)
   await input.fill(marker)

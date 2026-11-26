@@ -29,7 +29,6 @@ test("form page at the viewport width has no horizontal scroll (AC-45, TAC-003-0
 })
 
 test("chat page at the viewport width has no horizontal scroll (AC-45, TAC-003-04)", async ({ page }) => {
-  test.fail()
   await createCase(page, {
     caseType: "return",
     category: "laptop",
@@ -47,7 +46,6 @@ test("form page has no serious or critical axe violations (AC-46, TAC-003-05)", 
 })
 
 test("chat page has no serious or critical axe violations (AC-46, TAC-003-05)", async ({ page }) => {
-  test.fail()
   await createCase(page, {
     caseType: "return",
     category: "laptop",
@@ -59,7 +57,6 @@ test("chat page has no serious or critical axe violations (AC-46, TAC-003-05)", 
 
 test("mobile: case summary is collapsed by default on /chat (PRD 9.3)", async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== "mobile", "collapsed summary applies to the 360 px project only")
-  test.fail()
   await createCase(page, {
     caseType: "return",
     category: "laptop",

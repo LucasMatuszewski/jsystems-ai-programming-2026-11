@@ -1,0 +1,26 @@
+
+Running 5 tests using 1 worker
+
+  ✓  1 [desktop] › tests/e2e/responsive-a11y.spec.ts:24:1 › form page at the viewport width has no horizontal scroll (AC-45, TAC-003-04) (4.6s)
+  ✓  2 [desktop] › tests/e2e/responsive-a11y.spec.ts:31:1 › chat page at the viewport width has no horizontal scroll (AC-45, TAC-003-04) (18.5s)
+  ✘  3 [desktop] › tests/e2e/responsive-a11y.spec.ts:41:1 › form page has no serious or critical axe violations (AC-46, TAC-003-05) (2.6s)
+  ✓  4 [desktop] › tests/e2e/responsive-a11y.spec.ts:48:1 › chat page has no serious or critical axe violations (AC-46, TAC-003-05) (19.5s)
+  -  5 [desktop] › tests/e2e/responsive-a11y.spec.ts:58:1 › mobile: case summary is collapsed by default on /chat (PRD 9.3)
+
+
+  1) [desktop] › tests/e2e/responsive-a11y.spec.ts:24:1 › form page at the viewport width has no horizontal scroll (AC-45, TAC-003-04) 
+
+    Expected to fail, but passed.
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/responsive-a11y-form-page--a9558-al-scroll-AC-45-TAC-003-04--desktop/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace test-results/responsive-a11y-form-page--a9558-al-scroll-AC-45-TAC-003-04--desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [desktop] › tests/e2e/responsive-a11y.spec.ts:24:1 › form page at the viewport width has no horizontal scroll (AC-45, TAC-003-04) 
+  1 skipped
+  3 passed (52.5s)
