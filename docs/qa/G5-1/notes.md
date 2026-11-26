@@ -1,0 +1,5 @@
+# G5-1 notes: remedy on chat update cards (AC-28)
+
+Fix: `update_recommendation` input/output has `remedy` (RemedySchema nullable, default null). Guard in build-chat-stream.ts: complaint + Akceptacja without remedy throws `remedy_required` (output-error, no card); otherwise remedy forced to null. chat-complaint prompt 1.2.0. message-parts.tsx passes `remedy` to DecisionCard (same prop, pl.remedies).
+Tests: unit (schema, prompt), integration (stream.test.ts, variants derived from chat-tool-update.json), component (message-parts), session schema. `pnpm test` 671 passed, typecheck + lint clean, build OK.
+Real check: 2 submissions, 1 chat try. Case 1 (model "Samsung", phone-2): chat message got no update (reply kept Weryfikacja ręczna C-6, photo shows Apple). Case 2 (model "iPhone"): first decision was Akceptacja directly, so no update-to-Akceptacja could be produced within limits. Update card with remedy NOT seen live (covered by tests only). Console 0 errors. Upstream: 3 escalated, 2 signals, 1 chat-step.

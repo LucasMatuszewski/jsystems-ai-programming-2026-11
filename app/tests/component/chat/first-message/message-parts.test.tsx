@@ -99,6 +99,32 @@ describe("MessageParts: recorded update_recommendation (AC-35)", () => {
     expect(within(group).getByText(String(recorded.output.reason))).toBeInTheDocument()
   })
 
+  it.each(["repair", "replacement"] as const)("update card to Akceptacja shows the remedy %s like the first-decision card (G5-1)", (remedy) => {
+    const recorded = recordedToolUpdate()
+    const message = withExtraParts(recordedFirstMessage("rule-return-45d"), [
+      updatePart(recorded.toolCallId, "output-available", recorded.input, {
+        ...recorded.output,
+        previousDecision: "Weryfikacja ręczna",
+        newDecision: "Akceptacja",
+        remedy,
+      }),
+    ])
+    render(<MessageParts message={message} />)
+    const group = screen.getByRole("group", { name: new RegExp(pl.updatedRecommendation) })
+    expect(within(group).getByText(pl.remedies[remedy])).toBeInTheDocument()
+  })
+
+  it("update card without a remedy shows no remedy label", () => {
+    const recorded = recordedToolUpdate()
+    const message = withExtraParts(recordedFirstMessage("rule-return-45d"), [
+      updatePart(recorded.toolCallId, "output-available", recorded.input, recorded.output),
+    ])
+    render(<MessageParts message={message} />)
+    const group = screen.getByRole("group", { name: new RegExp(pl.updatedRecommendation) })
+    expect(within(group).queryByText(pl.remedies.repair)).toBeNull()
+    expect(within(group).queryByText(pl.remedies.replacement)).toBeNull()
+  })
+
   it("input-streaming and input-available show the updating text, not a card", () => {
     const recorded = recordedToolUpdate()
     for (const state of ["input-streaming", "input-available"] as const) {

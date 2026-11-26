@@ -7,6 +7,7 @@ import {
   CasesStreamEventSchema,
   ChatRequestSchema,
   StoredSessionSchema,
+  UpdateRecommendationOutputSchema,
 } from "@/lib/schemas"
 
 const caseId = "7b0f2c1e-3d4a-4b5c-8d6e-9f0a1b2c3d4e"
@@ -109,6 +110,23 @@ describe("ChatRequestSchema", () => {
       ],
     }
     expect(req([produced, user("Cześć", 1)]).success).toBe(true)
+  })
+  it("accepts a stored update tool part whose output carries a remedy (G5-1)", () => {
+    const stored = {
+      id: "a1",
+      role: "assistant",
+      parts: [
+        {
+          type: "tool-update_recommendation",
+          toolCallId: "t1",
+          state: "output-available",
+          input: { decision: "Akceptacja", reason: "r", ruleRefs: ["C-3"], remedy: "repair" },
+          output: { previousDecision: "Weryfikacja ręczna", newDecision: "Akceptacja", reason: "r", ruleRefs: ["C-3"], remedy: "repair", updatedAt: "2026-11-26T12:00:00.000Z" },
+        },
+      ],
+    }
+    expect(req([stored, user("Cześć", 1)]).success).toBe(true)
+    expect(UpdateRecommendationOutputSchema.parse(stored.parts[0]!.output).remedy).toBe("repair")
   })
   it("rejects a system role and non-text parts from the client (T28 F2)", () => {
     expect(req([{ id: "s", role: "system", parts: [{ type: "text", text: "x" }] }, user("Cześć", 1)]).success).toBe(false)

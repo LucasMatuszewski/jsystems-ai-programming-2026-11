@@ -66,6 +66,39 @@ describe("POST /api/chat handler: streams built from recorded OpenRouter respons
     expect(chunks.some((c) => c.type === "tool-output-available")).toBe(false)
   })
 
+  // G5-1 / AC-28: remedy on the update to Akceptacja. Base: chat-tool-update.json (complaint phone-1, current Odrzucenie).
+  describe("remedy on update (derived from chat-tool-update)", () => {
+    const accept = { decision: "Akceptacja", reason: "Serwis potwierdził wadę fabryczną.", ruleRefs: ["C-3", "C-4"] }
+
+    it("complaint to Akceptacja with remedy: output-available carries the remedy", async () => {
+      const { chunks } = await run(withToolInput(toolFixture, { ...accept, remedy: "repair" }), toolBody())
+      const output = chunks.find((c) => c.type === "tool-output-available")?.output as { newDecision: string; remedy: string }
+      expect(output).toMatchObject({ newDecision: "Akceptacja", remedy: "repair" })
+    })
+
+    it.each([{ remedy: null }, {}])("complaint to Akceptacja without a remedy (%j): output-error and no card", async (extra) => {
+      const { chunks } = await run(withToolInput(toolFixture, { ...accept, ...extra }), toolBody())
+      expect(chunks.some((c) => c.type === "tool-output-error")).toBe(true)
+      expect(chunks.some((c) => c.type === "tool-output-available")).toBe(false)
+    })
+
+    it("return to Akceptacja with a remedy: the remedy is null in the output", async () => {
+      const body = bodyFor(PLAIN.source, PLAIN.type, "Chcę dodać fakt: komplet jest w pudełku.")
+      body.caseContext.currentDecision = { ...body.caseContext.currentDecision, decision: "Weryfikacja ręczna" }
+      const variant = withToolInput(toolFixture, { decision: "Akceptacja", reason: "Nowy fakt.", ruleRefs: ["R-2"], remedy: "repair" })
+      const { chunks } = await run(variant, body)
+      const output = chunks.find((c) => c.type === "tool-output-available")?.output as { newDecision: string; remedy: unknown }
+      expect(output.newDecision).toBe("Akceptacja")
+      expect(output.remedy).toBeNull()
+    })
+
+    it("complaint to Weryfikacja ręczna with a remedy: the remedy is null in the output", async () => {
+      const { chunks } = await run(withToolInput(toolFixture, { decision: "Weryfikacja ręczna", reason: "Nowy fakt.", ruleRefs: ["C-5"], remedy: "replacement" }), toolBody())
+      const output = chunks.find((c) => c.type === "tool-output-available")?.output as { remedy: unknown }
+      expect(output.remedy).toBeNull()
+    })
+  })
+
   it("R-2.4 (derived from chat-tool-update, return <= 14 days, Odrzucenie): output is Weryfikacja ręczna", async () => {
     const variant = withToolInput(toolFixture, { decision: "Odrzucenie", reason: "Klient nie podał nowych faktów.", ruleRefs: ["R-2"] })
     const body = bodyFor(PLAIN.source, PLAIN.type, "Chcę dodać fakt: komplet jest w pudełku.")

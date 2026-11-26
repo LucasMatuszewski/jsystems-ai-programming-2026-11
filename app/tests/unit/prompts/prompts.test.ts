@@ -144,8 +144,14 @@ describe("chat prompts", () => {
     expect(t).toMatch(/new case/i)
     expect(t).toMatch(/update_recommendation` returns an error[^\n]*never claim/i)
   })
-  it.each(["chat-return", "chat-complaint"] as const)("%s: version is 1.1.0", (name) => {
-    expect(loadPrompt(name).version).toBe(`${name}@1.1.0`)
+  it("chat-return: version is 1.1.0", () => {
+    expect(loadPrompt("chat-return").version).toBe("chat-return@1.1.0")
+  })
+  it("chat-complaint: version is 1.2.0 and an update to Akceptacja must include the remedy (G5-1)", () => {
+    const prompt = loadPrompt("chat-complaint")
+    expect(prompt.version).toBe("chat-complaint@1.2.0")
+    expect(prompt.text).toMatch(/Akceptacja[^\n]*include the remedy/i)
+    expect(prompt.text).toMatch(/"repair"[^\n]*"replacement"|"replacement"[^\n]*"repair"/)
   })
 })
 

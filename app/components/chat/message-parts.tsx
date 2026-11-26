@@ -46,6 +46,7 @@ export function MessageParts({ message }: { message: CaseUIMessage }) {
                     previousDecision={part.output.previousDecision}
                     reason={part.output.reason}
                     ruleRefs={part.output.ruleRefs}
+                    remedy={part.output.remedy}
                   />
                 )
               default:

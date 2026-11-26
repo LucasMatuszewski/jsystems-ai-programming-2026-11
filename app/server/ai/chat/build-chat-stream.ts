@@ -70,11 +70,16 @@ export async function buildChatStream(body: ChatRequest, deps: BuildChatStreamDe
       if ("violation" in guarded) throw new Error(guarded.violation)
       // D1 / AC-35: a guarded result equal to the current decision is not an update (no card, no panel change).
       if (guarded.decision === caseContext.currentDecision.decision) throw new Error("no_change: decision unchanged after policy checks")
+      // G5-1 / AC-28: an accepted complaint names the remedy; for any other case the remedy is dropped.
+      const remedy = caseContext.form.caseType === "complaint" && guarded.decision === "Akceptacja" ? input.remedy : null
+      if (caseContext.form.caseType === "complaint" && guarded.decision === "Akceptacja" && remedy === null)
+        throw new Error("remedy_required: an update to Akceptacja on a complaint must include the remedy (repair or replacement)")
       return {
         previousDecision: caseContext.currentDecision.decision,
         newDecision: guarded.decision,
         reason: input.reason,
         ruleRefs: guarded.ruleRefs,
+        remedy,
         updatedAt: now().toISOString(),
       }
     },

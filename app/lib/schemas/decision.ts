@@ -157,6 +157,8 @@ export const UpdateRecommendationInputSchema = z.object({
   decision: DecisionSchema,
   reason: z.string().min(1),
   ruleRefs: RuleRefsSchema,
+  // G5-1 / AC-28: same values as the first decision; required by the server guard for complaint + Akceptacja.
+  remedy: RemedySchema.nullable().default(null),
 })
 export type UpdateRecommendationInput = z.infer<typeof UpdateRecommendationInputSchema>
 
@@ -165,6 +167,7 @@ export const UpdateRecommendationOutputSchema = z.object({
   newDecision: DecisionSchema,
   reason: z.string(),
   ruleRefs: RuleRefsSchema,
+  remedy: RemedySchema.nullable().default(null),
   updatedAt: z.string(),
 })
 export type UpdateRecommendationOutput = z.infer<typeof UpdateRecommendationOutputSchema>

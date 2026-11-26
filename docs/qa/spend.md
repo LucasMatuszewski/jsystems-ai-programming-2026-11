@@ -27,3 +27,4 @@ Cumulative spend cap for the whole implementation: **USD 5** (ADR-006 §3.4). Wh
 | 2026-11-26 | G4b gate (11 real submissions + 5 real chat requests = 6 chat-step calls incl. 1 update turn, 1 pipeline retry; openai/gpt-6-luna, typesafe/jev-1.14; BYOK, all costUsd 0) | 0.1138 | 0.1138 | 0.0000 | 0.1138 |
 | 2026-11-26 | G4b-1 (1 real submission in manual QA + 1 desktop return-flow E2E spec; `typesafe/jev-1.14` + `openai/gpt-6-luna`; BYOK, all costUsd 0) | 0.1138 | 0.1138 | 0.0000 | 0.1138 |
 | 2026-11-26 | G5 gate (9 real submissions + 10 real chat POSTs, 1 offline-failed POST, 4 probe 400/413 with 0 upstream; `openai/gpt-6-luna`, `typesafe/jev-1.14`; BYOK, usage unchanged) | 0.1138 | 0.1138 | 0.0000 | 0.1138 |
+| 2026-11-26 | G5-1 (2 real submissions + 1 real chat POST = 1 chat-step; E2E desktop chat spec; BYOK, usage unchanged) | 0.1138 | 0.1138 | 0.0000 | 0.1138 |

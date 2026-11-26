@@ -80,4 +80,14 @@ describe("buildChatCall", () => {
       updateRecommendationToolSchema.inputSchema.safeParse({ decision: "Akceptacja", reason: "r", ruleRefs: ["R-2"] }).success,
     ).toBe(true)
   })
+
+  it("update input carries a nullable remedy with the first-decision values (G5-1)", () => {
+    const schema = updateRecommendationToolSchema.inputSchema
+    const base = { decision: "Akceptacja", reason: "r", ruleRefs: ["C-3"] }
+    expect(schema.safeParse({ ...base, remedy: "repair" }).success).toBe(true)
+    expect(schema.safeParse({ ...base, remedy: "replacement" }).success).toBe(true)
+    expect(schema.safeParse({ ...base, remedy: null }).success).toBe(true)
+    expect(schema.safeParse({ ...base, remedy: "refund" }).success).toBe(false)
+    expect(schema.parse(base).remedy).toBeNull()
+  })
 })
