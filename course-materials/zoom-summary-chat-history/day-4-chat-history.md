@@ -184,3 +184,44 @@ Wiadomości publiczne w kolejności chronologicznej. Reakcje oznaczają zliczeni
 - **16:02 — M.Ś.:** cześć, dzięki za dzisiaj
 
 - **16:08 — E.:** Cześć! dzięki za dzisiaj
+
+## TODO na 27.11.2026
+
+- Code Review:
+    - Wbudowane w Claude / Codex / GH Copilot
+    - Customowe workflow z CLI agents w headless mode lub z SDK
+    - Wygenerowanie klucza API na rok z Claude CLI dla automatyzacji (z subskrypcji, ale tylko do automatyzacji użytkownika, nie dla całej firmy)
+    - PR Agent (open source), Qodo, CodeRabbit, itd.
+    - Create PR with screens + video
+    - use /respond-to-code-review skill and let agent fix & wait for another CR
+- Cloud Environments (Claude vs Codex vs Copilot)
+    - kredyty dla zdalnych komputerów Cloud Claude Environment
+        - Kiedy się rozliczanie włącza po kredytach, a do jakiego momentu jest w cenie?
+        - Prywatne env vs firmowe, tak samo Code Review
+    - Czy środowiska environment cloud są kasowane? Jak długo dane projektu są trzymane, jeśli ich nie wypchniemy na git repo remote? (Codex zachował historię sesji, ale pliki środowiska skasował i nie dało się ich przywrócić, jak nie było push)
+    - Minusy: brak kontroli, tylko dla jednego agenta, prywatność (np. klucze)
+- Czy Artefakty Claude są kasowane z czasem?
+- Bezpieczeństwo: środowisko w firmie bezpieczne dla agentów
+    - Docker vs VPS vs fizyczne urządzenie (np. Mac Mini)
+    - zewnętrzne urządzenia, Tailscale tunnel, Cloudflare tunnel
+    - PAT i dawanie narzędzi dla Agentów, Jira/Cloudflare / Rovo MCP vs CLI
+    - Dostęp przez SSH vs wbudowane przez Desktop app (np. Remote Control)
+    - Agent Managers: Herdr, Paseo, Orca, T3 Code
+- Nowości w MCP: skills over MCP, Tasks, Files (beta), lazy loading, stateless
+- Legacy Code
+    - Skill do legacy i co zawiera, jakie narzędzia i jaki workflow
+    - Analiza dużego codebase: RepoMap, RepoMix, Code Graph
+    - Dokumentacja:
+        - mermaid architecture
+        - /write-agents-md skill
+        - ADR/PRD dla istniejącego kodu
+    - RAG na kodzie - Custom Context7 backend dla MCP/CLI
+- Analiza kosztów sesji:
+    - skill do analizy dowolnych danych z sesji i porównań (także między agentami)
+    - wbudowane narzędzia analityczne Claude, Codex, Copilot
+    - Tracking z LangFuse / OpenRouter podpięty pod Claude / Codex
+- Modele lokalne w Claude/Codex - podpięcie Ollama lub OpenRouter w configs
+- VSCode i JetBrains - wtyczka, Agent Client Protocol (ACP registry), SDK w Copilot
+- Narzędzia do Vibe Coding / Web Apps:
+    - v0, Lovable, Bolt, Replit
+    - ChatGPT subscription used for other apps, e.g. v0 (Google also is working on it)
