@@ -96,6 +96,9 @@ Verify only the scope relevant to your change. If the change affects runtime beh
 
 **Env Vars:** See `.env.example` (OPENROUTER_API_KEY required)
 
+### Long-running processes
+Bound every build, server, E2E or recording run with a hard timeout and a log file. Watch background work, and report a run that overruns as a defect instead of waiting on it (details: `.claude/rules/long-running-processes.md`).
+
 ### Sub-agents
 - Prefer ad hoc subagents for one-off work. Reuse a named role only after checking its model and permissions; add a short custom definition (for example under `.claude/agents/` for Claude Code or `.codex/agents/` for Codex) only for a recurring need. The starting repository has no active custom roles.
 - Delegate bounded tasks with explicit dependencies and disjoint file ownership. The coordinating agent reviews diffs and verification evidence before committing.
