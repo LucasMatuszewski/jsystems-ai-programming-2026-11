@@ -7,10 +7,11 @@ Checked 2026-11-26 for day 5 (27.11.2026). Vendor docs read directly (code.claud
 ### 1. Cloud agents: what the subscription covers
 
 **Claude Code on the web (cloud sessions, `claude --cloud`, `--teleport`)**
-- Available on Pro, Max, Ultra and Team, and for Enterprise users with premium or Chat + Claude Code seats. A cloud session "counts toward your plan's usage limits alongside the rest of your Claude and Claude Code usage, and there's no separate charge for the cloud VM". Parallel tasks consume limits proportionately. https://code.claude.com/docs/en/claude-code-on-the-web
-- Limits are the same rolling 5-hour window and weekly window, shared with chat and Cowork. On Team/Enterprise the allowance is per seat (Standard or Premium). https://code.claude.com/docs/en/costs
-- Past the limit you only pay if **usage credits** (the new name for extra usage) are on: individual plans turn them on in Settings > Usage. On Team/Enterprise an Owner turns them on and sets org, group or member spend limits, and the organization pays. https://code.claude.com/docs/en/costs, https://support.claude.com/en/articles/12429409-extra-usage-for-paid-claude-plans
-- Owner controls: the `allow_remote_sessions` policy and the cloud sessions permission in custom roles. ZDR, HIPAA and CMEK orgs cannot use cloud sessions. https://code.claude.com/docs/en/claude-code-on-the-web
+- Available on Pro, Max, Ultra and Team, and for Enterprise users with premium or Chat + Claude Code seats and with the single Enterprise seat on new and self-serve plans (https://support.claude.com/en/articles/11845131-use-claude-code-with-your-team-or-enterprise-plan). On Pro, Max, Ultra, Team and legacy seat-based Enterprise a cloud session "counts toward your plan's usage limits alongside the rest of your Claude and Claude Code usage, and there's no separate charge for the cloud VM". Parallel tasks consume limits proportionately. https://code.claude.com/docs/en/claude-code-on-the-web
+- Current (usage-based) Enterprise is different: "The seat fee ... doesn't include any usage. Every token your team consumes is billed separately at standard API rates." Standard and Premium are legacy Enterprise seat types, no longer sold. https://support.claude.com/en/articles/11526368-how-am-i-billed-for-my-enterprise-plan
+- Limits are the same rolling 5-hour window and weekly window, shared with chat and Cowork. On Team and legacy seat-based Enterprise the allowance is per seat (Standard or Premium). https://code.claude.com/docs/en/costs
+- Past the limit you only pay if **usage credits** (the new name for extra usage) are on: individual plans turn them on in Settings > Usage. On Team and seat-based Enterprise an Owner turns them on and sets org, group or member spend limits, and the organization pays. Usage credits do not apply to usage-based Enterprise, which pays API rates from the first token. https://code.claude.com/docs/en/costs, https://support.claude.com/en/articles/12429409-extra-usage-for-paid-claude-plans
+- Owner controls: the GitHub connector (members need it to sign in with GitHub for cloud sessions, https://code.claude.com/docs/en/web-quickstart), the `allow_remote_sessions` policy and the cloud sessions permission in custom roles. ZDR, HIPAA and CMEK orgs cannot use cloud sessions. https://code.claude.com/docs/en/claude-code-on-the-web
 - `--remote` is now a deprecated alias for `--cloud`. `--teleport` moves sessions one way only, from cloud to terminal. It needs a claude.ai login, a clean git state and the session branch pushed. https://code.claude.com/docs/en/claude-code-on-the-web
 
 **Codex Cloud (OpenAI)**
@@ -71,10 +72,10 @@ Checked 2026-11-26 for day 5 (27.11.2026). Vendor docs read directly (code.claud
 
 | | Claude | Codex (OpenAI) | GitHub Copilot |
 |---|---|---|---|
-| Cloud agent quota | Plan 5h + weekly limits, shared with chat (Pro/Max/Ultra/Team, Enterprise premium seats) | Plan allowance shared with local, cloud uses more; Pro no 5h limit; Enterprise flex = credit pool | Monthly AI credits (Pro 1,500 / Pro+ 7,000 / Max 20,000; Business 1,900 / Enterprise 3,900 per user, pooled) |
-| Extra cost after limit | Usage credits at API rates, opt-in; org-paid on Team/Ent | Credits (Plus/Pro self; Business/Ent workspace pool) | AI credits budget; org paid usage on by default |
+| Cloud agent quota | Plan 5h + weekly limits, shared with chat (Pro/Max/Ultra/Team, legacy Enterprise seats); usage-based Enterprise: per token at API rates | Plan allowance shared with local, cloud uses more; Pro no 5h limit; Enterprise flex = credit pool | Monthly AI credits (Pro 1,500 / Pro+ 7,000 / Max 20,000; Business 1,900 / Enterprise 3,900 per user, pooled) |
+| Extra cost after limit | Usage credits at API rates, opt-in; org-paid on Team and seat-based Ent; usage-based Ent pays API rates from the first token | Credits (Plus/Pro self; Business/Ent workspace pool) | AI credits budget; org paid usage on by default |
 | VM / compute | No separate charge | No separate charge for standard env ("at launch"); bigger VMs Ent only | Separate: included compute $12-$300/month, then per vCPU-s, GiB-s, snapshot storage |
-| Managed PR review | Team/Ent only, always usage credits, billed to org | Plus+ incl., own "Code Review usage" bucket | AI credits (~$0.25-$10/review) + Actions minutes |
+| Managed PR review | Team/Ent only, usage credits separate from included usage, billed to org (usage-based Ent: API rates) | Plus+ incl., own "Code Review usage" bucket | AI credits (~$0.25-$10/review) + Actions minutes |
 | Env retention | Pauses with files; reclaimed later (time unknown); history kept | Task VM state up to 7 days after last turn; legacy cache 12 h | Stopped sandbox snapshot until deleted (billed) |
 | Bundled API credits | Max $100, Ultra $200, Team up to $500; not Claude Code | Pro $100-$500, Business up to $500; not Codex via API key | None documented |
 
@@ -85,3 +86,9 @@ Checked 2026-11-26 for day 5 (27.11.2026). Vendor docs read directly (code.claud
 - Copilot: whether the Actions-based cloud agent consumes standard Actions minutes from the same $ allowance, rather than a separate meter, is stated only generally. No automatic deletion period for stopped sandbox snapshots is documented.
 - Anthropic API credits with `anthropics/claude-code-action` in CI: excluded by the "Claude Code" row, but that is not stated explicitly for the Action.
 - Artifacts: effects of consumer account deletion, manual chat deletion outside Enterprise retention, and a downgrade to Free on published links are not documented.
+
+## Cloud sessions bonus credit promotion (expired)
+
+- Sep 23 to Nov 4, 2026: individual Pro ($100) and Max ($250) subscribers got a one-time bonus for cloud sessions from web, desktop, CLI or mobile, used before plan limits. Team and Enterprise were excluded. Claim by Oct 7, expired Nov 4, 2026. https://support.claude.com/en/articles/17152539-cloud-sessions-bonus-credit-promotion
+- Nov 4-22, 2025: an earlier promotion gave Pro $250 and Max $1000 at API pricing, for Claude Code on the web and mobile only, also used before regular limits.
+- Cloud sessions never required credits; these were bonuses on top of plan limits.
