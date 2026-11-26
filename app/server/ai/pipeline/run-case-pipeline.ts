@@ -62,8 +62,8 @@ export interface PipelineDeps {
   decisionLogSink?: (entry: DecisionLogEntry | FailedDecisionLogEntry) => void | Promise<void>
 }
 
-/** `CaseDecision` plus the photo advice the model gave (null when none; ADR-001 3.5 guard 5). */
-export type PipelineResult = CaseDecision & { photoAdvice: string | null }
+/** `CaseDecision` (includes `photoAdvice`: the model's photo advice, null when none; ADR-001 3.5 guard 5). */
+export type PipelineResult = CaseDecision
 
 export type PipelineCaseInput = Pick<CaseFormValues, "caseType" | "category" | "model" | "purchaseDate" | "reason">
 

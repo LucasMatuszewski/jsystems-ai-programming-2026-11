@@ -3,6 +3,7 @@ import {
   CHAT_MAX_MESSAGES,
   CHAT_MESSAGE_MAX,
   CasesErrorResponseSchema,
+  CaseSessionPayloadSchema,
   CasesStreamEventSchema,
   ChatRequestSchema,
   StoredSessionSchema,
@@ -49,6 +50,7 @@ const payload = {
     signalsSummary: caseContext.signalsSummary,
     remedy: null,
     daysSincePurchase: 10,
+    photoAdvice: null,
   },
   firstMessage: {
     id: `initial-${caseId}`,
@@ -114,6 +116,18 @@ describe("CasesStreamEvent", () => {
   it("rejects unknown events", () => {
     expect(CasesStreamEventSchema.safeParse({ type: "stage", stage: "x" }).success).toBe(false)
     expect(CasesStreamEventSchema.safeParse({ type: "error", code: "boom" }).success).toBe(false)
+  })
+})
+
+describe("CaseSessionPayload photoAdvice (ADR-001 3.5 guard 5)", () => {
+  it("requires photoAdvice as a string or null in the session decision", () => {
+    const withoutAdvice: Record<string, unknown> = { ...payload.decision }
+    delete withoutAdvice.photoAdvice
+    const withDecision = (decision: object) => CaseSessionPayloadSchema.safeParse({ ...payload, decision })
+    expect(withDecision(withoutAdvice).success).toBe(false)
+    expect(withDecision({ ...payload.decision, photoAdvice: null }).success).toBe(true)
+    expect(withDecision({ ...payload.decision, photoAdvice: "Prosimy o wyraźne zdjęcie." }).success).toBe(true)
+    expect(withDecision({ ...payload.decision, photoAdvice: 3 }).success).toBe(false)
   })
 })
 

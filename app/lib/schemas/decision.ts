@@ -139,6 +139,7 @@ export const CaseDecisionSchema = z.object({
   firstMessage: z.object({ greeting: z.string().min(1), bodyMarkdown: z.string().min(1) }),
   guardsApplied: z.array(z.string()),
   daysSincePurchase: z.number().int().min(0),
+  photoAdvice: z.string().nullable(),
 })
 export type CaseDecision = z.infer<typeof CaseDecisionSchema>
 
