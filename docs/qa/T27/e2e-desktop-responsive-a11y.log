@@ -1,0 +1,8 @@
+
+Running 3 tests using 1 worker
+
+  ✓  1 [desktop] › tests/e2e/responsive-a11y.spec.ts:24:1 › form page at the viewport width has no horizontal scroll (AC-45, TAC-003-04) (1.1s)
+  ✓  2 [desktop] › tests/e2e/responsive-a11y.spec.ts:30:1 › form page has no serious or critical axe violations (AC-46, TAC-003-05) (3.6s)
+  ✓  3 [desktop] › tests/e2e/responsive-a11y.spec.ts:37:1 › chat page: no horizontal scroll (AC-45), no serious axe violations (AC-46), mobile summary collapsed (PRD 9.3) (23.3s)
+
+  3 passed (34.5s)

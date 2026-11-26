@@ -82,7 +82,7 @@ export function PhotoInput({ id, caseType, file, error, disabled, onChange }: Ph
           aria-invalid={error ? true : undefined}
           aria-describedby={describedBy || undefined}
           className={cn(
-            "flex min-h-16 flex-1 items-center gap-3 rounded-2xl bg-input/50 px-3 py-2 text-left text-sm outline-none focus-visible:ring-3 focus-visible:ring-ring/30 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20",
+            "flex min-h-16 flex-1 items-center gap-3 rounded-2xl bg-transparent px-3 py-2 text-left text-sm outline-none focus-visible:ring-3 focus-visible:ring-ring/30 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20",
           )}
         >
           {file ? (

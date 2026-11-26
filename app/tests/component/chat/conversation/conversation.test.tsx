@@ -243,6 +243,8 @@ describe("scrolling (AC-37)", () => {
     await user.type(input(), "Pytanie")
     await user.click(sendButton())
     await waitFor(() => expect(input()).toBeEnabled())
-    expect(log().scrollTop).toBe(1234)
+    // The scroll effect runs after the commit that re-enables the input; wait for its result instead of
+    // assuming it already ran when the input became enabled (ordering varies under CPU load).
+    await waitFor(() => expect(log().scrollTop).toBe(1234))
   })
 })

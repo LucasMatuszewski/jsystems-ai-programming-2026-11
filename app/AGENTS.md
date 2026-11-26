@@ -21,7 +21,8 @@ Stack: Next.js 16 (App Router, Turbopack), React 19, AI SDK 7 (`ai`, `@ai-sdk/re
 | `pnpm lint` | ESLint, zero warnings in changed files | Yes |
 | `pnpm test` | Vitest: `node` + `jsdom` projects, no network | Yes |
 | `pnpm build` | Production build | Runtime changes |
-| `pnpm test:e2e` | Playwright (1440 px `desktop`, 360 px `mobile`), real stack incl. OpenRouter | Flow changes |
+| `pnpm build` then `pnpm test:e2e` | Playwright projects `desktop` (1440 px), `mobile` (360 px), `failure` (invalid-key server, port 3001); real stack incl. OpenRouter. Playwright starts both servers itself (no reuse, log in `test-results/server.log` or `E2E_SERVER_LOG`), global timeout 40 min | Flow changes |
+| `pnpm test:e2e --project=<p> <spec> --global-timeout=900000` | One spec per run (slow, paid); run in the background with a log and watch it | Flow changes |
 | `pnpm dev` / `pnpm start` | Manual QA with the Playwright CLI (port 3000) | Yes |
 | `pnpm openrouter:status` | Key credit, usage, rate limit, model availability (never prints the key) | Before real-endpoint runs |
 | `pnpm record:openrouter` / `pnpm record:app` | Record real responses into `tests/fixtures/` (ADR-006) | When fixtures drift |

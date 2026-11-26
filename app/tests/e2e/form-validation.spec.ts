@@ -144,3 +144,44 @@ test("whole form can be completed with the keyboard only (AC-46)", async ({ page
 
   await expect(page).toHaveURL(/\/chat\/?$/, { timeout: 90_000 })
 })
+
+test("model shorter than 2 characters is rejected (AC-04)", async ({ page }) => {
+  await page.goto("/")
+  await fillCaseForm(page, {
+    caseType: "return",
+    category: "laptop",
+    model: "X",
+    purchaseDate: daysAgo(10),
+    photoPath: photo.laptop2Webp,
+  })
+  await submitCase(page)
+
+  await expect(page.getByText(pl.errors.model_length)).toBeVisible()
+})
+
+test("purchase date older than 5 years is rejected (AC-05)", async ({ page }) => {
+  await page.goto("/")
+  await fillCaseForm(page, {
+    caseType: "return",
+    category: "laptop",
+    purchaseDate: daysAgo(6 * 365),
+    photoPath: photo.laptop2Webp,
+  })
+  await submitCase(page)
+
+  await expect(page.getByText(pl.errors.date_too_old)).toBeVisible()
+})
+
+test("reason longer than 2000 characters is rejected (AC-06)", async ({ page }) => {
+  await page.goto("/")
+  await fillCaseForm(page, {
+    caseType: "complaint",
+    category: "smartphone",
+    purchaseDate: daysAgo(400),
+    reason: "a".repeat(2001),
+    photoPath: photo.phone1Jpg,
+  })
+  await submitCase(page)
+
+  await expect(page.getByText(pl.errors.reason_too_long)).toBeVisible()
+})

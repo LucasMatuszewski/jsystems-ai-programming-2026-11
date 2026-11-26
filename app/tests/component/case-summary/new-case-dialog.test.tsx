@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react"
+import { fireEvent, render, screen, waitFor } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { describe, expect, it, vi } from "vitest"
 import { NewCaseDialog } from "@/components/case-summary/new-case-dialog"
@@ -62,10 +62,14 @@ describe("NewCaseDialog (AC-39)", () => {
 
     const cancel = screen.getByRole("button", { name: pl.newCase.cancelButton })
     const confirm = screen.getByRole("button", { name: pl.newCase.confirmButton })
+    // Base UI parks focus on an internal focus-guard span first and moves it to the real element
+    // asynchronously, so wait for the settled state instead of reading activeElement right after tab().
+    const expectFocusInsideDialog = () =>
+      waitFor(() => expect([cancel, confirm]).toContain(document.activeElement))
     await user.tab()
     await user.tab()
-    expect([cancel, confirm]).toContain(document.activeElement)
+    await expectFocusInsideDialog()
     await user.tab()
-    expect([cancel, confirm]).toContain(document.activeElement)
+    await expectFocusInsideDialog()
   })
 })

@@ -1,6 +1,6 @@
 import { test } from "@playwright/test"
 import { pl } from "../../lib/i18n/pl"
-import { daysAgo, expect, expectFirstMessageInvariants, fillCaseForm, photo, submitCase, waitForChat } from "./helpers"
+import { daysAgo, decisionBadge, expect, expectFirstMessageInvariants, fillCaseForm, photo, submitCase, waitForChat } from "./helpers"
 
 // PRD 4.1 happy path: return within the time limit. Structure and invariants only, never a verdict.
 
@@ -19,5 +19,6 @@ test("return case: progress texts, then chat with a decision, disclaimer and rul
 
   await waitForChat(page)
   await expectFirstMessageInvariants(page)
-  await expect(page.getByText(/^(Akceptacja|Odrzucenie|Weryfikacja ręczna)$/).first()).toBeVisible()
+  // Scoped to the chat log: on 360 px the first page-wide match is the hidden desktop copy of the summary badge.
+  await expect(decisionBadge(page)).toBeVisible()
 })

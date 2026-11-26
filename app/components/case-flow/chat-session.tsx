@@ -105,7 +105,9 @@ export function ChatSession({ session, onNewCase, fetch: fetchImpl }: ChatSessio
           ref={logRef}
           role="log"
           aria-label="Rozmowa"
-          className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto"
+          // Scrollable region must be keyboard reachable (axe scrollable-region-focusable, AC-46).
+          tabIndex={0}
+          className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto rounded-xl outline-none focus-visible:ring-3 focus-visible:ring-ring/30"
         >
           {messages.filter(hasVisibleParts).map((message) => (
             <Bubble key={message.id} message={message} />

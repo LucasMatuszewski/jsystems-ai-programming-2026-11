@@ -1,0 +1,27 @@
+
+ RUN  v5.1.1 /home/labuser/jsystems-ai-programming-2026-11/app
+
+ ❯ |jsdom| tests/component/case-summary/new-case-dialog.test.tsx (6 tests | 1 failed) 1936ms
+   ❯ NewCaseDialog (AC-39) (6)
+     × traps focus inside the dialog while open 222ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |jsdom| tests/component/case-summary/new-case-dialog.test.tsx > NewCaseDialog (AC-39) > traps focus inside the dialog while open
+AssertionError: expected [ <button …(4)></button>, …(1) ] to include <span data-type="inside" …(5)></span>
+ ❯ tests/component/case-summary/new-case-dialog.test.tsx:67:31
+     65|     await user.tab()
+     66|     await user.tab()
+     67|     expect([cancel, confirm]).toContain(document.activeElement)
+       |                               ^
+     68|     await user.tab()
+     69|     expect([cancel, confirm]).toContain(document.activeElement)
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 2 passed (3)
+      Tests  1 failed | 33 passed (34)
+   Start at  16:08:59
+   Duration  46.24s (tests 68%, environment 13%, import 12%, setup 5%, transform 2%)
+

@@ -1,0 +1,14 @@
+desktop smoke exit 0
+desktop return-flow exit 0
+desktop complaint-flow exit 0
+desktop date-rule exit 0
+desktop chat exit 0
+desktop session exit 0
+mobile smoke exit 0
+mobile return-flow exit 1
+mobile complaint-flow exit 0
+mobile date-rule exit 0
+mobile chat exit 0
+mobile session exit 0
+mobile form-validation exit 0
+DONE

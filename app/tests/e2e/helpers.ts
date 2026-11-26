@@ -2,7 +2,7 @@ import { fileURLToPath } from "node:url"
 import { expect as baseExpect, type Locator, type Page } from "@playwright/test"
 import { pl } from "../../lib/i18n/pl"
 
-/** Short expect timeout so missing UI fails fast in the red (test.fail) phase. */
+/** Short expect timeout so missing UI fails fast. */
 export const expect = baseExpect.configure({ timeout: 5_000 })
 
 /** Real example photos only (course rule: uploads use assets/example-images and assets/logo.svg). */

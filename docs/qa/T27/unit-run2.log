@@ -1,0 +1,10 @@
+$ vitest run
+
+ RUN  v5.1.1 /home/labuser/jsystems-ai-programming-2026-11/app
+
+
+ Test Files  51 passed (51)
+      Tests  578 passed (578)
+   Start at  16:15:14
+   Duration  31.18s (tests 47%, environment 24%, import 19%, setup 8%, transform 2%, worker 1%)
+

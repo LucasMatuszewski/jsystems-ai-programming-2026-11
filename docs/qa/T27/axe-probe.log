@@ -1,0 +1,7 @@
+
+Running 1 test using 1 worker
+
+color-contrast serious <span class="text-muted-foreground">Przeciągnij zdjęcie tutaj lub kliknij, aby wybrać plik</span> [{"fgColor":"#4c5b66","bgColor":"#888b8f","contrastRatio":2.04,"fontSize":"10.5pt (14px)","fontWeight":"normal","messageKey":null,"expectedContrastRatio":"4.5:1"}]
+  ✓  1 [desktop] › tests/e2e/zz-axe-probe.spec.ts:4:1 › probe (2.9s)
+
+  1 passed (9.8s)

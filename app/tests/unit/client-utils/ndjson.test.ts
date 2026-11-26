@@ -32,7 +32,24 @@ describe("readNdjson", () => {
     expect(events).toHaveLength(3)
   })
 
-  it.each([1, 2, 3, 5, 7, 13, 64, 1000])("handles chunks of %i bytes", async (size) => {
+  // The recorded final line is about 98 KB, so 1-byte chunks mean ~100k stream chunks (about 5 s even on an idle
+  // machine, more under CPU load): the cost scales with the chunk count, not with timing luck. Tiny chunk sizes
+  // therefore run on the short progress lines only; larger sizes (at most ~14k chunks) run on the full body.
+  it.each([1, 2, 3, 5])("handles chunks of %i bytes (progress lines)", async (size) => {
+    const short = (await recordedBody()).split("\n").filter((l) => l.trim()).slice(0, 2).join("\n") + "\n"
+    const bytes = new TextEncoder().encode(short)
+    const chunks: Uint8Array[] = []
+    for (let o = 0; o < bytes.length; o += size) chunks.push(bytes.slice(o, o + size))
+    const stream = new ReadableStream<Uint8Array>({
+      start(controller) {
+        for (const c of chunks) controller.enqueue(c)
+        controller.close()
+      },
+    })
+    expect(await collect(stream)).toEqual(lineByLine(short))
+  })
+
+  it.each([7, 13, 64, 1000])("handles chunks of %i bytes (full body)", async (size) => {
     const body = await recordedBody()
     const events = await collect(replayAppResponse(fixture, { chunkSizes: [size] }).body!)
     expect(events).toEqual(lineByLine(body))
