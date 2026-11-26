@@ -61,6 +61,8 @@ export async function buildChatStream(body: ChatRequest, deps: BuildChatStreamDe
         photoAdvice: null,
       })
       if ("violation" in guarded) throw new Error(guarded.violation)
+      // D1 / AC-35: a guarded result equal to the current decision is not an update (no card, no panel change).
+      if (guarded.decision === caseContext.currentDecision.decision) throw new Error("no_change: decision unchanged after policy checks")
       return {
         previousDecision: caseContext.currentDecision.decision,
         newDecision: guarded.decision,

@@ -74,6 +74,18 @@ describe("POST /api/chat handler: streams built from recorded OpenRouter respons
     const output = chunks.find((c) => c.type === "tool-output-available")?.output as { newDecision: string; previousDecision: string }
     expect(output.newDecision).toBe("Weryfikacja ręczna")
     expect(output.previousDecision).toBe(body.caseContext.currentDecision.decision)
+    expect(output.previousDecision).not.toBe(output.newDecision)
+  })
+
+  it("D1 (derived from chat-tool-update, Odrzucenie/R-4 on a 10-day return, current Weryfikacja ręczna): guarded decision equals current, tool ends in output-error, 2 chat-step lines", async () => {
+    const variant = withToolInput(toolFixture, { decision: "Odrzucenie", reason: "Laptop dostałem 40 dni temu.", ruleRefs: ["R-4"] })
+    const body = bodyFor(PLAIN.source, PLAIN.type, "Muszę sprostować: Laptop dostałem 40 dni temu.")
+    expect(body.caseContext.daysSincePurchase).toBeLessThanOrEqual(14)
+    body.caseContext.currentDecision = { ...body.caseContext.currentDecision, decision: "Weryfikacja ręczna" } // the G3 case state
+    const { chunks, stepLines } = await run(variant, body)
+    expect(chunks.some((c) => c.type === "tool-output-error")).toBe(true)
+    expect(chunks.some((c) => c.type === "tool-output-available")).toBe(false)
+    expect(stepLines.map((l) => l.stage)).toEqual(["chat-step", "chat-step"])
   })
 
   it("chat-401: error chunk carries only chat_failed, no provider text", async () => {

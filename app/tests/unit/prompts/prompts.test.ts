@@ -137,4 +137,14 @@ describe("chat prompts", () => {
     expect((t.match(/NEGATIVE example/g) ?? []).length).toBeGreaterThanOrEqual(3)
     expect((t.match(/POSITIVE example/g) ?? []).length).toBeGreaterThanOrEqual(2)
   })
+
+  it.each(["chat-return", "chat-complaint"] as const)("%s: purchase date from the form is authoritative, failed update is not claimed", (name) => {
+    const t = loadPrompt(name).text
+    expect(t).toMatch(/purchase date and `daysSincePurchase`[^\n]*authoritative/i)
+    expect(t).toMatch(/new case/i)
+    expect(t).toMatch(/update_recommendation` returns an error[^\n]*never claim/i)
+  })
+  it.each(["chat-return", "chat-complaint"] as const)("%s: version is 1.1.0", (name) => {
+    expect(loadPrompt(name).version).toBe(`${name}@1.1.0`)
+  })
 })
