@@ -14,7 +14,7 @@ describe("getEnv defaults (ADR-000 section 7)", () => {
     expect(env.openrouterApiKey).toBe(KEY)
     expect(env.llmModel).toBe("openai/gpt-6-luna")
     expect(env.decisionModel).toBe("openai/gpt-6-luna-decisions")
-    expect(env.fastPathEnabled).toBe(false)
+    expect(env.fastPathEnabled).toBe(true)
     expect(env.fastPathThreshold).toBe(0.8)
     expect(env.reasoning).toEqual({ decision: "high", writer: "low", chat: "medium" })
     expect(env.policiesDir).toBe(path.resolve(process.cwd(), "../docs/policies"))
@@ -23,7 +23,9 @@ describe("getEnv defaults (ADR-000 section 7)", () => {
     expect(env.appTitle).toBe("Hardware Service Decision Copilot")
   })
 
-  it("treats FAST_PATH_ENABLED=true as enabled and any other value as disabled", () => {
+  it("treats an unset FAST_PATH_ENABLED as enabled (ADR-001 3.4) and any value other than true as disabled", () => {
+    expect(getEnv({ ...base }).fastPathEnabled).toBe(true)
+    expect(getEnv({ ...base, FAST_PATH_ENABLED: "" }).fastPathEnabled).toBe(true)
     expect(getEnv({ ...base, FAST_PATH_ENABLED: "true" }).fastPathEnabled).toBe(true)
     expect(getEnv({ ...base, FAST_PATH_ENABLED: "false" }).fastPathEnabled).toBe(false)
   })

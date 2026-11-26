@@ -15,7 +15,7 @@ describe("runCasePipeline on recorded responses", () => {
   let runCasePipeline: typeof import("@/server/ai/pipeline/run-case-pipeline").runCasePipeline
   let PipelineError: typeof import("@/server/ai/pipeline/run-case-pipeline").PipelineError
   let getEnv: typeof import("@/server/env").getEnv
-  const env = () => getEnv({ OPENROUTER_API_KEY: "test", DECISION_LOG_PATH: "" })
+  const env = () => getEnv({ OPENROUTER_API_KEY: "test", DECISION_LOG_PATH: "", FAST_PATH_ENABLED: "false" })
   const signal = () => new AbortController().signal
 
   beforeAll(async () => {
