@@ -13,12 +13,12 @@ A PoC web application where an anonymous consumer submits a return or complaint 
 | ADR | Area |
 |---|---|
 | `000-main-architecture.md` (this file) | System overview, stack, module map, data models, API summary, env vars, cross-cutting decisions, end-to-end diagrams, overall test strategy |
-| [`001-ai-decision-pipeline.md`](001-ai-decision-pipeline.md) | Luna Decisions pre-check, fast path vs escalation, guards, prompts, chat agent, evaluation log |
+| [`001-ai-decision-pipeline.md`](001-ai-decision-pipeline.md) | Decision model (Jev 1.14) pre-check, fast path vs escalation, guards, prompts, chat agent, evaluation log |
 | [`002-backend-api.md`](002-backend-api.md) | `/api/cases`, `/api/chat`, image processing, validation, errors |
 | [`003-frontend-chat-ui.md`](003-frontend-chat-ui.md) | Form, chat UI (shadcn AI Elements + `useChat`), decision card, sessionStorage |
 | [`004-project-setup-and-tooling.md`](004-project-setup-and-tooling.md) | Template-based initialization, pnpm, TS strict, test tooling, nested `app/AGENTS.md` |
 
-**Deviation from PRD 11.1 (by user decision):** the PRD describes an "image analyst" followed by a "decision agent". The architecture implements this as (1) the typed decision model `gpt-6-luna-decisions` producing photo signals with probabilities, and (2) the reasoning LLM `gpt-6-luna` verifying those signals against the photo and deciding — only when the case is not a confident clear acceptance or a deterministic date rule. Image findings required by AC-15/16 are produced in both paths (ADR-001 4.3–4.4).
+**Deviation from PRD 11.1 (by user decision):** the PRD describes an "image analyst" followed by a "decision agent". The architecture implements this as (1) the typed decision model `typesafe/jev-1.14` (ADR-001 A2) producing photo signals with probabilities, and (2) the reasoning LLM `gpt-6-luna` verifying those signals against the photo and deciding — only when the case is not a confident clear acceptance or a deterministic date rule. Image findings required by AC-15/16 are produced in both paths (ADR-001 4.3–4.4).
 
 ---
 
@@ -64,9 +64,9 @@ docs/design-guidelines.md
 | Runtime | Node.js 24 LTS, pnpm (Corepack) | AI SDK 7 needs Node ≥ 22; installed on the VM; user chose pnpm |
 | Framework | Next.js 16 App Router, TypeScript strict | User requirement; route handlers for streaming; one deployable |
 | Starter | `shadcn-ui/chatbot-template` | Already wires AI SDK 7 `useChat`, streaming route, Tailwind 4, AI Elements (ADR-004) |
-| AI SDK | Vercel AI SDK 7 (`ai`, `@ai-sdk/react`) | Streaming chat protocol, typed parts, structured output, tools, `experimental_decide`, test mocks |
+| AI SDK | Vercel AI SDK 7 (`ai`, `@ai-sdk/react`) | Streaming chat protocol, typed parts, structured output, tools, `experimental_evaluate` (ADR-001 A1), test mocks |
 | LLM access | OpenRouter via `@openrouter/ai-sdk-provider` 3.x | Only path covering both chat models and the Decisions API (ADR-001) |
-| Decision model | `openai/gpt-6-luna-decisions` | Typed photo signals with probabilities; cheap and fast |
+| Decision model | `typesafe/jev-1.14` | Typed photo signals with probabilities; cheap (about $0.042 / 1M input tokens); JPEG/PNG only (ADR-001 A2) |
 | Reasoning LLM | `openai/gpt-6-luna` | Multimodal, reasoning effort control, structured outputs, tools |
 | UI | shadcn/ui + AI Elements patterns, Streamdown, Tailwind 4 with brand tokens | Restylable copied components for the custom brand (ADR-003) |
 | Forms | React Hook Form + Zod (shared schemas) | Same validation on client and server |
@@ -82,7 +82,7 @@ docs/design-guidelines.md
 |---|---|---|---|---|
 | Formularz | `CaseForm`, `PhotoInput` | — (client validation) | — | — |
 | Wysłanie + przesyłanie | `useCaseSubmission`, `SubmissionProgress` | `POST /api/cases` (multipart → NDJSON) | `lib/schemas`, `server/image` | — |
-| Analiza zdjęcia | `SubmissionProgress` ("Analiza zdjęcia…") | same request | `server/ai` signals adapter | `gpt-6-luna-decisions` |
+| Analiza zdjęcia | `SubmissionProgress` ("Analiza zdjęcia…") | same request | `server/ai` signals adapter | `typesafe/jev-1.14` |
 | Decyzja | `SubmissionProgress` ("Przygotowanie rekomendacji…") | same request | rules → fast-path gate → escalation or writer → guards → log | `gpt-6-luna` (high effort when escalated, low effort as writer) |
 | Pierwsza wiadomość | `ChatPage`, `MessageParts`, `DecisionCard` | — (payload already received) | — | — |
 | Czat | `ChatView`, `ChatInput`, `useChat` | `POST /api/chat` (SSE UI message stream) | `server/ai` chat agent + `update_recommendation` tool | `gpt-6-luna` (medium effort) |
@@ -142,7 +142,7 @@ No authentication (PRD §7). No rate limiting in the PoC (local VM); review trig
 |---|---|---|---|
 | `OPENROUTER_API_KEY` | OpenRouter authentication | Yes | `sk-or-v1-…` |
 | `LLM_MODEL` | Reasoning LLM for escalation, writer and chat | Yes (default provided) | `openai/gpt-6-luna` |
-| `DECISION_MODEL` | Typed decision model for photo signals | Yes (default provided) | `openai/gpt-6-luna-decisions` |
+| `DECISION_MODEL` | Typed decision model for photo signals | Yes (default provided) | `typesafe/jev-1.14` |
 | `FAST_PATH_ENABLED` | Allow skipping escalation for confident clear acceptances | No | `true` |
 | `FAST_PATH_THRESHOLD` | Minimum confidence per signal for the fast path | No | `0.8` |
 | `LLM_REASONING_DECISION` | Reasoning effort for escalated decisions | No | `high` |
@@ -161,8 +161,8 @@ No authentication (PRD §7). No rate limiting in the PoC (local VM); review trig
 **Status:** Accepted · **Date:** 2026-11-25
 **Context:** The user asked to evaluate the AI SDK, Chat SDK, the OpenRouter Responses API and the OpenRouter AI SDK provider for streaming chat and multimodal analysis.
 **Decision:** AI SDK 7 on server and client, models through `@openrouter/ai-sdk-provider` 3.x.
-- AI SDK 7 gives the `useChat` ↔ route-handler streaming protocol, typed data/tool parts (decision card), `Output.object` structured outputs, multimodal file parts, `experimental_decide` and `ai/test` mocks.
-- The OpenRouter provider is the only option that reaches both `gpt-6-luna` and the Decisions API (`openrouter.decisionModel`).
+- AI SDK 7 gives the `useChat` ↔ route-handler streaming protocol, typed data/tool parts (decision card), `Output.object` structured outputs, multimodal file parts, `experimental_evaluate` (ADR-001 A1) and `ai/test` mocks.
+- The OpenRouter provider is the only option that reaches both `gpt-6-luna` and the Decisions API (`openrouter.evaluationModel`, ADR-001 A1).
 **Rejected alternatives:**
 - **OpenRouter Responses API directly:** stateless on OpenRouter (`previous_response_id` → 400), no decisions support, and we would hand-write the streaming protocol the AI SDK already provides.
 - **Chat SDK (chat-sdk.dev):** now a Slack/Teams/… bot SDK, not a web chat template.
@@ -218,7 +218,7 @@ flowchart LR
         Log[(.data/decision-log.jsonl)]
     end
     subgraph OpenRouter
-        LD[openai/gpt-6-luna-decisions<br/>/api/alpha/decisions]
+        LD[typesafe/jev-1.14<br/>/api/alpha/decisions]
         LL[openai/gpt-6-luna<br/>chat completions]
     end
     Form --> Progress --> Cases
@@ -271,7 +271,7 @@ sequenceDiagram
     UI->>API: multipart
     API->>API: validate, sharp preprocess
     API-->>UI: stage analysis
-    API->>OR: decide (gpt-6-luna-decisions, photo + case text)
+    API->>OR: evaluate (typesafe/jev-1.14, photo + case text)
     OR-->>API: signals (some < 0.8)
     API-->>UI: stage decision
     API->>OR: generateText (gpt-6-luna high, photo + signals + policy, structured)
@@ -287,7 +287,7 @@ sequenceDiagram
 sequenceDiagram
     participant API as /api/cases
     participant OR as OpenRouter
-    API->>OR: decide (gpt-6-luna-decisions)
+    API->>OR: evaluate (typesafe/jev-1.14)
     OR-->>API: all fast-path conditions >= 0.8 (clear acceptance)
     API->>OR: generateText (gpt-6-luna low effort, decision locked: Akceptacja)
     OR-->>API: message markdown
@@ -392,8 +392,8 @@ TDD per AGENTS.md: specification → failing test → minimal code → green →
 
 ## 11. Open Questions and Assumptions
 
-- **Luna Decisions details to confirm with the first real capture (ADR-001 TAC-001-01):** exact question-type names on OpenRouter (`noul` vs AI SDK `boolean`), the confidence field name, and image pass-through via `experimental_decide`. If `experimental_decide` cannot pass images, the adapter calls the OpenRouter `/api/alpha/decisions` endpoint directly with the same contract.
+- **Decision model details (resolved):** the SDK API names, the `noul` wire type, the confidence fields and image pass-through are confirmed by real recordings (ADR-001 A1, A2). Still open: the image feature of Jev 1.14 is "early and may change"; no provider latency claim; JPEG/PNG only with 256–1568 px sides, so very small uploads fall back to escalation.
 - **Calibration:** the 0.8 threshold is a starting value; the decision log and `pnpm eval:decisions` provide the data to tune it. Example photos are unlabelled, so the eval measures agreement between paths, not accuracy.
-- **Model page:** the OpenRouter HTML page for `gpt-6-luna-decisions` returned 404 during research while the API metadata exists (`text+image->decisions`, $0.10/1M input). Re-check availability before implementation.
+- **Model page:** https://openrouter.ai/typesafe/jev-1.14 exists (endpoints `typesafe`, `typesafe/zdr`; build `typesafe/jev-1.14-20261014`). Re-check availability before the demo (`pnpm openrouter:status`).
 - **Template pin:** `shadcn-ui/chatbot-template` pins `next` 16.3.6; bump to the current 16.4.x after the first green build.
 - **PRD AC-40 vs decision log:** the log stores only scores and routing metadata (no customer text, images or messages); if this is considered "case data", disable it with an empty `DECISION_LOG_PATH`.
