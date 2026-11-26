@@ -3,7 +3,7 @@
 ## Po czwartym dniu (26.11)
 
 **Kod i repozytorium**
-- Aplikacja jest w gałęzi `feat/app-implementation`; PR z aplikacją utworzymy rano w dniu 5. `main` zostaje punktem startowym kursu.
+- Aplikacja: [PR #46](https://github.com/LucasMatuszewski/jsystems-ai-programming-2026-11/pull/46) w gałęzi `feat/app-implementation`, z wideo i zrzutami ekranu działającej aplikacji. PR jest w wersji roboczej (draft), code review robimy w dniu 5. `main` zostaje punktem startowym kursu.
 - [PR #9](https://github.com/LucasMatuszewski/jsystems-ai-programming-2026-11/pull/9) w gałęzi `docs/prd-adr-plan`: PRD, ADR i zaakceptowany plan implementacji, z modelem decyzyjnym Jev 1.14.
 - [Epic #10](https://github.com/LucasMatuszewski/jsystems-ai-programming-2026-11/issues/10) z issues do realizacji planu.
 - [PR #44](https://github.com/LucasMatuszewski/jsystems-ai-programming-2026-11/pull/44) w gałęzi `skills/write-plan`: skill do tworzenia planów oraz zasady dla tymczasowych planów i briefów agentów.
