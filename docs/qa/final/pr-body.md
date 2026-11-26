@@ -16,10 +16,10 @@ Next.js 16 app (`app/`) where a customer files a return (Zwrot) or complaint (Re
 ### Acceptance criteria coverage
 - Automated: see `app/tests/e2e/COVERAGE.md` (per-AC table).
 - Manual: gate reports G2, G3 (+G3-D1) and G4 re-verify the rows marked "Manual only".
-- Gaps: **AC-07** native camera picker (needs a physical phone; everything else verified by emulation); the fast path never opened in real runs (FU-1). AC-28 is verified live (G5-1, G5b).
+- Gaps: **AC-07** native camera picker (needs a physical phone; everything else verified by emulation); the fast path opens in a real run only at the verification threshold 0.3 (G5c); at the production 0.8 it never opened (FU-1). AC-28 is verified live (G5-1, G5b).
 
 ### Reports
-- Gates: [G1](docs/qa/G1/report.md), [G2](docs/qa/G2/report.md), [G3](docs/qa/G3/report.md), [G3-D1](docs/qa/G3-D1/report.md), [G4](docs/qa/G4/report.md), [G4b post-fix gate](docs/qa/G4b/report.md) (G4b-1 fix evidence: `docs/qa/G4b-1/`), [G5 real-run closure](docs/qa/G5/report.md), [G5-1 fix](docs/qa/G5-1/notes.md), [G5b re-check](docs/qa/G5b/notes.md)
+- Gates: [G1](docs/qa/G1/report.md), [G2](docs/qa/G2/report.md), [G3](docs/qa/G3/report.md), [G3-D1](docs/qa/G3-D1/report.md), [G4](docs/qa/G4/report.md), [G4b post-fix gate](docs/qa/G4b/report.md) (G4b-1 fix evidence: `docs/qa/G4b-1/`), [G5 real-run closure](docs/qa/G5/report.md), [G5-1 fix](docs/qa/G5-1/notes.md), [G5b re-check](docs/qa/G5b/notes.md), [G5c fast path](docs/qa/G5c/notes.md)
 - Independent review: [T28 review](docs/qa/T28/review.md)
 - Fixes and manual check: [T29 report](docs/qa/T29/report.md)
 
@@ -51,7 +51,7 @@ Condensed walkthrough, 2:25 (static waits cut automatically, motion kept at 1×)
 
 ### Verification limits and follow-ups
 - AC-28 (remedy for an accepted complaint) is verified live on both the first decision and a chat update card (plan Rev. 7).
-- The fast path never opened in real runs, even at verification thresholds 0.7/0.6; its logic is covered by tests, and calibration is FU-1. AC-07's native camera picker needs a physical phone.
+- Fast path observed in a real run at the verification threshold 0.3 ([G5c](docs/qa/G5c/notes.md): signals → writer, Akceptacja); at the production 0.8 it never opened, so calibration is FU-1. AC-07's native camera picker needs a physical phone.
 - Follow-ups FU-1 (decision-model calibration), FU-2 (GitHub Issues alignment), FU-3 (test-suite review) are in plan §11.
 - Refs epic #10 (issues #11-#43 are not auto-closed by this PR because the base is the docs branch).
 

@@ -10,3 +10,4 @@ You are an independent manual QA tester for this repository.
 - Follow the brief you are given, `app/AGENTS.md`, and `.claude/rules/long-running-processes.md` (timeouts, logs, report overruns).
 - Never edit application code, never read `.env*`, and never commit, stage or push.
 - Leave temporary files only in the session scratchpad, not in the repo. Use `mv`, not `rm`, if something must be moved out.
+- Before your final message, confirm that every server and browser you started is stopped and that their ports are free. Gates G5b and G4 left a `next-server` running that blocked the next gate.

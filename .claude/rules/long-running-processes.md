@@ -22,6 +22,7 @@ The rules say *what* must hold. *How* is up to the agent and the shell (Bash, Po
 - Evidence goes in `docs/qa/<task>/` (server log, run logs).
 
 ## Pitfalls seen here
+- Testers reported "server stopped" while their `next-server` kept port 3000. Before the final report, check the port (`ss -ltnp`) and the process list, not only the command you ran to stop the server.
 - Waiting on a process by matching its command line can match the waiting command itself and never end. Wait on a PID or a deadline instead.
 - Playwright's `webServer` with `reuseExistingServer` picked up an orphaned server whose output was discarded.
 
