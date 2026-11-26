@@ -1,5 +1,17 @@
 # UPDATES !!!
 
+## Po czwartym dniu (26.11)
+
+**Kod i repozytorium**
+- Aplikacja jest w gałęzi `feat/app-implementation`; PR z aplikacją utworzymy rano w dniu 5. `main` zostaje punktem startowym kursu.
+- [PR #9](https://github.com/LucasMatuszewski/jsystems-ai-programming-2026-11/pull/9) w gałęzi `docs/prd-adr-plan`: PRD, ADR i zaakceptowany plan implementacji, z modelem decyzyjnym Jev 1.14.
+- [Epic #10](https://github.com/LucasMatuszewski/jsystems-ai-programming-2026-11/issues/10) z issues do realizacji planu.
+- [PR #44](https://github.com/LucasMatuszewski/jsystems-ai-programming-2026-11/pull/44) w gałęzi `skills/write-plan`: skill do tworzenia planów oraz zasady dla tymczasowych planów i briefów agentów.
+
+**Czat**
+- [Historia czatu z dnia 4](course-materials/zoom-summary-chat-history/day-4-chat-history.md): Beads i Dolt, testy E2E i manualne bez mocków, `/goal`, zmiana modelu decyzyjnego na Jev 1.14 w OpenRouter, reguła Context7 w `AGENTS.md`, timeouty i monitorowanie procesów agentów, skill do planowania w git worktree, Workflows, Agent Teams, `/rc` i `/teleport`.
+- Na końcu historii czatu jest [lista tematów na dzień 5](course-materials/zoom-summary-chat-history/day-4-chat-history.md#todo-na-27112026).
+
 ## Po trzecim dniu (25.11)
 
 **Kod i repozytorium**
