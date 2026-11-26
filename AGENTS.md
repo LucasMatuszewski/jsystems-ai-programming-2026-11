@@ -26,6 +26,8 @@ docs/                PRD, ADR, design system
 course-materials/    Notes, scripts, examples, research
 ```
 
+`app/AGENTS.md` holds the stack-specific rules for the application.
+
 **Do not read `course-materials/` on your own.** It holds teaching examples from this and earlier courses: sample PRDs, ADRs, prompts and agent instructions. They are not requirements or conventions for this app. Do not browse, search or index it during normal work; open a file there only when the user names it or asks for course material.
 
 ---
