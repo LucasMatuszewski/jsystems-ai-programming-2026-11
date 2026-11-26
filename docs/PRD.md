@@ -45,7 +45,7 @@ Hardware Service Decision Copilot is a **proof of concept** of a customer-facing
 5. The system reduces the image size and analyses the photo with the **return-specific** image analysis instructions (judge whether the device is undamaged, shows no signs of use and could be resold as new).
 6. The decision agent receives the form data, the image description and the Return Policy, and produces a recommendation using the **return-specific** decision instructions.
 7. The system opens the chat screen (screen 9.3). The case summary panel shows the submitted data and the photo thumbnail. The first agent message contains: a greeting, the decision badge, the justification (with policy rule references), the next steps, and the mandatory disclaimer.
-8. The customer reads the message and can ask follow-up questions (Flow 4.3) or start a new case (Flow 4.6).
+8. The customer reads the message and can ask follow-up questions (Flow 4.3) or start a new case (Flow 4.7).
 
 ### 4.2 Happy path — complaint
 Same as 4.1 with these differences:
@@ -125,7 +125,7 @@ Same as 4.1 with these differences:
 ### AI decision (first message)
 - **AC-19** A "Zwrot" case is decided with return-specific decision instructions and the Return Policy only. A "Reklamacja" case is decided with complaint-specific decision instructions and the Complaint Policy only.
 - **AC-20** Every decision is exactly one of: "Akceptacja", "Odrzucenie", "Weryfikacja ręczna".
-- **AC-21** The first agent message contains, in this order: a greeting, a decision badge, a short case summary, the justification, next steps, the disclaimer.
+- **AC-21** The first agent message contains, in this order: a greeting, the decision badge with the disclaimer attached to it (AC-29), a short case summary, the justification, next steps.
 - **AC-22** The justification cites at least one rule number from the applicable policy (for example "R-2", "C-5") and refers to at least one specific observation from the image analysis.
 - **AC-23** The number of days between the date of purchase and today is stated in the justification and is computed by the system, not estimated by the model.
 - **AC-24** For a "Zwrot" with 0–14 days since purchase, the decision is never "Odrzucenie" because of the device's condition (rule R-2.4).
@@ -150,7 +150,7 @@ Same as 4.1 with these differences:
 ### Session
 - **AC-38** After a page refresh in the same browser tab, the chat screen is restored with the case summary and all messages in their original order.
 - **AC-39** "Nowe zgłoszenie" asks for confirmation; after confirmation, the stored session is deleted and an empty form is shown. After cancellation, nothing changes.
-- **AC-40** No case data is stored on a server after the response is returned (no database in the PoC).
+- **AC-40** No case data (form values, free text, images, thumbnails, chat messages) is stored on a server after the response is returned (no database in the PoC). Only the anonymised decision-scoring log defined in ADR-001 §3.7 (scores, routing, costs; no customer text or images) may be written.
 
 ### Errors and general
 - **AC-41** If the analysis or the first decision fails or times out, the form is shown again with all data and the photo kept, together with the error banner and "Spróbuj ponownie" (Flow 4.5).
@@ -299,6 +299,7 @@ flowchart TD
 ### 11.1 Components and roles
 - **Image analyst** — describes only what is visible in the photo, with separate instructions for returns and complaints (AC-15, AC-16). It does not make the decision.
 - **Decision agent** — a reasoning model that combines the form data, the system-computed days since purchase, the image analysis and the applicable policy. It produces the first message, then conducts the chat. Separate instructions for returns and complaints.
+- **Implementation note (ADR-000 §1, ADR-001 §3.2):** image analysis is split between a typed decision model (photo signals with probabilities) and the reasoning LLM, which verifies those signals against the photo; confident clear acceptances and date-rule rejections skip the reasoning decision step, and a low-effort LLM call writes their message.
 
 ### 11.2 Allowed
 - Recommend one of three decisions and explain it with policy rule references and image evidence.
