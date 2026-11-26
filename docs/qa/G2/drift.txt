@@ -1,0 +1,3 @@
+$ tsx scripts/record-openrouter.ts --compare
+compare: baseline = decisions/return-laptop-2.json (success fixture)
+compare: structure identical (HTTP status, keys and value types).
