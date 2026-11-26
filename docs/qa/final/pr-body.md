@@ -16,7 +16,7 @@ Next.js 16 app (`app/`) where a customer files a return (Zwrot) or complaint (Re
 ### Acceptance criteria coverage
 - Automated: see `app/tests/e2e/COVERAGE.md` (per-AC table).
 - Manual: gate reports G2, G3 (+G3-D1) and G4 re-verify the rows marked "Manual only".
-- Gaps: **AC-07** camera capture (only meaningful on a real phone, not exercised); **AC-28** (accept of complaint names remedy) never exercised in a real case, the E2E check is conditional on an Akceptacja decision; AC-35 update card appeared in G3/G4 manual runs but did not appear in the two T30 demo chat turns (model kept the recommendation).
+- Gaps: **AC-07** native camera picker (needs a physical phone; everything else verified by emulation); the fast path never opened in real runs (FU-1). AC-28 is verified live (G5-1, G5b).
 
 ### Reports
 - Gates: [G1](docs/qa/G1/report.md), [G2](docs/qa/G2/report.md), [G3](docs/qa/G3/report.md), [G3-D1](docs/qa/G3-D1/report.md), [G4](docs/qa/G4/report.md), [G4b post-fix gate](docs/qa/G4b/report.md) (G4b-1 fix evidence: `docs/qa/G4b-1/`), [G5 real-run closure](docs/qa/G5/report.md), [G5-1 fix](docs/qa/G5-1/notes.md), [G5b re-check](docs/qa/G5b/notes.md)
