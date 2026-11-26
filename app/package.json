@@ -14,7 +14,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
-    "eval:decisions": "tsx scripts/eval-decisions.ts",
+    "eval:decisions": "tsx --conditions=react-server scripts/eval-decisions.ts",
     "openrouter:status": "tsx scripts/openrouter-status.ts",
     "record:openrouter": "tsx scripts/record-openrouter.ts",
     "record:app": "tsx scripts/record-app.ts"

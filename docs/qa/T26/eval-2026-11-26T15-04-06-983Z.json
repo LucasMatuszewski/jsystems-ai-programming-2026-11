@@ -1,0 +1,769 @@
+{
+  "startedAt": "2026-11-26T15:04:06.983Z",
+  "finishedAt": "2026-11-26T15:06:25.849Z",
+  "threshold": 0.8,
+  "fastPathEnabledInConfig": true,
+  "modelIds": {
+    "signals": "typesafe/jev-1.14",
+    "llm": "openai/gpt-6-luna"
+  },
+  "runs": [
+    {
+      "photo": "laptop-1.png",
+      "caseType": "return",
+      "category": "laptop",
+      "purchaseDate": "2026-11-16",
+      "daysSincePurchase": 10,
+      "signals": {
+        "status": "ok",
+        "answers": {
+          "photo_usable": {
+            "value": true,
+            "confidence": 0.82
+          },
+          "device_visible": {
+            "value": true,
+            "confidence": 0.99
+          },
+          "category_match": {
+            "value": true,
+            "confidence": 0.97
+          },
+          "damage_visible": {
+            "value": true,
+            "confidence": 0.98
+          },
+          "damage_type": {
+            "value": "crack",
+            "confidence": 0.99
+          },
+          "damage_location": {
+            "value": "screen",
+            "confidence": 1
+          },
+          "condition": {
+            "value": 2,
+            "confidence": 0.62
+          },
+          "signs_of_use": {
+            "value": true,
+            "confidence": 0.92
+          },
+          "packaging_visible": {
+            "value": false,
+            "confidence": 0.97
+          }
+        },
+        "durationMs": 573,
+        "costUsd": 0
+      },
+      "gate": {
+        "eligible": false,
+        "reasons": [
+          "damage_visible",
+          "signs_of_use",
+          "condition"
+        ]
+      },
+      "escalated": {
+        "decision": "Weryfikacja ręczna",
+        "ruleRefs": [
+          "R-2",
+          "R-8"
+        ],
+        "guardsApplied": [],
+        "call": {
+          "latencyMs": 0,
+          "costUsd": 0
+        }
+      },
+      "fast": null,
+      "agreement": null,
+      "minConfidence": 0.62
+    },
+    {
+      "photo": "laptop-1.png",
+      "caseType": "complaint",
+      "category": "laptop",
+      "purchaseDate": "2025-10-22",
+      "daysSincePurchase": 400,
+      "signals": {
+        "status": "ok",
+        "answers": {
+          "photo_usable": {
+            "value": true,
+            "confidence": 0.81
+          },
+          "device_visible": {
+            "value": true,
+            "confidence": 0.99
+          },
+          "category_match": {
+            "value": true,
+            "confidence": 0.96
+          },
+          "damage_visible": {
+            "value": true,
+            "confidence": 0.98
+          },
+          "damage_type": {
+            "value": "crack",
+            "confidence": 0.99
+          },
+          "damage_location": {
+            "value": "screen",
+            "confidence": 1
+          },
+          "condition": {
+            "value": 2,
+            "confidence": 0.65
+          },
+          "damage_cause": {
+            "value": "user_caused",
+            "confidence": 0.97
+          },
+          "description_consistent": {
+            "value": true,
+            "confidence": 0.5
+          }
+        },
+        "durationMs": 388,
+        "costUsd": 0
+      },
+      "gate": {
+        "eligible": false,
+        "reasons": [
+          "description_consistent",
+          "damage_cause",
+          "excluded_damage_type"
+        ]
+      },
+      "escalated": {
+        "decision": "Odrzucenie",
+        "ruleRefs": [
+          "C-3",
+          "C-5"
+        ],
+        "guardsApplied": [],
+        "call": {
+          "latencyMs": 0,
+          "costUsd": 0
+        }
+      },
+      "fast": null,
+      "agreement": null,
+      "minConfidence": 0.5
+    },
+    {
+      "photo": "laptop-2.webp",
+      "caseType": "return",
+      "category": "laptop",
+      "purchaseDate": "2026-11-16",
+      "daysSincePurchase": 10,
+      "signals": {
+        "status": "ok",
+        "answers": {
+          "photo_usable": {
+            "value": true,
+            "confidence": 0.88
+          },
+          "device_visible": {
+            "value": true,
+            "confidence": 0.99
+          },
+          "category_match": {
+            "value": true,
+            "confidence": 0.98
+          },
+          "damage_visible": {
+            "value": false,
+            "confidence": 0.81
+          },
+          "damage_type": {
+            "value": "none",
+            "confidence": 0.71
+          },
+          "damage_location": {
+            "value": "none",
+            "confidence": 0.7
+          },
+          "condition": {
+            "value": 4,
+            "confidence": 0.43
+          },
+          "signs_of_use": {
+            "value": true,
+            "confidence": 0.79
+          },
+          "packaging_visible": {
+            "value": false,
+            "confidence": 0.98
+          }
+        },
+        "durationMs": 303,
+        "costUsd": 0
+      },
+      "gate": {
+        "eligible": false,
+        "reasons": [
+          "signs_of_use",
+          "condition"
+        ]
+      },
+      "escalated": {
+        "decision": "Weryfikacja ręczna",
+        "ruleRefs": [
+          "R-2"
+        ],
+        "guardsApplied": [],
+        "call": {
+          "latencyMs": 0,
+          "costUsd": 0
+        }
+      },
+      "fast": null,
+      "agreement": null,
+      "minConfidence": 0.43
+    },
+    {
+      "photo": "laptop-2.webp",
+      "caseType": "complaint",
+      "category": "laptop",
+      "purchaseDate": "2025-10-22",
+      "daysSincePurchase": 400,
+      "signals": {
+        "status": "ok",
+        "answers": {
+          "photo_usable": {
+            "value": true,
+            "confidence": 0.9
+          },
+          "device_visible": {
+            "value": true,
+            "confidence": 0.99
+          },
+          "category_match": {
+            "value": true,
+            "confidence": 0.98
+          },
+          "damage_visible": {
+            "value": false,
+            "confidence": 0.88
+          },
+          "damage_type": {
+            "value": "none",
+            "confidence": 0.78
+          },
+          "damage_location": {
+            "value": "none",
+            "confidence": 0.71
+          },
+          "condition": {
+            "value": 4,
+            "confidence": 0.43
+          },
+          "damage_cause": {
+            "value": "undetermined",
+            "confidence": 0.32
+          },
+          "description_consistent": {
+            "value": true,
+            "confidence": 0.6
+          }
+        },
+        "durationMs": 421,
+        "costUsd": 0
+      },
+      "gate": {
+        "eligible": false,
+        "reasons": [
+          "description_consistent",
+          "damage_visible",
+          "damage_cause"
+        ]
+      },
+      "escalated": {
+        "decision": "Weryfikacja ręczna",
+        "ruleRefs": [
+          "C-6"
+        ],
+        "guardsApplied": [],
+        "call": {
+          "latencyMs": 0,
+          "costUsd": 0
+        }
+      },
+      "fast": null,
+      "agreement": null,
+      "minConfidence": 0.32
+    },
+    {
+      "photo": "phone-1.jpg",
+      "caseType": "return",
+      "category": "smartphone",
+      "purchaseDate": "2026-11-16",
+      "daysSincePurchase": 10,
+      "signals": {
+        "status": "ok",
+        "answers": {
+          "photo_usable": {
+            "value": true,
+            "confidence": 0.87
+          },
+          "device_visible": {
+            "value": true,
+            "confidence": 0.98
+          },
+          "category_match": {
+            "value": true,
+            "confidence": 0.96
+          },
+          "damage_visible": {
+            "value": true,
+            "confidence": 0.98
+          },
+          "damage_type": {
+            "value": "crack",
+            "confidence": 0.96
+          },
+          "damage_location": {
+            "value": "screen",
+            "confidence": 1
+          },
+          "condition": {
+            "value": 1,
+            "confidence": 0.63
+          },
+          "signs_of_use": {
+            "value": true,
+            "confidence": 0.94
+          },
+          "packaging_visible": {
+            "value": false,
+            "confidence": 0.97
+          }
+        },
+        "durationMs": 303,
+        "costUsd": 0
+      },
+      "gate": {
+        "eligible": false,
+        "reasons": [
+          "damage_visible",
+          "signs_of_use",
+          "condition"
+        ]
+      },
+      "escalated": {
+        "decision": "Weryfikacja ręczna",
+        "ruleRefs": [
+          "R-2",
+          "R-8"
+        ],
+        "guardsApplied": [],
+        "call": {
+          "latencyMs": 0,
+          "costUsd": 0
+        }
+      },
+      "fast": null,
+      "agreement": null,
+      "minConfidence": 0.63
+    },
+    {
+      "photo": "phone-1.jpg",
+      "caseType": "complaint",
+      "category": "smartphone",
+      "purchaseDate": "2025-10-22",
+      "daysSincePurchase": 400,
+      "signals": {
+        "status": "ok",
+        "answers": {
+          "photo_usable": {
+            "value": true,
+            "confidence": 0.91
+          },
+          "device_visible": {
+            "value": true,
+            "confidence": 0.99
+          },
+          "category_match": {
+            "value": true,
+            "confidence": 0.96
+          },
+          "damage_visible": {
+            "value": true,
+            "confidence": 0.99
+          },
+          "damage_type": {
+            "value": "crack",
+            "confidence": 0.97
+          },
+          "damage_location": {
+            "value": "screen",
+            "confidence": 1
+          },
+          "condition": {
+            "value": 1,
+            "confidence": 0.67
+          },
+          "damage_cause": {
+            "value": "user_caused",
+            "confidence": 0.95
+          },
+          "description_consistent": {
+            "value": false,
+            "confidence": 0.53
+          }
+        },
+        "durationMs": 304,
+        "costUsd": 0
+      },
+      "gate": {
+        "eligible": false,
+        "reasons": [
+          "description_consistent",
+          "damage_cause",
+          "excluded_damage_type"
+        ]
+      },
+      "escalated": {
+        "decision": "Odrzucenie",
+        "ruleRefs": [
+          "C-3",
+          "C-5"
+        ],
+        "guardsApplied": [],
+        "call": {
+          "latencyMs": 0,
+          "costUsd": 0
+        }
+      },
+      "fast": null,
+      "agreement": null,
+      "minConfidence": 0.53
+    },
+    {
+      "photo": "phone-2.jpeg",
+      "caseType": "return",
+      "category": "smartphone",
+      "purchaseDate": "2026-11-16",
+      "daysSincePurchase": 10,
+      "signals": {
+        "status": "ok",
+        "answers": {
+          "photo_usable": {
+            "value": true,
+            "confidence": 0.78
+          },
+          "device_visible": {
+            "value": true,
+            "confidence": 0.98
+          },
+          "category_match": {
+            "value": true,
+            "confidence": 0.97
+          },
+          "damage_visible": {
+            "value": true,
+            "confidence": 0.67
+          },
+          "damage_type": {
+            "value": "none",
+            "confidence": 0.21
+          },
+          "damage_location": {
+            "value": "housing",
+            "confidence": 0.75
+          },
+          "condition": {
+            "value": 2,
+            "confidence": 0.28
+          },
+          "signs_of_use": {
+            "value": true,
+            "confidence": 0.76
+          },
+          "packaging_visible": {
+            "value": false,
+            "confidence": 0.96
+          }
+        },
+        "durationMs": 243,
+        "costUsd": 0
+      },
+      "gate": {
+        "eligible": false,
+        "reasons": [
+          "photo_usable",
+          "damage_visible",
+          "signs_of_use",
+          "condition"
+        ]
+      },
+      "escalated": {
+        "decision": "Akceptacja",
+        "ruleRefs": [
+          "R-2",
+          "R-8"
+        ],
+        "guardsApplied": [],
+        "call": {
+          "latencyMs": 0,
+          "costUsd": 0
+        }
+      },
+      "fast": null,
+      "agreement": null,
+      "minConfidence": 0.21
+    },
+    {
+      "photo": "phone-2.jpeg",
+      "caseType": "complaint",
+      "category": "smartphone",
+      "purchaseDate": "2025-10-22",
+      "daysSincePurchase": 400,
+      "signals": {
+        "status": "ok",
+        "answers": {
+          "photo_usable": {
+            "value": true,
+            "confidence": 0.82
+          },
+          "device_visible": {
+            "value": true,
+            "confidence": 0.99
+          },
+          "category_match": {
+            "value": true,
+            "confidence": 0.97
+          },
+          "damage_visible": {
+            "value": true,
+            "confidence": 0.7
+          },
+          "damage_type": {
+            "value": "none",
+            "confidence": 0.27
+          },
+          "damage_location": {
+            "value": "housing",
+            "confidence": 0.85
+          },
+          "condition": {
+            "value": 2,
+            "confidence": 0.27
+          },
+          "damage_cause": {
+            "value": "user_caused",
+            "confidence": 0.36
+          },
+          "description_consistent": {
+            "value": false,
+            "confidence": 0.5900000000000001
+          }
+        },
+        "durationMs": 244,
+        "costUsd": 0
+      },
+      "gate": {
+        "eligible": false,
+        "reasons": [
+          "description_consistent",
+          "damage_visible",
+          "damage_cause"
+        ]
+      },
+      "escalated": {
+        "decision": "Weryfikacja ręczna",
+        "ruleRefs": [
+          "C-3",
+          "C-6",
+          "C-9"
+        ],
+        "guardsApplied": [],
+        "call": {
+          "latencyMs": 0,
+          "costUsd": 0
+        }
+      },
+      "fast": null,
+      "agreement": null,
+      "minConfidence": 0.27
+    },
+    {
+      "photo": "phone-3.jpeg",
+      "caseType": "return",
+      "category": "smartphone",
+      "purchaseDate": "2026-11-16",
+      "daysSincePurchase": 10,
+      "signals": {
+        "status": "ok",
+        "answers": {
+          "photo_usable": {
+            "value": true,
+            "confidence": 0.86
+          },
+          "device_visible": {
+            "value": true,
+            "confidence": 0.98
+          },
+          "category_match": {
+            "value": true,
+            "confidence": 0.96
+          },
+          "damage_visible": {
+            "value": false,
+            "confidence": 0.91
+          },
+          "damage_type": {
+            "value": "none",
+            "confidence": 0.87
+          },
+          "damage_location": {
+            "value": "none",
+            "confidence": 0.79
+          },
+          "condition": {
+            "value": 5,
+            "confidence": 0.77
+          },
+          "signs_of_use": {
+            "value": false,
+            "confidence": 0.81
+          },
+          "packaging_visible": {
+            "value": true,
+            "confidence": 0.96
+          }
+        },
+        "durationMs": 253,
+        "costUsd": 0
+      },
+      "gate": {
+        "eligible": false,
+        "reasons": [
+          "condition"
+        ]
+      },
+      "escalated": {
+        "decision": "Akceptacja",
+        "ruleRefs": [
+          "R-2",
+          "R-8"
+        ],
+        "guardsApplied": [],
+        "call": {
+          "latencyMs": 0,
+          "costUsd": 0
+        }
+      },
+      "fast": null,
+      "agreement": null,
+      "minConfidence": 0.77
+    },
+    {
+      "photo": "phone-3.jpeg",
+      "caseType": "complaint",
+      "category": "smartphone",
+      "purchaseDate": "2025-10-22",
+      "daysSincePurchase": 400,
+      "signals": {
+        "status": "ok",
+        "answers": {
+          "photo_usable": {
+            "value": true,
+            "confidence": 0.9
+          },
+          "device_visible": {
+            "value": true,
+            "confidence": 0.98
+          },
+          "category_match": {
+            "value": true,
+            "confidence": 0.96
+          },
+          "damage_visible": {
+            "value": false,
+            "confidence": 0.94
+          },
+          "damage_type": {
+            "value": "none",
+            "confidence": 0.96
+          },
+          "damage_location": {
+            "value": "none",
+            "confidence": 0.83
+          },
+          "condition": {
+            "value": 5,
+            "confidence": 0.85
+          },
+          "damage_cause": {
+            "value": "no_defect_visible",
+            "confidence": 0.55
+          },
+          "description_consistent": {
+            "value": false,
+            "confidence": 0.54
+          }
+        },
+        "durationMs": 273,
+        "costUsd": 0
+      },
+      "gate": {
+        "eligible": false,
+        "reasons": [
+          "description_consistent",
+          "damage_visible",
+          "damage_cause"
+        ]
+      },
+      "escalated": {
+        "decision": "Weryfikacja ręczna",
+        "ruleRefs": [
+          "C-6"
+        ],
+        "guardsApplied": [],
+        "call": {
+          "latencyMs": 0,
+          "costUsd": 0
+        }
+      },
+      "fast": null,
+      "agreement": null,
+      "minConfidence": 0.54
+    }
+  ],
+  "upstreamLines": [
+    "{\"type\":\"upstream\",\"requestId\":\"t26-1\",\"stage\":\"signals\",\"modelId\":\"typesafe/jev-1.14\",\"outcome\":\"ok\",\"latencyMs\":570,\"costUsd\":0}",
+    "{\"type\":\"upstream\",\"requestId\":\"t26-1\",\"stage\":\"escalated\",\"modelId\":\"openai/gpt-6-luna\",\"outcome\":\"ok\",\"latencyMs\":12195,\"costUsd\":0}",
+    "{\"type\":\"upstream\",\"requestId\":\"t26-2\",\"stage\":\"signals\",\"modelId\":\"typesafe/jev-1.14\",\"outcome\":\"ok\",\"latencyMs\":387,\"costUsd\":0}",
+    "{\"type\":\"upstream\",\"requestId\":\"t26-2\",\"stage\":\"escalated\",\"modelId\":\"openai/gpt-6-luna\",\"outcome\":\"ok\",\"latencyMs\":16045,\"costUsd\":0}",
+    "{\"type\":\"upstream\",\"requestId\":\"t26-3\",\"stage\":\"signals\",\"modelId\":\"typesafe/jev-1.14\",\"outcome\":\"ok\",\"latencyMs\":301,\"costUsd\":0}",
+    "{\"type\":\"upstream\",\"requestId\":\"t26-3\",\"stage\":\"escalated\",\"modelId\":\"openai/gpt-6-luna\",\"outcome\":\"ok\",\"latencyMs\":13021,\"costUsd\":0}",
+    "{\"type\":\"upstream\",\"requestId\":\"t26-4\",\"stage\":\"signals\",\"modelId\":\"typesafe/jev-1.14\",\"outcome\":\"ok\",\"latencyMs\":419,\"costUsd\":0}",
+    "{\"type\":\"upstream\",\"requestId\":\"t26-4\",\"stage\":\"escalated\",\"modelId\":\"openai/gpt-6-luna\",\"outcome\":\"ok\",\"latencyMs\":13557,\"costUsd\":0}",
+    "{\"type\":\"upstream\",\"requestId\":\"t26-5\",\"stage\":\"signals\",\"modelId\":\"typesafe/jev-1.14\",\"outcome\":\"ok\",\"latencyMs\":303,\"costUsd\":0}",
+    "{\"type\":\"upstream\",\"requestId\":\"t26-5\",\"stage\":\"escalated\",\"modelId\":\"openai/gpt-6-luna\",\"outcome\":\"ok\",\"latencyMs\":10081,\"costUsd\":0}",
+    "{\"type\":\"upstream\",\"requestId\":\"t26-6\",\"stage\":\"signals\",\"modelId\":\"typesafe/jev-1.14\",\"outcome\":\"ok\",\"latencyMs\":303,\"costUsd\":0}",
+    "{\"type\":\"upstream\",\"requestId\":\"t26-6\",\"stage\":\"escalated\",\"modelId\":\"openai/gpt-6-luna\",\"outcome\":\"ok\",\"latencyMs\":15830,\"costUsd\":0}",
+    "{\"type\":\"upstream\",\"requestId\":\"t26-7\",\"stage\":\"signals\",\"modelId\":\"typesafe/jev-1.14\",\"outcome\":\"ok\",\"latencyMs\":242,\"costUsd\":0}",
+    "{\"type\":\"upstream\",\"requestId\":\"t26-7\",\"stage\":\"escalated\",\"modelId\":\"openai/gpt-6-luna\",\"outcome\":\"ok\",\"latencyMs\":12149,\"costUsd\":0}",
+    "{\"type\":\"upstream\",\"requestId\":\"t26-8\",\"stage\":\"signals\",\"modelId\":\"typesafe/jev-1.14\",\"outcome\":\"ok\",\"latencyMs\":243,\"costUsd\":0}",
+    "{\"type\":\"upstream\",\"requestId\":\"t26-8\",\"stage\":\"escalated\",\"modelId\":\"openai/gpt-6-luna\",\"outcome\":\"ok\",\"latencyMs\":14568,\"costUsd\":0}",
+    "{\"type\":\"upstream\",\"requestId\":\"t26-9\",\"stage\":\"signals\",\"modelId\":\"typesafe/jev-1.14\",\"outcome\":\"ok\",\"latencyMs\":253,\"costUsd\":0}",
+    "{\"type\":\"upstream\",\"requestId\":\"t26-9\",\"stage\":\"escalated\",\"modelId\":\"openai/gpt-6-luna\",\"outcome\":\"ok\",\"latencyMs\":11662,\"costUsd\":0}",
+    "{\"type\":\"upstream\",\"requestId\":\"t26-10\",\"stage\":\"signals\",\"modelId\":\"typesafe/jev-1.14\",\"outcome\":\"ok\",\"latencyMs\":272,\"costUsd\":0}",
+    "{\"type\":\"upstream\",\"requestId\":\"t26-10\",\"stage\":\"escalated\",\"modelId\":\"openai/gpt-6-luna\",\"outcome\":\"ok\",\"latencyMs\":14499,\"costUsd\":0}"
+  ],
+  "agreement": {
+    "agreed": 0,
+    "compared": 0
+  },
+  "suggestion": {
+    "minConfidenceAgreedAccept": null,
+    "agreedAcceptCases": 0
+  },
+  "totalCostUsd": 0
+}

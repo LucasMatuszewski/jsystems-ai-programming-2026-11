@@ -1,0 +1,46 @@
+$ tsx --conditions=react-server scripts/eval-decisions.ts
+done t26-1 laptop-1.png return
+done t26-2 laptop-1.png complaint
+done t26-3 laptop-2.webp return
+done t26-4 laptop-2.webp complaint
+done t26-5 phone-1.jpg return
+done t26-6 phone-1.jpg complaint
+done t26-7 phone-2.jpeg return
+done t26-8 phone-2.jpeg complaint
+done t26-9 phone-3.jpeg return
+done t26-10 phone-3.jpeg complaint
+# T26 decision evaluation (2026-11-26T15:04:06.983Z)
+
+Threshold 0.8, fast path enabled in config: true, signals model typesafe/jev-1.14, decision model openai/gpt-6-luna.
+
+| # | Photo | Case | Gate | Signals | Min conf | Escalated | Fast | Agree | Latency sig/esc/fast (ms) | Cost USD |
+|---|---|---|---|---|---|---|---|---|---|---|
+| 1 | laptop-1.png | return (10 d) | no: damage_visible, signs_of_use, condition | ok | 0.62 | Weryfikacja ręczna | - | n/a | 573/0/- | 0.00000 |
+| 2 | laptop-1.png | complaint (400 d) | no: description_consistent, damage_cause, excluded_damage_type | ok | 0.50 | Odrzucenie | - | n/a | 388/0/- | 0.00000 |
+| 3 | laptop-2.webp | return (10 d) | no: signs_of_use, condition | ok | 0.43 | Weryfikacja ręczna | - | n/a | 303/0/- | 0.00000 |
+| 4 | laptop-2.webp | complaint (400 d) | no: description_consistent, damage_visible, damage_cause | ok | 0.32 | Weryfikacja ręczna | - | n/a | 421/0/- | 0.00000 |
+| 5 | phone-1.jpg | return (10 d) | no: damage_visible, signs_of_use, condition | ok | 0.63 | Weryfikacja ręczna | - | n/a | 303/0/- | 0.00000 |
+| 6 | phone-1.jpg | complaint (400 d) | no: description_consistent, damage_cause, excluded_damage_type | ok | 0.53 | Odrzucenie | - | n/a | 304/0/- | 0.00000 |
+| 7 | phone-2.jpeg | return (10 d) | no: photo_usable, damage_visible, signs_of_use, condition | ok | 0.21 | Akceptacja | - | n/a | 243/0/- | 0.00000 |
+| 8 | phone-2.jpeg | complaint (400 d) | no: description_consistent, damage_visible, damage_cause | ok | 0.27 | Weryfikacja ręczna | - | n/a | 244/0/- | 0.00000 |
+| 9 | phone-3.jpeg | return (10 d) | no: condition | ok | 0.77 | Akceptacja | - | n/a | 253/0/- | 0.00000 |
+| 10 | phone-3.jpeg | complaint (400 d) | no: description_consistent, damage_visible, damage_cause | ok | 0.54 | Weryfikacja ręczna | - | n/a | 273/0/- | 0.00000 |
+
+## Signals per run
+
+1. laptop-1.png return: photo_usable=true@0.82, device_visible=true@0.99, category_match=true@0.97, damage_visible=true@0.98, damage_type=crack@0.99, damage_location=screen@1.00, condition=2@0.62, signs_of_use=true@0.92, packaging_visible=false@0.97
+2. laptop-1.png complaint: photo_usable=true@0.81, device_visible=true@0.99, category_match=true@0.96, damage_visible=true@0.98, damage_type=crack@0.99, damage_location=screen@1.00, condition=2@0.65, damage_cause=user_caused@0.97, description_consistent=true@0.50
+3. laptop-2.webp return: photo_usable=true@0.88, device_visible=true@0.99, category_match=true@0.98, damage_visible=false@0.81, damage_type=none@0.71, damage_location=none@0.70, condition=4@0.43, signs_of_use=true@0.79, packaging_visible=false@0.98
+4. laptop-2.webp complaint: photo_usable=true@0.90, device_visible=true@0.99, category_match=true@0.98, damage_visible=false@0.88, damage_type=none@0.78, damage_location=none@0.71, condition=4@0.43, damage_cause=undetermined@0.32, description_consistent=true@0.60
+5. phone-1.jpg return: photo_usable=true@0.87, device_visible=true@0.98, category_match=true@0.96, damage_visible=true@0.98, damage_type=crack@0.96, damage_location=screen@1.00, condition=1@0.63, signs_of_use=true@0.94, packaging_visible=false@0.97
+6. phone-1.jpg complaint: photo_usable=true@0.91, device_visible=true@0.99, category_match=true@0.96, damage_visible=true@0.99, damage_type=crack@0.97, damage_location=screen@1.00, condition=1@0.67, damage_cause=user_caused@0.95, description_consistent=false@0.53
+7. phone-2.jpeg return: photo_usable=true@0.78, device_visible=true@0.98, category_match=true@0.97, damage_visible=true@0.67, damage_type=none@0.21, damage_location=housing@0.75, condition=2@0.28, signs_of_use=true@0.76, packaging_visible=false@0.96
+8. phone-2.jpeg complaint: photo_usable=true@0.82, device_visible=true@0.99, category_match=true@0.97, damage_visible=true@0.70, damage_type=none@0.27, damage_location=housing@0.85, condition=2@0.27, damage_cause=user_caused@0.36, description_consistent=false@0.59
+9. phone-3.jpeg return: photo_usable=true@0.86, device_visible=true@0.98, category_match=true@0.96, damage_visible=false@0.91, damage_type=none@0.87, damage_location=none@0.79, condition=5@0.77, signs_of_use=false@0.81, packaging_visible=true@0.96
+10. phone-3.jpeg complaint: photo_usable=true@0.90, device_visible=true@0.98, category_match=true@0.96, damage_visible=false@0.94, damage_type=none@0.96, damage_location=none@0.83, condition=5@0.85, damage_cause=no_defect_visible@0.55, description_consistent=false@0.54
+
+Agreement: 0/0 compared cases (-%).
+Upstream lines: 20. Total cost USD 0.00000 (upstream, not billed to the key under BYOK).
+Threshold suggestion: no case where fast path and escalation both agreed on Akceptacja; no minimum to suggest.
+JSON: /home/labuser/jsystems-ai-programming-2026-11/docs/qa/T26/eval-2026-11-26T15-04-06-983Z.json
+RUN EXIT 0
