@@ -23,11 +23,31 @@ Next.js 16 app (`app/`) where a customer files a return (Zwrot) or complaint (Re
 - Independent review: [T28 review](docs/qa/T28/review.md)
 - Fixes and manual check: [T29 report](docs/qa/T29/report.md)
 
-### Evidence
-- Video (committed file, drag it into the description for inline playback): `docs/qa/final/demo.mp4`, chapters in `docs/qa/final/chapters.md`
-- ![Return decision](docs/qa/final/return-decision.png)
-- ![Complaint decision](docs/qa/final/complaint-decision.png)
-- ![Mobile chat](docs/qa/final/mobile-chat.png)
+### Demo
+Condensed walkthrough, 2:25 (static waits cut automatically, motion kept at 1×): [demo-condensed.mp4](https://github.com/LucasMatuszewski/jsystems-ai-programming-2026-11/blob/feat/app-implementation/docs/qa/final/demo-condensed.mp4). The full 8:08 recording is `docs/qa/final/demo.mp4`. Drag the file into this description for inline playback.
+
+| Time | Chapter |
+|---|---|
+| 0:00 | Empty form |
+| 0:06 | Return: laptop, 10 days |
+| 0:35 | Chat: new fact |
+| 1:10 | Refresh |
+| 1:16 | Nowe zgłoszenie |
+| 1:39 | Complaint: smartphone, 400 days |
+| 2:15 | Mobile 360 px |
+
+### Screenshots
+| Return decision | Complaint decision |
+|---|---|
+| ![Return decision](https://github.com/LucasMatuszewski/jsystems-ai-programming-2026-11/raw/feat/app-implementation/docs/qa/final/return-decision.png) | ![Complaint decision](https://github.com/LucasMatuszewski/jsystems-ai-programming-2026-11/raw/feat/app-implementation/docs/qa/final/complaint-decision.png) |
+
+| Validation errors (empty submit) | Invalid values |
+|---|---|
+| ![Empty submit](https://github.com/LucasMatuszewski/jsystems-ai-programming-2026-11/raw/feat/app-implementation/docs/qa/G4/d-form-errors-empty.png) | ![Invalid values](https://github.com/LucasMatuszewski/jsystems-ai-programming-2026-11/raw/feat/app-implementation/docs/qa/G4/d-form-errors-invalid.png) |
+
+| Analysis failure banner (invalid key) | Mobile chat |
+|---|---|
+| ![Failure banner](https://github.com/LucasMatuszewski/jsystems-ai-programming-2026-11/raw/feat/app-implementation/docs/qa/G2/failure-banner.png) | ![Mobile chat](https://github.com/LucasMatuszewski/jsystems-ai-programming-2026-11/raw/feat/app-implementation/docs/qa/final/mobile-chat.png) |
 
 ### Verification limits and follow-ups
 - Plan Rev. 6: AC-28 and the fast path were not reproducible in real runs with the current models (covered by tests on recordings); AC-07 needs a physical phone.
