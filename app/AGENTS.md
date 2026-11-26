@@ -53,6 +53,7 @@ The Next.js router lives in `app/app/` (outer `app/` = course project folder).
 - **Env:** variables are listed in `.env.example`. The real `OPENROUTER_API_KEY` lives in the repository-root `.env`; `next.config.ts` and `scripts/load-env.ts` load it (`app/.env.local` wins). **Never read, cat, grep or print any `.env` file** — only `.env.example`.
 - **Tests:** write them first (root TDD rules). The `node` project blocks any `fetch` to `openrouter.ai`. Endpoint doubles are replays of recordings in `tests/fixtures/` (ADR-006), never hand-written responses.
 - **Upload tests and QA use only `../assets/example-images/`.**
+- **Client input that reaches a prompt** has a Zod length/format limit and an allow-list of message roles and part types. The server recomputes derived values (such as `daysSincePurchase`) and never trusts the client copy.
 - UI text is Polish; follow `../docs/design-guidelines.md` and `../assets/design-tokens.json`.
 - Context7 for libraries: match docs to the version in `pnpm-lock.yaml` (`ai` 7.x, Next 16, Zod 4).
 
