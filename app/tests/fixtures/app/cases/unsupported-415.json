@@ -1,0 +1,38 @@
+{
+  "meta": {
+    "capturedAt": "2026-11-26T11:18:36.720Z",
+    "target": "/api/cases",
+    "request": {
+      "method": "POST",
+      "contentType": "multipart/form-data",
+      "fields": {
+        "caseType": "return",
+        "category": "laptop",
+        "model": "Lenovo ThinkPad E14",
+        "reason": "",
+        "consent": "true",
+        "purchaseDate": "2026-11-16"
+      },
+      "photo": "logo.svg",
+      "photoMime": "image/svg+xml"
+    },
+    "appCommit": "fa1c749",
+    "versions": {
+      "next": "16.4.6",
+      "ai": "7.0.118",
+      "@openrouter/ai-sdk-provider": "3.1.0"
+    },
+    "durationMs": 34,
+    "upstreamCalls": 0,
+    "logLines": [
+      "{\"type\":\"incoming\",\"requestId\":\"6be9cba0-64dc-45ff-8115-c433df17823d\",\"route\":\"/api/cases\",\"status\":415}"
+    ],
+    "script": "record-app.ts",
+    "notes": "assets/logo.svg as the image."
+  },
+  "response": {
+    "status": 415,
+    "contentType": "application/json",
+    "body": "{\"code\":\"unsupported_media_type\"}"
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "meta": {
+    "capturedAt": "2026-11-26T11:18:36.132Z",
+    "target": "/api/cases",
+    "request": {
+      "method": "POST",
+      "contentType": "multipart/form-data",
+      "fields": {
+        "caseType": "return",
+        "category": "laptop",
+        "model": "A",
+        "reason": "",
+        "purchaseDate": "2026-11-01"
+      },
+      "photo": "laptop-1.png",
+      "photoMime": "image/png"
+    },
+    "appCommit": "fa1c749",
+    "versions": {
+      "next": "16.4.6",
+      "ai": "7.0.118",
+      "@openrouter/ai-sdk-provider": "3.1.0"
+    },
+    "durationMs": 63,
+    "upstreamCalls": 0,
+    "logLines": [
+      "{\"type\":\"incoming\",\"requestId\":\"307b7bcc-0739-45eb-8dfb-54107a507b44\",\"route\":\"/api/cases\",\"status\":400}"
+    ],
+    "script": "record-app.ts",
+    "notes": "Server-side validation: model too short, consent missing (client validation bypassed)."
+  },
+  "response": {
+    "status": 400,
+    "contentType": "application/json",
+    "body": "{\"code\":\"validation_failed\",\"fieldErrors\":{\"model\":\"model_length\",\"consent\":\"consent_required\"}}"
+  }
+}

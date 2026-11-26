@@ -34,6 +34,14 @@ describe("fixture metadata scan", () => {
           expect(tail === "invalid" || tail.length <= 10).toBe(true)
         }
       })
+      if (rel.startsWith("app")) {
+        it("has no API key and data:image only in thumbnailDataUrl", () => {
+          expect(text).not.toMatch(/sk-or-v1-(?!invalid)/)
+          // the body is stored as an escaped string, so the quotes may be escaped
+          const stripped = text.replace(/thumbnailDataUrl\\?":\s*\\?"data:image\/[a-z+.-]+;base64,[A-Za-z0-9+/=]*/g, "thumbnailDataUrl")
+          expect(stripped).not.toContain("data:image")
+        })
+      }
       if (rel.startsWith("openrouter")) {
         it("contains no image data", () => {
           expect(text).not.toContain("data:image")
