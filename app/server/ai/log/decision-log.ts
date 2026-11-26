@@ -72,7 +72,7 @@ export async function appendDecisionLog(entry: DecisionLogEntry, filePath?: stri
   try {
     const target = filePath ?? getEnv().decisionLogPath
     if (target === "") return
-    const absolute = path.resolve(process.cwd(), target)
+    const absolute = path.resolve(/* turbopackIgnore: true */ process.cwd(), target)
     await mkdir(path.dirname(absolute), { recursive: true })
     await appendFile(absolute, `${JSON.stringify(entry)}\n`, "utf8")
   } catch (error) {

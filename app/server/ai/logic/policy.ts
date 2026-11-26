@@ -37,12 +37,12 @@ function extractRuleIds(text: string): string[] {
 
 /** Loads and caches the case-type policy and its content-derived version. */
 export function loadPolicy(caseType: CaseType, dir?: string): LoadedPolicy {
-  const policyDir = path.resolve(dir ?? process.env.POLICIES_DIR ?? path.resolve(process.cwd(), "../docs/policies"))
-  const filePath = path.join(policyDir, POLICY_FILES[caseType])
+  const policyDir = path.resolve(/* turbopackIgnore: true */ dir ?? process.env.POLICIES_DIR ?? path.resolve(/* turbopackIgnore: true */ process.cwd(), "../docs/policies"))
+  const filePath = path.join(/* turbopackIgnore: true */ policyDir, POLICY_FILES[caseType])
   const cached = cache.get(filePath)
   if (cached) return cached
 
-  const text = readFileSync(filePath, "utf8")
+  const text = readFileSync(/* turbopackIgnore: true */ filePath, "utf8")
   const ruleIds = extractRuleIds(text)
   if (ruleIds.length === 0) {
     throw new Error(`Policy contains no rule IDs: ${filePath}`)

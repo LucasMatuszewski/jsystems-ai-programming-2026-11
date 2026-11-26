@@ -76,7 +76,7 @@ function parse(source: EnvSource): AppEnv {
       chat: data.LLM_REASONING_CHAT as ReasoningEffort,
     },
     // Resolved from the app working directory (the Next.js project root).
-    policiesDir: path.resolve(process.cwd(), data.POLICIES_DIR as string),
+    policiesDir: path.resolve(/* turbopackIgnore: true */ process.cwd(), data.POLICIES_DIR as string),
     decisionLogPath: data.DECISION_LOG_PATH,
     appUrl: data.APP_URL as string,
     appTitle: data.APP_TITLE as string,
