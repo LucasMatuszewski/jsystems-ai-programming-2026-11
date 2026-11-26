@@ -21,6 +21,14 @@ describe("replayFetch", () => {
     expect(await res.text()).toBe(fx.exchanges[0]!.response!.body)
   })
 
+  it("serves several fixtures in sequence when given an array", async () => {
+    const f = replayFetch([f401, fConn])
+    const first = await f("https://openrouter.ai/api/alpha/decisions")
+    expect(first.status).toBe(401)
+    await expect(f("http://127.0.0.1:9/api/alpha/decisions")).rejects.toThrow()
+    await expect(f("https://openrouter.ai/x")).rejects.toThrow(/unexpected request #3/)
+  })
+
   it("fails when more requests arrive than were recorded", async () => {
     const f = replayFetch(f401)
     await f("https://openrouter.ai/api/alpha/decisions")

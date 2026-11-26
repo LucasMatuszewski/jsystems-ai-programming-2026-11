@@ -23,8 +23,18 @@ export function loadFixture(path: string): Fixture {
   return JSON.parse(fs.readFileSync(path, "utf8")) as Fixture
 }
 
-export function replayFetch(source: string | Fixture): typeof fetch {
-  const fixture = typeof source === "string" ? loadFixture(source) : source
+/** Serves one fixture, or several fixtures' exchanges concatenated in the given order. */
+export function replayFetch(source: string | Fixture | Array<string | Fixture>): typeof fetch {
+  const fixture: Fixture = Array.isArray(source)
+    ? {
+        meta: {},
+        exchanges: source.flatMap(
+          (item) => (typeof item === "string" ? loadFixture(item) : item).exchanges
+        ),
+      }
+    : typeof source === "string"
+      ? loadFixture(source)
+      : source
   let index = 0
   return (async (input: RequestInfo | URL) => {
     const url =
