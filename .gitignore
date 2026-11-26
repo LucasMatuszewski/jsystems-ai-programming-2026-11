@@ -16,6 +16,7 @@ secrets
 .agents/skills/*
 !.agents/skills/evidence-research/
 !.agents/skills/orchestrate-gated-fixes/
+!.agents/skills/qa-demo-video/
 .claude/skills/
 __pycache__/
 *.pyc

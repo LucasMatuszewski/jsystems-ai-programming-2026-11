@@ -80,6 +80,7 @@ Use **the Playwright CLI** to drive the real running app like a human tester:
 4. Verify the flow actually works: correct navigation, correct data displayed, no console errors, Polish UI text.
 5. **Compare your screenshots against the brand reference** (`assets/homepage.png` + `docs/design-guidelines.md` tokens): colors, typography, spacing, button styles and logo placement must match the application's agreed brand reference.
 6. Report what you validated (steps + screenshots) in your task summary. If anything looks or behaves wrong, fix it before committing.
+7. Before a feature is done, the last QA step records a condensed demo video of the accepted version, covering the happy paths and the error states, and links it in the PR description (skill `qa-demo-video`).
 
 ### Verification (required before every commit)
 
