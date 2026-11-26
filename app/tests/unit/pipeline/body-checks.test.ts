@@ -52,6 +52,14 @@ describe("checkBody", () => {
     expect(checkBody(`### Uzasadnienie\n- ${text}\n\n### Następne kroki\n- x`, days, RULES).daysMissing).toBe(false)
   })
 
+  it.each(["minęło 1 dni od zakupu", "w 1 dniach od zakupu"])("treats the wrong plural for 1 day (%s) as a violation (G4b-1)", (text) => {
+    expect(checkBody(`### Uzasadnienie\n- ${text}`, 1, RULES).daysMissing).toBe(true)
+  })
+
+  it.each([[1, "minął 1 dzień"], [2, "minęły 2 dni"], [5, "minęło 5 dni"]])("accepts the correct form for %i (G4b-1)", (days, text) => {
+    expect(checkBody(`### Uzasadnienie\n- Od zakupu ${text}.`, days, RULES).daysMissing).toBe(false)
+  })
+
   it("does not match a number glued to other digits (110 dni is not 10 dni)", () => {
     expect(checkBody("### Uzasadnienie\n- minęło 110 dni", 10, RULES).daysMissing).toBe(true)
   })
@@ -101,6 +109,24 @@ describe("ensureDayCount", () => {
     const { bodyMarkdown, inserted } = ensureDayCount(body, 10)
     expect(inserted).toBe(true)
     expect(bodyMarkdown).toContain("### Uzasadnienie\n\nOd zakupu minęło 10 dni.\n\n- Rekomendujemy")
+  })
+
+  it("normalizes a wrong-plural sentence for 1 day into the correct one (G4b-1)", () => {
+    const body = "### Uzasadnienie\n- Od zakupu minęło 1 dni. Rekomendujemy zwrot (R-2).\n\n### Następne kroki\n- x"
+    const { bodyMarkdown, normalized } = ensureDayCount(body, 1)
+    expect(normalized).toBe(true)
+    expect(bodyMarkdown).toBe("### Uzasadnienie\n- Od zakupu minął 1 dzień. Rekomendujemy zwrot (R-2).\n\n### Następne kroki\n- x")
+    expect(checkBody(bodyMarkdown, 1, RULES).daysMissing).toBe(false)
+  })
+
+  it("replaces only the matched phrase and leaves 11 dni and 14 dni alone (G4b-1)", () => {
+    const body = "### Uzasadnienie\n- Zwrot w ciągu 14 dni; minęło 1 dni; 11 dni nie dotyczy."
+    expect(ensureDayCount(body, 1).bodyMarkdown).toBe("### Uzasadnienie\n- Zwrot w ciągu 14 dni; minął 1 dzień; 11 dni nie dotyczy.")
+  })
+
+  it("does not touch a wrong plural when the count is not 1", () => {
+    const body = "### Uzasadnienie\n- Od zakupu minęło 2 dni."
+    expect(ensureDayCount(body, 2)).toEqual({ bodyMarkdown: body, inserted: false })
   })
 
   it("appends a paragraph when there is no justification heading", () => {

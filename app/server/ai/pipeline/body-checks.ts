@@ -25,7 +25,10 @@ function justificationSection(bodyMarkdown: string): string {
 
 /** AC-23: the day count is looked for in the justification section only; rule IDs anywhere in the body. */
 export function checkBody(bodyMarkdown: string, days: number, policyRuleIds: readonly string[]): BodyCheck {
-  const counts = [...justificationSection(bodyMarkdown).matchAll(DAY_COUNT)].map((m) => Number(m[1]))
+  // G4b-1: "1 dni" / "1 dniach" is a wrong plural for the system count of 1 and does not count as stating it.
+  const counts = [...justificationSection(bodyMarkdown).matchAll(DAY_COUNT)]
+    .filter((m) => !(Number(m[1]) === 1 && /^dni/i.test(m[0].replace(/^\d+\s*/, ""))))
+    .map((m) => Number(m[1]))
   const cited = [...bodyMarkdown.matchAll(RULE_ID)].map((m) => m[0])
   const unknownRuleIds = [...new Set(cited)].filter((id) => !policyRuleIds.includes(id))
   return { daysMissing: !counts.includes(days), unknownRuleIds }
@@ -38,8 +41,25 @@ export function dayCountSentence(days: number): string {
   return `Od zakupu ${few ? "minęły" : "minęło"} ${days} dni.`
 }
 
+/** G4b-1: for 1 day, "minęło 1 dni" becomes "minął 1 dzień" (also "upłynęło"), and a bare "1 dni(ach)" becomes "1 dzień". */
+const WRONG_ONE_DAY_VERB = /(?<![\d.,])(minęło|upłynęło)\s+1\s+dni(?:ach)?(?![\p{L}])/giu
+const WRONG_ONE_DAY = /(?<![\d.,])1\s+dni(?:ach)?(?![\p{L}])/giu
+function normalizeOneDay(bodyMarkdown: string): string {
+  return bodyMarkdown
+    .replace(WRONG_ONE_DAY_VERB, (_m, verb: string) => `${verb.toLowerCase() === "minęło" ? "minął" : "upłynął"} 1 dzień`)
+    .replace(WRONG_ONE_DAY, "1 dzień")
+}
+
 /** Inserts the day-count sentence as the first paragraph of the justification (or at the end without one). */
-export function ensureDayCount(bodyMarkdown: string, days: number): { bodyMarkdown: string; inserted: boolean } {
+export function ensureDayCount(input: string, days: number): { bodyMarkdown: string; inserted: boolean; normalized?: true } {
+  if (days === 1) {
+    const fixed = normalizeOneDay(input)
+    if (fixed !== input) return { ...insertIfMissing(fixed, days), normalized: true }
+  }
+  return insertIfMissing(input, days)
+}
+
+function insertIfMissing(bodyMarkdown: string, days: number): { bodyMarkdown: string; inserted: boolean } {
   if (!checkBody(bodyMarkdown, days, []).daysMissing) return { bodyMarkdown, inserted: false }
   const sentence = dayCountSentence(days)
   const lines = bodyMarkdown.split("\n")

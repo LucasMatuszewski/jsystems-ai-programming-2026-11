@@ -65,4 +65,4 @@ The PRD does not require `capture`. Without it, mobile browsers offer both the c
 ## Defects
 | # | Sev | Finding |
 |---|---|---|
-| G4b-1 | low | "Od zakupu minęło 1 dni." on a 1-day return (`b6-return-laptop2-1d.png`). The count matches the panel, but the singular should be "1 dzień". The body check accepts it. |
+| G4b-1 | low | "Od zakupu minęło 1 dni." on a 1-day return (`b6-return-laptop2-1d.png`). The count matches the panel, but the singular should be "1 dzień". **Fixed** in the G4b-1 follow-up. A real re-check shows "Od zakupu minął 1 dzień." in Uzasadnienie; evidence in `docs/qa/G4b-1/`. |

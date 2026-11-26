@@ -1,0 +1,10 @@
+$ next start
+▲ Next.js 16.4.6
+- Local:         http://localhost:3000
+- Network:       http://10.123.4.35:3000
+✓ Ready in 564ms
+✓ Running next.config.ts took 136ms
+[hsdc] {"type":"incoming","requestId":"12d42730-1fad-45e1-878d-6df8c41dbffc","route":"/api/cases","status":200}
+[hsdc] {"type":"upstream","requestId":"12d42730-1fad-45e1-878d-6df8c41dbffc","stage":"signals","modelId":"typesafe/jev-1.14","outcome":"ok","latencyMs":520,"costUsd":0}
+[hsdc] {"type":"upstream","requestId":"12d42730-1fad-45e1-878d-6df8c41dbffc","stage":"escalated","modelId":"openai/gpt-6-luna","outcome":"ok","latencyMs":18906,"costUsd":0}
+[ELIFECYCLE] Command failed with signal SIGTERM.

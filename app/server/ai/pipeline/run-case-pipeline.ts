@@ -254,7 +254,11 @@ async function run(
     const fixed = ensureDayCount(parsed.bodyMarkdown, days)
     return {
       parsed: { ...parsed, bodyMarkdown: fixed.bodyMarkdown },
-      guardsApplied: fixed.inserted ? [...guardsApplied, "day_count_inserted"] : guardsApplied,
+      guardsApplied: [
+        ...guardsApplied,
+        ...(fixed.normalized ? ["day_count_normalized"] : []),
+        ...(fixed.inserted ? ["day_count_inserted"] : []),
+      ],
     }
   }
 
