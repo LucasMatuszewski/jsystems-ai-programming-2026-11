@@ -11,6 +11,12 @@ import {
   buildSignalStateText,
   type SignalCaseType,
 } from "../server/ai/signals/questions"
+import {
+  type Capture,
+  captureFromExchange,
+  diffCapture,
+  type RecordedResponse,
+} from "./lib/structure-diff"
 
 // ADR-006 3.1: records REAL OpenRouter exchanges at the HTTP level.
 //   pnpm record:openrouter decisions | errors | refusal | --compare
@@ -160,27 +166,40 @@ function save(rel: string, data: unknown) {
   console.log(`saved ${path.relative(appDir, file)} (${fs.statSync(file).size} bytes)`)
 }
 
-function shape(v: unknown): unknown {
-  if (Array.isArray(v)) return v.length ? [shape(v[0])] : []
-  if (v && typeof v === "object") return Object.fromEntries(Object.entries(v).sort().map(([k, x]) => [k, shape(x)]))
-  return v === null ? "null" : typeof v
-}
-
-function diffShape(a: unknown, b: unknown, at = ""): string[] {
-  if (typeof a === "string" || typeof b === "string" || a === undefined || b === undefined) {
-    return a === b ? [] : [`${at || "(root)"}: fixture=${JSON.stringify(a)} live=${JSON.stringify(b)}`]
+// --compare baseline: the success fixture when recorded, otherwise the newest
+// upstream account_deactivated error recording (ADR-001 amendment A1).
+function loadCompareBaseline(file: string): { label: string; capture: Capture } | { error: string } {
+  const successRel = path.join("decisions", `${file}.json`)
+  const successFile = path.join(fixturesDir, successRel)
+  if (fs.existsSync(successFile)) {
+    const fixture = JSON.parse(fs.readFileSync(successFile, "utf8")) as { exchanges: { response?: RecordedResponse }[] }
+    return { label: `${successRel} (success fixture)`, capture: captureFromExchange(fixture.exchanges[0]?.response) }
   }
-  if (Array.isArray(a) || Array.isArray(b)) {
-    return Array.isArray(a) && Array.isArray(b) ? (a.length && b.length ? diffShape(a[0], b[0], `${at}[]`) : []) : [`${at}: array mismatch`]
+  const errorsDir = path.join(fixturesDir, "errors")
+  const candidates = fs.existsSync(errorsDir)
+    ? fs.readdirSync(errorsDir).filter((f) => /^decisions-upstream-account-deactivated-.*\.json$/.test(f))
+    : []
+  const recorded = candidates
+    .map((f) => {
+      const rel = path.join("errors", f)
+      const parsed = JSON.parse(fs.readFileSync(path.join(fixturesDir, rel), "utf8")) as {
+        meta?: { capturedAt?: string }
+        exchanges?: { response?: RecordedResponse }[]
+      }
+      return { rel, capturedAt: parsed.meta?.capturedAt ?? "", response: parsed.exchanges?.[0]?.response }
+    })
+    .filter((x) => x.response !== undefined)
+    .sort((a, b) => (a.capturedAt < b.capturedAt ? 1 : a.capturedAt > b.capturedAt ? -1 : 0))
+  const newest = recorded[0]
+  if (!newest) {
+    return {
+      error: `no baseline. Neither ${successRel} nor errors/decisions-upstream-account-deactivated-*.json exists under tests/fixtures/openrouter. Record one with \`pnpm record:openrouter decisions\` once the model is available.`,
+    }
   }
-  const ao = a as Record<string, unknown>, bo = b as Record<string, unknown>
-  const out: string[] = []
-  for (const k of new Set([...Object.keys(ao), ...Object.keys(bo)])) {
-    if (!(k in ao)) out.push(`${at}.${k}: only in live`)
-    else if (!(k in bo)) out.push(`${at}.${k}: only in fixture`)
-    else out.push(...diffShape(ao[k], bo[k], `${at}.${k}`))
+  return {
+    label: `${newest.rel} (newest upstream error recording, captured ${newest.capturedAt})`,
+    capture: captureFromExchange(newest.response),
   }
-  return out
 }
 
 function requireKey(): string {
@@ -215,15 +234,19 @@ if (command === "decisions") {
   if (body.includes('"refusal"')) save("decisions/refusal-attempt.json", fixture)
   else console.log("No refusal produced; not saved (list in GAPS.md).")
 } else if (command === "--compare") {
-  const key = requireKey()
   const c = CASES[0]!
-  const fixture = JSON.parse(fs.readFileSync(path.join(fixturesDir, "decisions", `${c.file}.json`), "utf8")) as { exchanges: Exchange[] }
+  // Baseline first: a missing baseline must fail without spending a live call.
+  const baseline = loadCompareBaseline(c.file)
+  if ("error" in baseline) {
+    console.error(`compare: ${baseline.error}`)
+    process.exit(2)
+  }
+  const key = requireKey()
   const live = await runCase(c, { apiKey: key }, "compare run")
-  const recordedBody = JSON.parse(fixture.exchanges[0]!.response!.body) as unknown
-  const liveBody = JSON.parse(live.exchanges[0]?.response?.body ?? "null") as unknown
-  const diffs = diffShape(shape(recordedBody), shape(liveBody))
+  console.log(`compare: baseline = ${baseline.label}`)
+  const diffs = diffCapture(baseline.capture, captureFromExchange(live.exchanges[0]?.response))
   if (diffs.length === 0) {
-    console.log("compare: structure identical (keys and value types).")
+    console.log("compare: structure identical (HTTP status, keys and value types).")
   } else {
     console.log("compare: structural differences:")
     diffs.forEach((d) => console.log("  " + d))
