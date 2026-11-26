@@ -6,6 +6,7 @@ import { fileURLToPath } from "node:url"
 
 // ADR-006 3.1: records REAL HTTP exchanges with the running app (/api/cases).
 //   pnpm record:app cases [name...]
+//   pnpm record:app chat [name...]   (POST /api/chat, SSE; case context from a recorded T18 case)
 // Env: APP_URL (default http://localhost:3000), APP_LOG (server stdout log file),
 //      APP_URL_INVALID (default http://localhost:3001) + APP_LOG_INVALID for the
 //      instance started with OPENROUTER_API_KEY=sk-or-v1-invalid.
@@ -107,9 +108,113 @@ async function record(spec: Spec) {
   console.log(JSON.stringify({ file, status: res.status, terminal: terminal?.type, code: terminal?.code, decision: terminal?.case?.decision, durationMs, upstreamCalls: upstream.length }))
 }
 
+const chatOutDir = path.join(appDir, "tests", "fixtures", "app", "chat")
+const casesDir = path.join(appDir, "tests", "fixtures", "app", "cases")
+
+type ChatSpec = {
+  name: string
+  instance?: "invalid"
+  source: string
+  userMessage: string
+  expect: string
+  notes: string
+}
+
+const LAPTOP = "escalated-return-laptop-2.ndjson"
+const PHONE = "escalated-complaint-phone-1.ndjson"
+
+const CHAT_SPECS: ChatSpec[] = [
+  { name: "plain-return.sse", source: LAPTOP, userMessage: "Jak mam zapakować laptopa?", expect: "text, no tool, 1 chat-step", notes: "Clarifying question; expected no tool call." },
+  { name: "update-return.sse", source: LAPTOP, userMessage: "Chcę dodać ważny fakt: laptop nigdy nie był używany, mam oryginalne opakowanie i wszystkie folie ochronne są na swoim miejscu. Smugi na płytce dotykowej to tylko odciski palców ze sklepu.", expect: "tool-update_recommendation output, then text, 2 chat-steps", notes: "New relevant fact; expected update_recommendation." },
+  { name: "insist-complaint.sse", source: PHONE, userMessage: "Nie zgadzam się z tą oceną. Proszę o uznanie reklamacji, to moja ostateczna prośba.", expect: "no tool call", notes: "Insistence without new facts; expected no tool call (whatever happens is recorded)." },
+  { name: "upstream-failure.sse", instance: "invalid", source: LAPTOP, userMessage: "Jak mam zapakować laptopa?", expect: "error chunk chat_failed, no provider text", notes: "Second server instance with OPENROUTER_API_KEY=sk-or-v1-invalid, request 1." },
+  { name: "validation-400", source: LAPTOP, userMessage: "", expect: "400, 0 upstream lines", notes: "Empty last user message (client validation bypassed)." },
+]
+
+type LoadedCase = {
+  caseId: string
+  form: { caseType: string }
+  daysSincePurchase: number
+  decision: { decision: string; ruleRefs: unknown; imageFindings: unknown; signalsSummary: unknown }
+  firstMessage: unknown
+}
+
+/** Case context and first assistant message exactly as the UI keeps them (CaseSessionPayload -> CaseContext + UIMessage). */
+function loadCase(source: string): LoadedCase {
+  const raw = JSON.parse(fs.readFileSync(path.join(casesDir, `${source}.json`), "utf8")) as { response: { body: string } }
+  const last = raw.response.body.split("\n").filter(Boolean).map((l) => JSON.parse(l) as { type: string; case?: LoadedCase }).at(-1)
+  if (last?.type !== "result" || !last.case) throw new Error(`${source}: no result event`)
+  return last.case
+}
+
+async function recordChat(spec: ChatSpec) {
+  const url = (spec.instance === "invalid" ? process.env.APP_URL_INVALID ?? "http://localhost:3001" : process.env.APP_URL ?? "http://localhost:3000") + "/api/chat"
+  const log = spec.instance === "invalid" ? process.env.APP_LOG_INVALID : process.env.APP_LOG
+  const c = loadCase(spec.source)
+  const caseContext = {
+    caseId: c.caseId,
+    form: c.form,
+    daysSincePurchase: c.daysSincePurchase,
+    imageFindings: c.decision.imageFindings,
+    signalsSummary: c.decision.signalsSummary,
+    currentDecision: { decision: c.decision.decision, ruleRefs: c.decision.ruleRefs, source: "initial" },
+  }
+  const messages = [c.firstMessage, { id: "user-1", role: "user", parts: [{ type: "text", text: spec.userMessage }] }]
+  const payload = { id: c.caseId, messages, caseContext }
+
+  const offset = logSize(log)
+  const started = Date.now()
+  const res = await fetch(url, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(payload), signal: AbortSignal.timeout(120_000) })
+  const body = await res.text()
+  const durationMs = Date.now() - started
+  await new Promise((r) => setTimeout(r, 500))
+  const lines = logSince(log, offset)
+  const upstream = lines.filter((l) => l.includes('"type":"upstream"'))
+  const fixture = {
+    meta: {
+      capturedAt: new Date(started).toISOString(),
+      target: "/api/chat",
+      request: {
+        method: "POST",
+        contentType: "application/json",
+        caseSource: `${spec.source}.json`,
+        caseType: c.form.caseType,
+        currentDecision: caseContext.currentDecision.decision,
+        messageCount: messages.length,
+        lastUserMessage: spec.userMessage,
+        expected: spec.expect,
+      },
+      appCommit: execSync("git rev-parse --short HEAD", { cwd: appDir }).toString().trim(),
+      versions: { next: pkgVersion("next"), ai: pkgVersion("ai"), "@openrouter/ai-sdk-provider": pkgVersion("@openrouter/ai-sdk-provider") },
+      durationMs,
+      upstreamCalls: upstream.length,
+      logLines: lines,
+      script: "record-app.ts",
+      notes: spec.notes,
+    },
+    response: { status: res.status, contentType: res.headers.get("content-type"), body },
+  }
+  fs.mkdirSync(chatOutDir, { recursive: true })
+  const file = spec.name.endsWith(".json") ? spec.name : `${spec.name}.json`
+  fs.writeFileSync(path.join(chatOutDir, file), JSON.stringify(fixture, null, 2) + "\n")
+  const chunks = res.status === 200
+    ? body.split("\n\n").map((b) => b.replace(/^data: /, "").trim()).filter((d) => d && d !== "[DONE]").map((d) => JSON.parse(d) as { type: string; output?: { newDecision?: string }; errorText?: string })
+    : []
+  const tool = chunks.find((x) => x.type === "tool-output-available")
+  console.log(JSON.stringify({
+    file, status: res.status, toolCalled: chunks.some((x) => x.type.startsWith("tool-")), newDecision: tool?.output?.newDecision,
+    error: chunks.find((x) => x.type === "error")?.errorText, text: chunks.some((x) => x.type === "text-delta"), durationMs, upstreamCalls: upstream.length,
+  }))
+}
+
 async function main() {
   const [cmd, ...names] = process.argv.slice(2)
-  if (cmd !== "cases") throw new Error("usage: record-app cases [name...]")
+  if (cmd === "chat") {
+    const chosenChat = names.length ? CHAT_SPECS.filter((s) => names.some((n) => s.name.startsWith(n))) : CHAT_SPECS
+    for (const spec of chosenChat) await recordChat(spec)
+    return
+  }
+  if (cmd !== "cases") throw new Error("usage: record-app cases|chat [name...]")
   const chosen = names.length ? SPECS.filter((s) => names.some((n) => s.name.startsWith(n))) : SPECS
   for (const spec of chosen) await record(spec)
 }

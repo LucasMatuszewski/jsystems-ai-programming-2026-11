@@ -42,6 +42,12 @@ describe("fixture metadata scan", () => {
           expect(stripped).not.toContain("data:image")
         })
       }
+      if (rel.startsWith(path.join("app", "chat"))) {
+        it("chat recording has no API key and no reasoning parts", () => {
+          expect(text).not.toMatch(/sk-or-v1-(?!invalid)/)
+          expect(text).not.toMatch(/"type\\?":\s*\\?"reasoning/)
+        })
+      }
       if (rel.startsWith("openrouter")) {
         it("contains no image data", () => {
           expect(text).not.toContain("data:image")

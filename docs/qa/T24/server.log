@@ -1,0 +1,15 @@
+$ next start -p 3000
+▲ Next.js 16.4.6
+- Local:         http://localhost:3000
+- Network:       http://10.123.4.35:3000
+✓ Ready in 848ms
+✓ Running next.config.ts took 317ms
+[hsdc] {"type":"incoming","requestId":"57ca6d0f-3fb5-408a-b525-2dfce1a4020f","route":"/api/chat","status":200}
+[hsdc] {"type":"upstream","requestId":"57ca6d0f-3fb5-408a-b525-2dfce1a4020f","stage":"chat-step","modelId":"openai/gpt-6-luna","outcome":"ok","latencyMs":4100,"costUsd":0}
+[hsdc] {"type":"incoming","requestId":"cd0a6ac5-b0c1-4989-97d9-23d6ea6b477b","route":"/api/chat","status":200}
+[hsdc] {"type":"upstream","requestId":"cd0a6ac5-b0c1-4989-97d9-23d6ea6b477b","stage":"chat-step","modelId":"openai/gpt-6-luna","outcome":"ok","latencyMs":3410,"costUsd":0}
+[hsdc] {"type":"upstream","requestId":"cd0a6ac5-b0c1-4989-97d9-23d6ea6b477b","stage":"chat-step","modelId":"openai/gpt-6-luna","outcome":"ok","latencyMs":3103,"costUsd":0}
+[hsdc] {"type":"incoming","requestId":"00ef4fe3-a6a2-4740-ac7f-63087d6a5020","route":"/api/chat","status":200}
+[hsdc] {"type":"upstream","requestId":"00ef4fe3-a6a2-4740-ac7f-63087d6a5020","stage":"chat-step","modelId":"openai/gpt-6-luna","outcome":"ok","latencyMs":9298,"costUsd":0}
+[hsdc] {"type":"incoming","requestId":"0afdcb82-53fa-4471-9ff0-b9ef986cc6b2","route":"/api/chat","status":400}
+[ELIFECYCLE] Command failed with exit code 143.

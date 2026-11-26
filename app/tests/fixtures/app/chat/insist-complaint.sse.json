@@ -1,0 +1,35 @@
+{
+  "meta": {
+    "capturedAt": "2026-11-26T14:02:29.295Z",
+    "target": "/api/chat",
+    "request": {
+      "method": "POST",
+      "contentType": "application/json",
+      "caseSource": "escalated-complaint-phone-1.ndjson.json",
+      "caseType": "complaint",
+      "currentDecision": "Weryfikacja ręczna",
+      "messageCount": 2,
+      "lastUserMessage": "Nie zgadzam się z tą oceną. Proszę o uznanie reklamacji, to moja ostateczna prośba.",
+      "expected": "no tool call"
+    },
+    "appCommit": "bcd9513",
+    "versions": {
+      "next": "16.4.6",
+      "ai": "7.0.118",
+      "@openrouter/ai-sdk-provider": "3.1.0"
+    },
+    "durationMs": 9504,
+    "upstreamCalls": 1,
+    "logLines": [
+      "{\"type\":\"incoming\",\"requestId\":\"00ef4fe3-a6a2-4740-ac7f-63087d6a5020\",\"route\":\"/api/chat\",\"status\":200}",
+      "{\"type\":\"upstream\",\"requestId\":\"00ef4fe3-a6a2-4740-ac7f-63087d6a5020\",\"stage\":\"chat-step\",\"modelId\":\"openai/gpt-6-luna\",\"outcome\":\"ok\",\"latencyMs\":9298,\"costUsd\":0}"
+    ],
+    "script": "record-app.ts",
+    "notes": "Insistence without new facts; expected no tool call (whatever happens is recorded)."
+  },
+  "response": {
+    "status": 200,
+    "contentType": "text/event-stream",
+    "body": "data: {\"type\":\"start\"}\n\ndata: {\"type\":\"start-step\"}\n\ndata: {\"type\":\"text-start\",\"id\":\"gen-1795701749-cHv4E5k2ERn6GpDHkukR\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701749-cHv4E5k2ERn6GpDHkukR\",\"delta\":\"Roz\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701749-cHv4E5k2ERn6GpDHkukR\",\"delta\":\"umiem\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701749-cHv4E5k2ERn6GpDHkukR\",\"delta\":\",\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701749-cHv4E5k2ERn6GpDHkukR\",\"delta\":\" że\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701749-cHv4E5k2ERn6GpDHkukR\",\"delta\":\" się\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701749-cHv4E5k2ERn6GpDHkukR\",\"delta\":\" Pan\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701749-cHv4E5k2ERn6GpDHkukR\",\"delta\":\"/P\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701749-cHv4E5k2ERn6GpDHkukR\",\"delta\":\"ani\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701749-cHv4E5k2ERn6GpDHkukR\",\"delta\":\" nie\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701749-cHv4E5k2ERn6GpDHkukR\",\"delta\":\" zg\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701749-cHv4E5k2ERn6GpDHkukR\",\"delta\":\"adza\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701749-cHv4E5k2ERn6GpDHkukR\",\"delta\":\".\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701749-cHv4E5k2ERn6GpDHkukR\",\"delta\":\" Sama\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701749-cHv4E5k2ERn6GpDHkukR\",\"delta\":\" pro\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701749-cHv4E5k2ERn6GpDHkukR\",\"delta\":\"ś\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701749-cHv4E5k2ERn6GpDHkukR\",\"delta\":\"ba\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701749-cHv4E5k2ERn6GpDHkukR\",\"delta\":\" nie zm\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701749-cHv4E5k2ERn6GpDHkukR\",\"delta\":\"ienia jednak\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701749-cHv4E5k2ERn6GpDHkukR\",\"delta\":\" podstaw oc\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701749-cHv4E5k2ERn6GpDHkukR\",\"delta\":\"eny:\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701749-cHv4E5k2ERn6GpDHkukR\",\"delta\":\" na zdję\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701749-cHv4E5k2ERn6GpDHkukR\",\"delta\":\"ciu w\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701749-cHv4E5k2ERn6GpDHkukR\",\"delta\":\"idać\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701749-cHv4E5k2ERn6GpDHkukR\",\"delta\":\" pęk\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701749-cHv4E5k2ERn6GpDHkukR\",\"delta\":\"nięcia ek\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701749-cHv4E5k2ERn6GpDHkukR\",\"delta\":\"ranu,\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701749-cHv4E5k2ERn6GpDHkukR\",\"delta\":\" a wyświet\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701749-cHv4E5k2ERn6GpDHkukR\",\"delta\":\"lany interfe\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701749-cHv4E5k2ERn6GpDHkukR\",\"delta\":\"js przyp\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701749-cHv4E5k2ERn6GpDHkukR\",\"delta\":\"omina\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701749-cHv4E5k2ERn6GpDHkukR\",\"delta\":\" iOS, co\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701749-cHv4E5k2ERn6GpDHkukR\",\"delta\":\" nie odpowiada zg\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701749-cHv4E5k2ERn6GpDHkukR\",\"delta\":\"łoszonemu model\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701749-cHv4E5k2ERn6GpDHkukR\",\"delta\":\"owi Samsung Galaxy A55\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701749-cHv4E5k2ERn6GpDHkukR\",\"delta\":\". Dlatego rekomend\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701749-cHv4E5k2ERn6GpDHkukR\",\"delta\":\"acja weryfikacji\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701749-cHv4E5k2ERn6GpDHkukR\",\"delta\":\" ręcznej pozostaje bez zmian\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701749-cHv4E5k2ERn6GpDHkukR\",\"delta\":\" na podstawie\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701749-cHv4E5k2ERn6GpDHkukR\",\"delta\":\" reguł C-5\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701749-cHv4E5k2ERn6GpDHkukR\",\"delta\":\" i C-6.\\n\\nJeśli\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701749-cHv4E5k2ERn6GpDHkukR\",\"delta\":\" zdję\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701749-cHv4E5k2ERn6GpDHkukR\",\"delta\":\"cie przedstawia inne urządzenie,\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701749-cHv4E5k2ERn6GpDHkukR\",\"delta\":\" proszę przesła\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701749-cHv4E5k2ERn6GpDHkukR\",\"delta\":\"ć wyra\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701749-cHv4E5k2ERn6GpDHkukR\",\"delta\":\"źne zdjęcia zgłaszanego\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701749-cHv4E5k2ERn6GpDHkukR\",\"delta\":\" telefonu i obsz\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701749-cHv4E5k2ERn6GpDHkukR\",\"delta\":\"aru z usterką. Obs\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701749-cHv4E5k2ERn6GpDHkukR\",\"delta\":\"ługa klienta\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701749-cHv4E5k2ERn6GpDHkukR\",\"delta\":\" zweryfikuje zgłoszenie i prz\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701749-cHv4E5k2ERn6GpDHkukR\",\"delta\":\"ekaże decyzję e\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701749-cHv4E5k2ERn6GpDHkukR\",\"delta\":\"-mailem.\"}\n\ndata: {\"type\":\"text-end\",\"id\":\"gen-1795701749-cHv4E5k2ERn6GpDHkukR\"}\n\ndata: {\"type\":\"finish-step\"}\n\ndata: {\"type\":\"finish\",\"finishReason\":\"stop\"}\n\ndata: [DONE]\n\n"
+  }
+}

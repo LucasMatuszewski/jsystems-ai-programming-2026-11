@@ -1,0 +1,15 @@
+$ tsx scripts/openrouter-status.ts
+OpenRouter key status
+  label            : (set)
+  credit limit     : USD 5.0000
+  usage (all time) : USD 0.1115
+  usage (today)    : USD 0.1115
+  remaining credit : USD 4.8885
+  limit reset      : never
+  free-tier flag   : false
+  effective budget : USD 4.8885 left of USD 5.0000
+  free-model reqs  : 0/1000 today
+  rate limit       : no request cap (deprecated field, interval 10s)
+Models (42 listed by OpenRouter)
+  LLM_MODEL      : openai/gpt-6-luna -> listed in /models
+  DECISION_MODEL : typesafe/jev-1.14 -> NOT listed in /models, 2 endpoint(s) available
