@@ -261,3 +261,17 @@ Defined in [ADR-006 §3.2–3.5](../ADR/006-real-endpoint-verification.md#3-comp
 
 - **Review gate:** passed — plan accepted and option A chosen on 2026-11-26. T00 is delivered by the docs PR.
 - **First task of the implementation session:** **T01** — create the epic and 33 issues, fill the Issue column, create the session tasks; then T02.
+
+## 11. Follow-ups after the implementation PR (TODO, agreed 2026-11-26)
+
+Do these only when the owner starts them, each on its own branch and PR.
+
+- **FU-1 Decision-model calibration.** T26 measured Jev 1.14 confidences over 10 cases and 90 answers: mean 0.82, min 0.21, max 1.00, with 0 of 10 cases passing the 0.8 gate.
+  - Weakest questions: `description_consistent` (mean 0.55), `condition` (0.56, 5-level score), `damage_cause` (0.63) and `damage_type` (0.77).
+  - The gate also closes for non-confidence reasons (signs of use, visible damage).
+  - Decide between: (a) better questions and context (clearer criteria, fewer score levels, the reason text available for consistency checks); (b) a recalibrated threshold from a larger evaluation set; (c) dropping the fast path and always using the LLM.
+  - Update ADR-001 §3.4 accordingly.
+- **FU-2 GitHub Issues alignment.** T01 created the epic #10 and issues #11–#43, and the Issue column holds their IDs. During execution, though, no issue was updated: there were no status comments or labels, and every issue is still OPEN. The commit messages say `Closes #NN`, but that only fires on a merge into the default branch, while this PR targets the docs branch.
+  - Close or comment on each issue with its commit and evidence.
+  - Make the write-plan skill (PR #44) require issue IDs per task, plus a per-task issue update (comment on start, close with evidence on done), and have the orchestrator do it at each commit.
+- **FU-3 Test-suite review.** Review the about 660 unit/integration/component tests and the E2E specs for duplicates, redundant coverage, and tests that assert nothing meaningful (for example a mocked value echoed back). Merge or delete with a short rationale per change. Mutation-check the critical guards (R-2.4, the date rules, D1 `no_change`, AC-23).
