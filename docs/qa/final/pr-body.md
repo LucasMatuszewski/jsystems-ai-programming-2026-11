@@ -19,7 +19,7 @@ Next.js 16 app (`app/`) where a customer files a return (Zwrot) or complaint (Re
 - Gaps: **AC-07** camera capture (only meaningful on a real phone, not exercised); **AC-28** (accept of complaint names remedy) never exercised in a real case, the E2E check is conditional on an Akceptacja decision; AC-35 update card appeared in G3/G4 manual runs but did not appear in the two T30 demo chat turns (model kept the recommendation).
 
 ### Reports
-- Gates: [G1](docs/qa/G1/report.md), [G2](docs/qa/G2/report.md), [G3](docs/qa/G3/report.md), [G3-D1](docs/qa/G3-D1/report.md), [G4](docs/qa/G4/report.md), [G4b post-fix gate](docs/qa/G4b/report.md) (+ [G4b-1 fix](docs/qa/G4b-1/report.md) if present), G5 real-run closure gate: in progress
+- Gates: [G1](docs/qa/G1/report.md), [G2](docs/qa/G2/report.md), [G3](docs/qa/G3/report.md), [G3-D1](docs/qa/G3-D1/report.md), [G4](docs/qa/G4/report.md), [G4b post-fix gate](docs/qa/G4b/report.md) (G4b-1 fix evidence: `docs/qa/G4b-1/`), G5 real-run closure gate: in progress
 - Independent review: [T28 review](docs/qa/T28/review.md)
 - Fixes and manual check: [T29 report](docs/qa/T29/report.md)
 
