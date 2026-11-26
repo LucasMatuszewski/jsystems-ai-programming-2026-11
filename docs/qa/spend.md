@@ -9,3 +9,4 @@ Cumulative spend cap for the whole implementation: **USD 5** (ADR-006 §3.4). Wh
 | 2026-11-26 | T06 Luna Decisions recordings (2 real calls failed upstream 401 account_deactivated; 401-invalid-key and closed-port cases cost nothing) | 0.0040 | 0.0040 | 0.0000 | 0.0000 |
 | 2026-11-26 | G1 gate (7 real chat turns, `openai/gpt-6-luna`: 6 prod + 1 dev; drift check crashed before any call) | 0.0040 | 0.0040 | 0.0000 | 0.0000 |
 | 2026-11-26 | T13 LLM recordings (8 real HTTP requests, `openai/gpt-6-luna`: 2 escalated, 2 writer, chat-plain, chat-tool-update 2 steps; plus 1 invalid-key 401 that costs nothing) | 0.0040 | 0.0043 | 0.0003 | 0.0003 |
+| 2026-11-26 | G1 re-check (drift check live call returned 200 + 3 real chat turns on prod, `openai/gpt-6-luna`; all upstream lines costUsd 0) | 0.0048 | 0.0048 | 0.0000 | 0.0003 |
