@@ -10,7 +10,7 @@ Next.js 16 app (`app/`) where a customer files a return (Zwrot) or complaint (Re
 - **Phase 4, hardening:** full E2E suites (desktop, failure, mobile), gate G4, independent review T28, fixes F1-F8 and G4 additions (T29), demo video (T30).
 
 ### Tests
-- Unit/integration/component (Vitest): 54 files, 661 tests.
+- Unit/integration/component (Vitest): 54 files, 671 tests.
 - E2E desktop + failure projects: 29 tests. E2E mobile (360 px): 27 tests. Real stack incl. OpenRouter.
 
 ### Acceptance criteria coverage
@@ -19,7 +19,7 @@ Next.js 16 app (`app/`) where a customer files a return (Zwrot) or complaint (Re
 - Gaps: **AC-07** camera capture (only meaningful on a real phone, not exercised); **AC-28** (accept of complaint names remedy) never exercised in a real case, the E2E check is conditional on an Akceptacja decision; AC-35 update card appeared in G3/G4 manual runs but did not appear in the two T30 demo chat turns (model kept the recommendation).
 
 ### Reports
-- Gates: [G1](docs/qa/G1/report.md), [G2](docs/qa/G2/report.md), [G3](docs/qa/G3/report.md), [G3-D1](docs/qa/G3-D1/report.md), [G4](docs/qa/G4/report.md), [G4b post-fix gate](docs/qa/G4b/report.md) (G4b-1 fix evidence: `docs/qa/G4b-1/`), G5 real-run closure gate: in progress
+- Gates: [G1](docs/qa/G1/report.md), [G2](docs/qa/G2/report.md), [G3](docs/qa/G3/report.md), [G3-D1](docs/qa/G3-D1/report.md), [G4](docs/qa/G4/report.md), [G4b post-fix gate](docs/qa/G4b/report.md) (G4b-1 fix evidence: `docs/qa/G4b-1/`), [G5 real-run closure](docs/qa/G5/report.md), [G5-1 fix](docs/qa/G5-1/notes.md), [G5b re-check](docs/qa/G5b/notes.md)
 - Independent review: [T28 review](docs/qa/T28/review.md)
 - Fixes and manual check: [T29 report](docs/qa/T29/report.md)
 
@@ -50,7 +50,8 @@ Condensed walkthrough, 2:25 (static waits cut automatically, motion kept at 1×)
 | ![Failure banner](https://github.com/LucasMatuszewski/jsystems-ai-programming-2026-11/raw/feat/app-implementation/docs/qa/G2/failure-banner.png) | ![Mobile chat](https://github.com/LucasMatuszewski/jsystems-ai-programming-2026-11/raw/feat/app-implementation/docs/qa/final/mobile-chat.png) |
 
 ### Verification limits and follow-ups
-- Plan Rev. 6: AC-28 and the fast path were not reproducible in real runs with the current models (covered by tests on recordings); AC-07 needs a physical phone.
+- AC-28 (remedy for an accepted complaint) is verified live on both the first decision and a chat update card (plan Rev. 7).
+- The fast path never opened in real runs, even at verification thresholds 0.7/0.6; its logic is covered by tests, and calibration is FU-1. AC-07's native camera picker needs a physical phone.
 - Follow-ups FU-1 (decision-model calibration), FU-2 (GitHub Issues alignment), FU-3 (test-suite review) are in plan §11.
 - Refs epic #10 (issues #11-#43 are not auto-closed by this PR because the base is the docs branch).
 

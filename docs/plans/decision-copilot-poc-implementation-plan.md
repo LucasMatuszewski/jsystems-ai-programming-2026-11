@@ -51,6 +51,8 @@
 
 ---
 
+**Rev. 7 — closure gates (2026-11-26):** G5 (real-run closure) confirmed D1 and F1–F6 in the real app and found G5-1: an accepted complaint update in chat showed no remedy. The fix was 7b03acf. **AC-28 is now verified live** by both the first decision (G5-1: Akceptacja with "Naprawa", C-7) and the chat update card (G5b: Weryfikacja ręczna → Akceptacja, C-3/C-4/C-7, "Naprawa"). The fast path stays not reproducible, even at verification thresholds 0.7 and 0.6 (see FU-1). AC-07's native camera picker still needs a physical phone. Evidence: [G5](../qa/G5/report.md), [G5-1](../qa/G5-1/notes.md), [G5b](../qa/G5b/notes.md).
+
 ## 1. Current state (inspected 2026-11-25/26)
 
 | Item | Observed |
