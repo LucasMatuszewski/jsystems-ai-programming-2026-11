@@ -1,7 +1,8 @@
 "use client"
 
 import * as React from "react"
-import { Button } from "@/components/ui/button"
+import { UploadIcon } from "lucide-react"
+import { Button, buttonVariants } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { pl } from "@/lib/i18n/pl"
 import type { CaseType } from "@/lib/schemas"
@@ -56,8 +57,9 @@ export function PhotoInput({ id, caseType, file, error, disabled, onChange }: Ph
   return (
     <div
       className={cn(
-        "flex flex-col gap-2 rounded-2xl border border-dashed bg-card p-3",
-        dragging ? "border-ring" : "border-border",
+        "relative flex flex-col gap-2 rounded-2xl border border-dashed bg-card p-3 transition-colors",
+        "hover:border-ring hover:bg-accent-warm/10",
+        dragging ? "border-solid border-ring bg-accent-warm/25" : "border-border",
       )}
       onDragOver={(event) => {
         event.preventDefault()
@@ -82,7 +84,9 @@ export function PhotoInput({ id, caseType, file, error, disabled, onChange }: Ph
           aria-invalid={error ? true : undefined}
           aria-describedby={describedBy || undefined}
           className={cn(
-            "flex min-h-16 flex-1 items-center gap-3 rounded-2xl bg-transparent px-3 py-2 text-left text-sm outline-none focus-visible:ring-3 focus-visible:ring-ring/30 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20",
+            file
+              ? "flex min-h-16 flex-1 items-center gap-3 rounded-2xl bg-transparent px-3 py-2 text-left text-sm outline-none focus-visible:ring-3 focus-visible:ring-ring/30 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20"
+              : cn(buttonVariants({ variant: "outline", size: "lg" }), "cursor-pointer hover:bg-accent-warm hover:text-on-accent-warm"),
           )}
         >
           {file ? (
@@ -92,9 +96,15 @@ export function PhotoInput({ id, caseType, file, error, disabled, onChange }: Ph
               <span className="truncate">{file.name}</span>
             </>
           ) : (
-            <span className="text-muted-foreground">{pl.photo.dropzone}</span>
+            <>
+              <UploadIcon aria-hidden="true" />
+              <span>{pl.photo.add}</span>
+            </>
           )}
         </button>
+        {file ? null : (
+          <span className="text-sm text-muted-foreground">{pl.photo.dropHint}</span>
+        )}
         {file ? (
           <Button type="button" variant="outline" size="sm" disabled={disabled} onClick={openPicker}>
             {pl.changePhoto}

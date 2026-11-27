@@ -15,6 +15,15 @@ async function expectNoHorizontalScroll(page: import("@playwright/test").Page): 
   expect(scrollWidth).toBeLessThanOrEqual(innerWidth)
 }
 
+// Only the inner region may scroll vertically: the document itself must fit the viewport (no second scrollbar).
+async function expectNoPageVerticalScroll(page: import("@playwright/test").Page): Promise<void> {
+  const { scrollHeight, innerHeight } = await page.evaluate(() => ({
+    scrollHeight: document.documentElement.scrollHeight,
+    innerHeight: window.innerHeight,
+  }))
+  expect(scrollHeight).toBeLessThanOrEqual(innerHeight)
+}
+
 async function expectNoSeriousA11yIssues(page: import("@playwright/test").Page): Promise<void> {
   const results = await new AxeBuilder({ page }).analyze()
   const blocking = results.violations.filter((v) => seriousOrCritical(v.impact))
@@ -25,6 +34,15 @@ test("form page at the viewport width has no horizontal scroll (AC-45, TAC-003-0
   await page.goto("/")
   await expect(page.getByRole("heading", { name: pl.form.title })).toBeVisible()
   await expectNoHorizontalScroll(page)
+})
+
+test("form page: only the inner region scrolls, the page has no vertical scrollbar", async ({ page }) => {
+  await page.goto("/")
+  await expect(page.getByRole("heading", { name: pl.form.title })).toBeVisible()
+  await expectNoPageVerticalScroll(page)
+  // Short desktop-like viewport: the form no longer fits, still only <main> may scroll.
+  await page.setViewportSize({ width: 1440, height: 749 })
+  await expectNoPageVerticalScroll(page)
 })
 
 test("form page has no serious or critical axe violations (AC-46, TAC-003-05)", async ({ page }) => {
@@ -49,5 +67,6 @@ test("chat page: no horizontal scroll (AC-45), no serious axe violations (AC-46)
     })
   }
   await test.step("no horizontal scroll (AC-45, TAC-003-04)", () => expectNoHorizontalScroll(page))
+  await test.step("only the inner region scrolls, no page vertical scroll", () => expectNoPageVerticalScroll(page))
   await test.step("no serious or critical axe violations (AC-46, TAC-003-05)", () => expectNoSeriousA11yIssues(page))
 })

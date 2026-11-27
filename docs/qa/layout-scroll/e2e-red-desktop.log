@@ -1,0 +1,35 @@
+
+Running 1 test using 1 worker
+
+  ✘  1 [desktop] › tests/e2e/responsive-a11y.spec.ts:39:1 › form page: only the inner region scrolls, the page has no vertical scrollbar (3.0s)
+
+
+  1) [desktop] › tests/e2e/responsive-a11y.spec.ts:39:1 › form page: only the inner region scrolls, the page has no vertical scrollbar 
+
+    Error: expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 749
+    Received:    817
+
+      22 |     innerHeight: window.innerHeight,
+      23 |   }))
+    > 24 |   expect(scrollHeight).toBeLessThanOrEqual(innerHeight)
+         |                        ^
+      25 | }
+      26 |
+      27 | async function expectNoSeriousA11yIssues(page: import("@playwright/test").Page): Promise<void> {
+        at expectNoPageVerticalScroll (/home/labuser/jsystems-ai-programming-2026-11/app/tests/e2e/responsive-a11y.spec.ts:24:24)
+        at /home/labuser/jsystems-ai-programming-2026-11/app/tests/e2e/responsive-a11y.spec.ts:45:3
+
+    Error Context: test-results/responsive-a11y-form-page--49aed-e-has-no-vertical-scrollbar-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/responsive-a11y-form-page--49aed-e-has-no-vertical-scrollbar-desktop/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace test-results/responsive-a11y-form-page--49aed-e-has-no-vertical-scrollbar-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [desktop] › tests/e2e/responsive-a11y.spec.ts:39:1 › form page: only the inner region scrolls, the page has no vertical scrollbar 

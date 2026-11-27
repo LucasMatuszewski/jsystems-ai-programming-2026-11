@@ -32,7 +32,7 @@ export const pl = {
     model: "Nazwa / model urządzenia",
     purchaseDate: "Data zakupu",
     reason: "Powód zgłoszenia",
-    photo: "Zdjęcie urządzenia",
+    photo: "Dodaj zdjęcie urządzenia",
     requiredMarker: "*",
     categoryPlaceholder: "Wybierz kategorię",
   },
@@ -49,6 +49,8 @@ export const pl = {
   },
   photo: {
     dropzone: "Przeciągnij zdjęcie tutaj lub kliknij, aby wybrać plik",
+    add: "Dodaj zdjęcie",
+    dropHint: "lub przeciągnij plik tutaj (JPG, PNG, WebP, maks. 10 MB)",
     change: "Zmień zdjęcie",
   },
   changePhoto: "Zmień zdjęcie",

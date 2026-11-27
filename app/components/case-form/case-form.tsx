@@ -147,7 +147,10 @@ export function CaseForm({ onSubmit, disabled = false, initialValues, initialFil
             <label
               key={type}
               className={cn(
-                "flex cursor-pointer flex-col gap-1 rounded-2xl border bg-card p-4 transition-colors",
+                "relative flex cursor-pointer flex-col gap-1 rounded-2xl border bg-card p-4 transition-colors",
+                // Hover: brand hard offset shadow plus a small lift (no movement with reduced motion).
+                "hover:shadow-brand-md motion-safe:transition-[transform,box-shadow,color,background-color] motion-safe:hover:-translate-x-0.5 motion-safe:hover:-translate-y-0.5",
+                "has-[:disabled]:cursor-not-allowed has-[:disabled]:shadow-none has-[:disabled]:translate-x-0 has-[:disabled]:translate-y-0",
                 "has-[:checked]:border-ring has-[:checked]:ring-3 has-[:checked]:ring-ring/30",
                 "has-[:focus-visible]:ring-3 has-[:focus-visible]:ring-ring/30",
                 caseTypeError ? "border-destructive" : "border-border",
