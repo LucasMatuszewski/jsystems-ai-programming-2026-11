@@ -35,7 +35,6 @@
       "Bash(npm run:*)",
       "Bash(npm test:*)",
       "Bash(npm audit:*)",
-      "Bash(npx:*)",
       "Bash(pnpm install:*)",
       "Bash(pnpm run:*)",
       "Bash(pnpm test:*)",
@@ -50,14 +49,12 @@
       "Bash(vitest:*)",
       "Bash(next:*)",
       "Bash(turbo:*)",
-      "Bash(tsx:*)",
-      "Bash(node:*)",
+      // No npx, tsx, node, python, python3 or uv here: they run any code, so an allow
+      // rule would skip the auto-mode check. Allow narrow commands instead, e.g.
+      // "Bash(npx vitest:*)" or "Bash(uv run pytest:*)".
 
       // ── Python (for your AI/data work)
-      "Bash(python:*)",
-      "Bash(python3:*)",
       "Bash(pip install:*)",
-      "Bash(uv:*)",
       "Bash(pytest:*)",
 
       // ── Docker (read-only inspection)
@@ -124,8 +121,8 @@
       "Bash(chmod:*)",
       "Bash(chown:*)",
       "Bash(sudo:*)",
-      "Bash(curl:*)",
-      "Bash(wget:*)",
+      // curl and wget are not denied: denying them blocked every HTTP request, even
+      // reading public docs or a local dev server. Auto mode or a prompt judges each call.
       "Bash(ssh:*)",
       "Bash(scp:*)",
       "Bash(docker run:*)",
