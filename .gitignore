@@ -16,6 +16,12 @@ secrets
 .agents/skills/*
 !.agents/skills/evidence-research/
 .claude/skills/
+# Repo-authored skills are always committed, even where an older rule ignores .agents/skills/*.
+!.agents/skills/evidence-research/
+!.agents/skills/write-plan/
+# Agent briefs (.agent-briefs/) are committed during implementation and deleted with their plan;
+# raw worker logs are not.
+.agent-runs/
 __pycache__/
 *.pyc
 .playwright-cli
@@ -34,8 +40,7 @@ playwright/.cache/
 .codex/tmp/
 .codex/*.sqlite*
 
-# Private agent briefs and Java build artifacts
-.agent-briefs/
+# Java build artifacts
 **/target/
 *.class
 /.idea
