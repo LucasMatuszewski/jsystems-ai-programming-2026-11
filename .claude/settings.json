@@ -31,7 +31,6 @@
       "Bash(npm run:*)",
       "Bash(npm test:*)",
       "Bash(npm audit:*)",
-      "Bash(npx:*)",
       "Bash(pnpm install:*)",
       "Bash(pnpm run:*)",
       "Bash(pnpm test:*)",
@@ -45,13 +44,8 @@
       "Bash(vitest:*)",
       "Bash(next:*)",
       "Bash(turbo:*)",
-      "Bash(tsx:*)",
-      "Bash(node:*)",
 
-      "Bash(python:*)",
-      "Bash(python3:*)",
       "Bash(pip install:*)",
-      "Bash(uv:*)",
       "Bash(pytest:*)",
 
       "Bash(docker ps:*)",
