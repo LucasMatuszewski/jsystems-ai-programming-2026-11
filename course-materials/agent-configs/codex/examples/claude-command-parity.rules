@@ -8,6 +8,8 @@
 # Source: course-materials/agent-configs/claude/settings.json.
 # Colon-star becomes trailing argv; there are no wildcard strings in these patterns.
 # Even Claude's exact-looking Bash(pwd) maps to a Codex PREFIX, not exact argv length.
+# Like the Claude source, there is no allow for npx, tsx, node, python, python3 or uv (they run
+# any code) and no forbidden curl or wget (each call is reviewed instead of blocked).
 
 # ALLOW command mappings
 prefix_rule(pattern=["cat"], decision="allow", match=['cat'], not_match=["true"])  # Bash(cat:*)
