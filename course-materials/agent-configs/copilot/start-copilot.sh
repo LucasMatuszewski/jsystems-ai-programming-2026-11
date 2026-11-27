@@ -9,6 +9,8 @@ cd "$repo_root"
 # Feature pushes may be approved; explicit main/master/prod and force prefixes are denied.
 # Bare push, refspec destinations, other remotes/options and later force flags can escape
 # these prefixes. GitHub/Bitbucket branch protection is the real guard.
+# curl and wget are not denied: a blanket deny blocked every HTTP read (docs, local dev
+# server). Without a rule, Copilot asks before each call.
 # Source: https://docs.github.com/en/copilot/reference/copilot-cli-reference/cli-command-reference#tool-permission-patterns
 
 exec copilot \
@@ -91,8 +93,6 @@ exec copilot \
   --deny-tool='shell(printenv:*)' \
   --deny-tool='shell(ssh:*)' \
   --deny-tool='shell(scp:*)' \
-  --deny-tool='shell(curl:*)' \
-  --deny-tool='shell(wget:*)' \
   --deny-tool='write(.env)' \
   --deny-tool='write(.env.local)' \
   "$@"
