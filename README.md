@@ -8,6 +8,12 @@
 - Ćwiczenie z legacy code na jFTP: [gałąź `codebase-context`](https://github.com/LucasMatuszewski/jftp-23-11-2026/tree/codebase-context) z mapą repozytorium, RepoMix, grafem kodu, lokalnym Context7, `AGENTS.md`, diagramami Mermaid i testami charakteryzacyjnymi.
 - Przykłady CI/CD z agentami w trybie headless: [`course-materials/cicd-headless`](course-materials/cicd-headless), hooki: [`course-materials/hooks-example`](course-materials/hooks-example).
 
+**Code review w CI i uprawnienia agentów**
+- Claude Code headless review ([workflow](.github/workflows/claude-pr-review.yml), [przykład do skopiowania](course-materials/cicd-headless/github-actions/claude-pr-review.yml)) działa przy każdym pushu do PR i po komentarzu `/claude-review` (uprawnienie write). Analizuje diff do ok. 500 tys. tokenów, bez lockfile'ów, logów i fixture'ów testów. PR-Agent reaguje na komentarze `/review`, `/describe` i `/improve`.
+- Token do CI: `claude setup-token`, potem sekret `CLAUDE_CODE_OAUTH_TOKEN` w repozytorium. Instrukcja krok po kroku: [Token do CI](course-materials/cicd-headless/README.md#token-do-ci-claude-setup-token).
+- W `.claude/settings.json` usunęliśmy z `allow` reguły `npx`, `tsx`, `node`, `python`, `python3` i `uv` (uruchamiają dowolny kod z pominięciem sprawdzenia w auto mode), a z `deny` reguły `curl` i `wget` (blokowały każde zapytanie HTTP, także czytanie dokumentacji). To samo w [przykładowej konfiguracji](course-materials/agent-configs/claude/settings.jsonc). Zamiast szerokich reguł dodawajcie wąskie, np. `Bash(npx vitest:*)`.
+- [Claude Ship](https://code.claude.com/docs/en/claude-ship) (Code Review, PR Steward, Claude Approvals) działa tylko w planach Team i Enterprise: włącza go Owner organizacji, a koszt idzie z kredytów organizacji, poza limitem planu. Na planach indywidualnych i prywatnych repozytoriach używajcie agentów w CI/CD (jak wyżej), GitHub Copilot code review albo Codex code review. W pracy poproście administratora organizacji o konfigurację Code Review.
+
 **Podsumowanie i czat**
 - [Podsumowanie dnia 5](course-materials/zoom-summary-chat-history/day-5-summary.md): code review z PR-Agent i wbudowanymi recenzentami, Claude Code headless z `claude setup-token`, hooki i uprawnienia w Claude Code i Codex, praca z legacy code na jFTP, narzędzia do UI i dalszej nauki.
 - [Historia czatu z dnia 5](course-materials/zoom-summary-chat-history/day-5-chat-history.md) ze wszystkimi linkami, poleceniami i promptami z zajęć.

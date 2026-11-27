@@ -1,5 +1,13 @@
 # CI/CD, Headless Mode, Jenkins, Jira, Confluence
 
+## Claude Code headless review w GitHub Actions (27 listopada 2026)
+
+- [github-actions/claude-pr-review.yml](github-actions/claude-pr-review.yml): ten sam workflow, który działa w tym repozytorium (`.github/workflows/claude-pr-review.yml`). Uruchamia się przy każdym pushu do PR, który nie jest draftem, oraz po komentarzu `/claude-review` w PR (osoba z uprawnieniem write; działa też na draftach).
+- Diff do ok. 500 tys. tokenów (`MAX_DIFF_BYTES: 1100000`; zmierzone w tym repo: ok. 2,2 bajta na token dla JSON i lockfile'ów). Sonnet 5.5 i Opus 5.5 mają domyślnie okno 1M tokenów. Lockfile'y, logi, fixture'y testów i pliki `.min`/`.map` są pominięte (`DIFF_EXCLUDES`). Ponad budżet wchodzą tylko całe pliki, a komentarz z review wymienia pominięte.
+- Bezpieczeństwo: diff trafia na stdin, Claude nie ma narzędzi (`--tools ""`), działa poza checkoutem, więc `.claude/`, hooki i MCP z PR nie są ładowane. Reguły review pochodzą z `AGENTS.md` gałęzi bazowej.
+- [scripts/claude_pr_review.sh](scripts/claude_pr_review.sh): ta sama logika do uruchomienia lokalnie albo w innym CI, z tokenem subskrypcji lub kluczem API.
+- Token: sekcja [Token do CI: `claude setup-token`](#token-do-ci-claude-setup-token) niżej.
+
 ## Updated review examples (2 October 2026)
 
 - [PR-Agent (Qodo) exercise: AI code review in your CI/CD](PR-Agent-Qodo/README.md): a hands-on exercise for the platform you use at work. Qodo's commercial product and community PR-Agent are separate; version 0.47.0 examples for GitHub Actions, GitLab CI, Bitbucket Cloud, Azure DevOps, Bitbucket Server/DC through Jenkins or Bamboo, Gitea, and a local run. Every example reads the same variables for any OpenAI-compatible model endpoint (default: OpenRouter with `gpt-6-luna`).
@@ -69,6 +77,22 @@ To nie jest dobre, jeśli pipeline ma korzystać z:
 
 Wtedy uruchamiaj bez `--bare`, ale tylko w kontrolowanym runnerze.
 
+Ważne: `--bare` nie czyta `CLAUDE_CODE_OAUTH_TOKEN`, tylko `ANTHROPIC_API_KEY` albo `apiKeyHelper`. Z tokenem subskrypcji z `claude setup-token` uruchamiaj `claude -p` bez `--bare`, ale z pustego katalogu poza repozytorium, z `--tools ""` i `--strict-mcp-config`. Tak robi nasz [workflow](github-actions/claude-pr-review.yml) i [skrypt](scripts/claude_pr_review.sh).
+
+### Token do CI: `claude setup-token`
+
+1. Lokalnie uruchom `claude setup-token`. Otworzy się logowanie w przeglądarce (jak przy `/login`), a po akceptacji token pojawi się w terminalu. Claude go nigdzie nie zapisuje.
+2. Skopiuj token jako jedną linię. Terminal łamie go na dwie linie, a skopiowany znak nowej linii psuje token (nasz workflow usuwa białe znaki i ostrzega, ale lepiej zapisać go poprawnie).
+3. W repozytorium: **Settings → Secrets and variables → Actions → New repository secret**, nazwa `CLAUDE_CODE_OAUTH_TOKEN`. Albo w terminalu: `gh secret set CLAUDE_CODE_OAUTH_TOKEN` i wklej token, gdy CLI o niego poprosi (nie wpisuj go w poleceniu, bo zostanie w historii).
+4. Nie ustawiaj w tym samym jobie `ANTHROPIC_API_KEY`: w trybie `-p` klucz API zawsze wygrywa z tokenem subskrypcji.
+5. Token działa rok, na planach Pro, Max, Ultra, Team i Enterprise, i pozwala tylko na zapytania do modelu (bez Remote Control i connectorów claude.ai).
+6. Token jest przypięty do subskrypcji osoby, która go wygenerowała. Do własnych repozytoriów i prywatnej automatyzacji to udokumentowane użycie. Do wspólnego CI w firmie dokumentacja zaleca klucz API z Claude Console albo workload identity federation (GitHub OIDC), bez długożyjącego sekretu.
+
+Źródła:
+- Claude docs: `https://code.claude.com/docs/en/authentication#generate-a-long-lived-token`
+- Claude docs: `https://code.claude.com/docs/en/github-actions#set-up-for-an-organization`
+- Nasz research: [tokeny do automatyzacji](../Research/automation-tokens-mcp-news-ide-acp-2026-11-26.md#1-long-lived-automation-tokens)
+
 Źródło:
 - Claude docs: `https://code.claude.com/docs/en/headless`
 
@@ -104,19 +128,22 @@ to najprościej robić to osobnym skryptem przez REST API.
 
 ### 6. “Claude by comment” jak GitHub Copilot?
 
-Stan praktyczny:
+Stan praktyczny (27.11.2026):
 - GitHub Copilot ma oficjalne flow `@copilot` w PR commentach,
-- dla Claude nie znalazłem publicznie udokumentowanego, oficjalnego odpowiednika `@claude` w PR comment -> start cloud coding session -> push fix,
-- da się to emulować przez GitHub Actions, Jenkins, webhook i `claude -p`,
+- oficjalna akcja `anthropics/claude-code-action@v1` reaguje na wzmianki `@claude` w komentarzach (trigger `issue_comment`), z tokenem `CLAUDE_CODE_OAUTH_TOKEN` albo kluczem API,
+- Claude Code Review i reszta Claude Ship (`@claude review`, PR Steward, Claude Approvals) działają tylko w planach Team i Enterprise: włącza je Owner organizacji, a koszt idzie z kredytów organizacji, poza limitem planu,
+- nasz [workflow](github-actions/claude-pr-review.yml) robi review po komentarzu `/claude-review` na dowolnym planie z `claude setup-token`; PR-Agent reaguje na `/review`, `/describe` i `/improve`,
 - da się też pushować eventy do otwartej sesji przez Channels, ale to nie jest to samo co nowa cloud sesja CI/CD.
 
 Wniosek:
-- na GitHubie natywny review-by-comment jest dziś lepiej dopracowany przez Copilota,
-- dla Claude najlepiej budować własny workflow automatyzacji.
+- w firmie z planem Team lub Enterprise najprościej poprosić administratora o włączenie Claude Code Review,
+- na planach indywidualnych i prywatnych repozytoriach: własny workflow z `claude -p`, PR-Agent, GitHub Copilot code review albo Codex code review.
 
 Źródła:
 - GitHub Copilot docs
 - Claude channels docs: `https://code.claude.com/docs/en/channels`
+- Claude Code GitHub Actions: `https://code.claude.com/docs/en/github-actions`
+- Claude Ship: `https://code.claude.com/docs/en/claude-ship`, Code Review: `https://code.claude.com/docs/en/code-review`
 
 ### 7. `/schedule` i cotygodniowe utrzymanie CLAUDE.md, rules i skills
 
@@ -215,7 +242,7 @@ Przykład:
 
 ### GitHub Actions
 
-- secret `ANTHROPIC_API_KEY`
+- secret `CLAUDE_CODE_OAUTH_TOKEN` z `claude setup-token` (własne repozytoria) albo `ANTHROPIC_API_KEY` (wspólne CI w firmie), nigdy oba naraz
 - możliwość pisania komentarzy do PR
 - brak fork-secrets exposure albo odpowiednie zabezpieczenie workflow
 
