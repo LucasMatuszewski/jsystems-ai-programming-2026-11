@@ -124,6 +124,17 @@
   },
   "plansDirectory": "./docs/plans",
   "hooks": {
+    "PostModelSwitch": [
+      {
+        "matcher": ".*fable.*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cat \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/fable-instructions.md"
+          }
+        ]
+      }
+    ],
     "PreToolUse": [
       {
         "matcher": "Edit|Write",
