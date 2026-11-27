@@ -1,0 +1,139 @@
+# App tests: lint, typecheck, unit/integration/component tests on every change to the app,
+# and the real-stack Playwright E2E suite (paid OpenRouter calls) only on request:
+#   - add the `e2e` label to a PR (each push to a labelled PR runs it again), or
+#   - run this workflow manually (Actions tab -> App Tests -> Run workflow).
+# Setup: Actions secret OPENROUTER_API_KEY. Optional Actions variables LLM_MODEL and
+# DECISION_MODEL override the app defaults (openai/gpt-6-luna, typesafe/jev-1.14).
+name: App Tests
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review, labeled]
+    paths:
+      - 'app/**'
+      - 'docs/policies/**'
+      - '.github/workflows/app-tests.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'app/**'
+      - 'docs/policies/**'
+      - '.github/workflows/app-tests.yml'
+  workflow_dispatch:
+    inputs:
+      e2e:
+        description: Run the E2E suite (real OpenRouter calls, about 20-40 min)
+        type: boolean
+        default: true
+      spec:
+        description: Optional single spec, e.g. tests/e2e/smoke.spec.ts (empty = whole suite)
+        type: string
+        default: ''
+
+permissions:
+  contents: read
+
+# A new push cancels the previous run. A label other than `e2e` gets its own group, so adding
+# it never cancels a running E2E job (its jobs are skipped anyway).
+concurrency:
+  group: >-
+    app-tests-${{ github.event.pull_request.number || github.ref }}${{
+    github.event.action == 'labeled' && github.event.label.name != 'e2e' && format('-label-{0}', github.run_id) || '' }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    working-directory: app
+
+jobs:
+  unit:
+    name: Lint, typecheck, unit and integration tests
+    # A label other than `e2e` changes no code; skip the rerun.
+    if: github.event.action != 'labeled' || github.event.label.name == 'e2e'
+    runs-on: ubuntu-latest
+    # Normal run: about 2 min install + 1 min checks.
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
+        with:
+          package_json_file: app/package.json
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: app/pnpm-lock.yaml
+
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm typecheck
+      # No OpenRouter key here on purpose: tests/setup/node.ts blocks every OpenRouter call
+      # and the tests replay recorded responses (ADR-006).
+      - run: pnpm test
+
+  e2e:
+    name: E2E (real stack, OpenRouter)
+    needs: unit
+    if: >-
+      (github.event_name == 'workflow_dispatch' && inputs.e2e) ||
+      (github.event_name == 'pull_request' &&
+       github.event.pull_request.head.repo.full_name == github.repository &&
+       contains(github.event.pull_request.labels.*.name, 'e2e'))
+    runs-on: ubuntu-latest
+    # Playwright's own globalTimeout is 40 min; the job limit adds room for install and build.
+    timeout-minutes: 55
+    env:
+      OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+      LLM_MODEL: ${{ vars.LLM_MODEL }}
+      DECISION_MODEL: ${{ vars.DECISION_MODEL }}
+      E2E_SERVER_LOG: test-results/server.log
+      SPEC: ${{ inputs.spec }}
+    steps:
+      - name: Check OpenRouter secret
+        run: |
+          [[ -n "${OPENROUTER_API_KEY:-}" ]] || { echo "::error::Set Actions secret OPENROUTER_API_KEY."; exit 1; }
+          if [[ -n "${SPEC:-}" && ! "$SPEC" =~ ^tests/e2e/[a-z0-9-]+\.spec\.ts$ ]]; then
+            echo "::error::spec must look like tests/e2e/<name>.spec.ts"; exit 1
+          fi
+        working-directory: .
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
+        with:
+          package_json_file: app/package.json
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: app/pnpm-lock.yaml
+
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm build
+
+      # Playwright starts both servers itself (port 3000 real key, 3001 invalid key) and
+      # never reuses an existing one; their output goes to E2E_SERVER_LOG.
+      - name: Run E2E
+        run: |
+          if [[ -n "${SPEC:-}" ]]; then
+            pnpm test:e2e "$SPEC"
+          else
+            pnpm test:e2e
+          fi
+
+      - name: Upload server log and traces
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: e2e-results
+          path: app/test-results/
+          retention-days: 7
+          if-no-files-found: ignore
