@@ -68,7 +68,7 @@ Wiadomości publiczne w kolejności chronologicznej. Reakcje oznaczają zliczeni
   API Key ten same który macie w .env ustawcie w sekretach  
   Poproście aby agent Was pokierował jak to zrobić po stronie GitHub
 
-- **10:41 — Łukasz Matuszewski:** https://github.com/<USER_NAME>/jsystems-ai-programming-2026-11/settings/secrets/actions
+- **10:41 — Łukasz Matuszewski:** `https://github.com/<USER_NAME>/jsystems-ai-programming-2026-11/settings/secrets/actions`
 
 - **10:44 — Łukasz Matuszewski:** OPENROUTER_API_KEY
 
@@ -147,26 +147,34 @@ Wiadomości publiczne w kolejności chronologicznej. Reakcje oznaczają zliczeni
 - **12:46 — Łukasz Matuszewski:** Przykłady z Hooks dla różnych agentów:  
   https://github.com/LucasMatuszewski/jsystems-ai-programming-2026-11/tree/main/course-materials/hooks-example
 
-- **12:51 — Łukasz Matuszewski:** "PostModelSwitch": [  
-        {  
-          "hooks": [  
-            {  
-              "type": "command",  
-              "command": "python3 -I \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/fable_guard.py model-switch || true",  
-              "timeout": 10  
-            }  
-          ]  
-        }  
+- **12:51 — Łukasz Matuszewski:**
+
+  ```json
+  "PostModelSwitch": [
+        {
+          "hooks": [
+            {
+              "type": "command",
+              "command": "python3 -I \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/fable_guard.py model-switch || true",
+              "timeout": 10
+            }
+          ]
+        }
       ],
+  ```
 
 - **12:53 — Łukasz Matuszewski:** It seems to me that you've overcombined things here and added too much, because I'm afraid that this will also affect performance. I also don't want Opus to duplicate these instructions when talking to Fable. They should only be duplicated when I talk to Fable directly. So maybe the Postmodel Switch event would be best when I manually switch to Fable. And the question is: can't we add some matches there so that this script command isn't deactivated if a match isn't found? At this point, you've made it so that this Python script is deactivated every time. Maybe we can use an if statement at the hook level to filter this data.
 
 - **12:54 — Łukasz Matuszewski:** Przykładowy hook dla odpalenia agenta z review zmian w dependencjach dla pom.xml  
   https://github.com/LucasMatuszewski/jsystems-ai-programming-2026-11/blob/main/.claude/settings.json#L132
 
-- **13:02 — Łukasz Matuszewski:** "Bash(node:*)",  
-        "Bash(python:*)",  
-        "Bash(python3:*)",  
+- **13:02 — Łukasz Matuszewski:**
+
+  ```json
+  "Bash(node:*)",
+        "Bash(python:*)",
+        "Bash(python3:*)",
+  ```
   These 3 commands here with allow should be removed. They are very dangerous because they actually allow you to use any Node and Python script without scanning by Auto mode.
 
 - **13:05 — Łukasz Matuszewski:** Koniec przerwy 13:35
