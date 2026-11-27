@@ -1,5 +1,22 @@
 # UPDATES !!!
 
+## Po piątym dniu (27.11)
+
+**Kod i repozytorium**
+- Aplikacja: [PR #46](https://github.com/LucasMatuszewski/jsystems-ai-programming-2026-11/pull/46) w gałęzi `feat/app-implementation`, z code review. `main` zostaje punktem startowym kursu.
+- [PR #49](https://github.com/LucasMatuszewski/jsystems-ai-programming-2026-11/pull/49): PR-Agent z OpenRouter i Claude Code headless w GitHub Actions, hook z instrukcjami dla Fable.
+- Ćwiczenie z legacy code na jFTP: [gałąź `codebase-context`](https://github.com/LucasMatuszewski/jftp-23-11-2026/tree/codebase-context) z mapą repozytorium, RepoMix, grafem kodu, lokalnym Context7, `AGENTS.md`, diagramami Mermaid i testami charakteryzacyjnymi.
+- Przykłady CI/CD z agentami w trybie headless: [`course-materials/cicd-headless`](course-materials/cicd-headless), hooki: [`course-materials/hooks-example`](course-materials/hooks-example).
+
+**Podsumowanie i czat**
+- [Podsumowanie dnia 5](course-materials/zoom-summary-chat-history/day-5-summary.md): code review z PR-Agent i wbudowanymi recenzentami, Claude Code headless z `claude setup-token`, hooki i uprawnienia w Claude Code i Codex, praca z legacy code na jFTP, narzędzia do UI i dalszej nauki.
+- [Historia czatu z dnia 5](course-materials/zoom-summary-chat-history/day-5-chat-history.md) ze wszystkimi linkami, poleceniami i promptami z zajęć.
+
+**Co dalej**
+- [Checklisty po szkoleniu](https://devpowers.com/szkolenia/jsystems/ai-programming-2026-11/checklisty.html#harness), [pytania i odpowiedzi](https://devpowers.com/szkolenia/jsystems/ai-programming-2026-11/pytania.html), [materiały kursu](https://devpowers.com/szkolenia/jsystems/ai-programming-2026-11/).
+- [Kogo śledzić](course-materials/Course%20INDEX%20-%20AI%20in%20Programming.md#people-and-accounts-to-follow-in-ai) i [narzędzia do zarządzania wieloma agentami](course-materials/Research/agent-managers-and-remote-agents.md).
+- Zróbcie fork repozytorium, żeby zachować materiały po zakończeniu dostępu.
+
 ## Po czwartym dniu (26.11)
 
 **Kod i repozytorium**
