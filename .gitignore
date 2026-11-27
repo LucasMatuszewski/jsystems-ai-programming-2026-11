@@ -41,3 +41,4 @@ playwright/.cache/
 /.idea
 # Playwright CLI output (may contain credentials)
 .playwright-cli/
+binary-assets.json
