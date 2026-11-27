@@ -1,0 +1,35 @@
+{
+  "meta": {
+    "capturedAt": "2026-11-26T14:02:14.148Z",
+    "target": "/api/chat",
+    "request": {
+      "method": "POST",
+      "contentType": "application/json",
+      "caseSource": "escalated-return-laptop-2.ndjson.json",
+      "caseType": "return",
+      "currentDecision": "Weryfikacja ręczna",
+      "messageCount": 2,
+      "lastUserMessage": "Jak mam zapakować laptopa?",
+      "expected": "text, no tool, 1 chat-step"
+    },
+    "appCommit": "bcd9513",
+    "versions": {
+      "next": "16.4.6",
+      "ai": "7.0.118",
+      "@openrouter/ai-sdk-provider": "3.1.0"
+    },
+    "durationMs": 4797,
+    "upstreamCalls": 1,
+    "logLines": [
+      "{\"type\":\"incoming\",\"requestId\":\"57ca6d0f-3fb5-408a-b525-2dfce1a4020f\",\"route\":\"/api/chat\",\"status\":200}",
+      "{\"type\":\"upstream\",\"requestId\":\"57ca6d0f-3fb5-408a-b525-2dfce1a4020f\",\"stage\":\"chat-step\",\"modelId\":\"openai/gpt-6-luna\",\"outcome\":\"ok\",\"latencyMs\":4100,\"costUsd\":0}"
+    ],
+    "script": "record-app.ts",
+    "notes": "Clarifying question; expected no tool call."
+  },
+  "response": {
+    "status": 200,
+    "contentType": "text/event-stream",
+    "body": "data: {\"type\":\"start\"}\n\ndata: {\"type\":\"start-step\"}\n\ndata: {\"type\":\"text-start\",\"id\":\"gen-1795701734-vq39I4HgMAa3izRq4iwt\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701734-vq39I4HgMAa3izRq4iwt\",\"delta\":\"###\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701734-vq39I4HgMAa3izRq4iwt\",\"delta\":\" Pak\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701734-vq39I4HgMAa3izRq4iwt\",\"delta\":\"owanie\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701734-vq39I4HgMAa3izRq4iwt\",\"delta\":\" laptop\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701734-vq39I4HgMAa3izRq4iwt\",\"delta\":\"a\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701734-vq39I4HgMAa3izRq4iwt\",\"delta\":\"\\n\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701734-vq39I4HgMAa3izRq4iwt\",\"delta\":\"-\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701734-vq39I4HgMAa3izRq4iwt\",\"delta\":\" Wy\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701734-vq39I4HgMAa3izRq4iwt\",\"delta\":\"łącz\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701734-vq39I4HgMAa3izRq4iwt\",\"delta\":\" laptop\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701734-vq39I4HgMAa3izRq4iwt\",\"delta\":\" i\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701734-vq39I4HgMAa3izRq4iwt\",\"delta\":\" zabez\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701734-vq39I4HgMAa3izRq4iwt\",\"delta\":\"pie\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701734-vq39I4HgMAa3izRq4iwt\",\"delta\":\"cz\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701734-vq39I4HgMAa3izRq4iwt\",\"delta\":\" go\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701734-vq39I4HgMAa3izRq4iwt\",\"delta\":\" przed\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701734-vq39I4HgMAa3izRq4iwt\",\"delta\":\" przypadk\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701734-vq39I4HgMAa3izRq4iwt\",\"delta\":\"owym w\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701734-vq39I4HgMAa3izRq4iwt\",\"delta\":\"łączeniem\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701734-vq39I4HgMAa3izRq4iwt\",\"delta\":\".\\n-\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701734-vq39I4HgMAa3izRq4iwt\",\"delta\":\" Wł\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701734-vq39I4HgMAa3izRq4iwt\",\"delta\":\"óż go\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701734-vq39I4HgMAa3izRq4iwt\",\"delta\":\" do or\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701734-vq39I4HgMAa3izRq4iwt\",\"delta\":\"yginalnego\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701734-vq39I4HgMAa3izRq4iwt\",\"delta\":\" opakowania\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701734-vq39I4HgMAa3izRq4iwt\",\"delta\":\", jeśli je\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701734-vq39I4HgMAa3izRq4iwt\",\"delta\":\" masz; przy\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701734-vq39I4HgMAa3izRq4iwt\",\"delta\":\" zwrocie\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701734-vq39I4HgMAa3izRq4iwt\",\"delta\":\" w tym okres\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701734-vq39I4HgMAa3izRq4iwt\",\"delta\":\"ie jest ono zal\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701734-vq39I4HgMAa3izRq4iwt\",\"delta\":\"ecane (R\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701734-vq39I4HgMAa3izRq4iwt\",\"delta\":\"-6).\\n-\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701734-vq39I4HgMAa3izRq4iwt\",\"delta\":\" Zabezpiecz laptop\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701734-vq39I4HgMAa3izRq4iwt\",\"delta\":\" w pudeł\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701734-vq39I4HgMAa3izRq4iwt\",\"delta\":\"ku tak\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701734-vq39I4HgMAa3izRq4iwt\",\"delta\":\", aby nie przesuwa\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701734-vq39I4HgMAa3izRq4iwt\",\"delta\":\"ł się podczas transportu.\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701734-vq39I4HgMAa3izRq4iwt\",\"delta\":\" Dołącz wszystkie\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701734-vq39I4HgMAa3izRq4iwt\",\"delta\":\" otrzymane akcesoria\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701734-vq39I4HgMAa3izRq4iwt\",\"delta\":\".\\n- Zamknij pudeł\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701734-vq39I4HgMAa3izRq4iwt\",\"delta\":\"ko\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701734-vq39I4HgMAa3izRq4iwt\",\"delta\":\" solidnie. Adres\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701734-vq39I4HgMAa3izRq4iwt\",\"delta\":\" działu\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701734-vq39I4HgMAa3izRq4iwt\",\"delta\":\" zwrotów znajdziesz w\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701734-vq39I4HgMAa3izRq4iwt\",\"delta\":\" potwierdzeniu od obsługi klient\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701734-vq39I4HgMAa3izRq4iwt\",\"delta\":\"a (R-8\"}\n\ndata: {\"type\":\"text-delta\",\"id\":\"gen-1795701734-vq39I4HgMAa3izRq4iwt\",\"delta\":\").\"}\n\ndata: {\"type\":\"text-end\",\"id\":\"gen-1795701734-vq39I4HgMAa3izRq4iwt\"}\n\ndata: {\"type\":\"finish-step\"}\n\ndata: {\"type\":\"finish\",\"finishReason\":\"stop\"}\n\ndata: [DONE]\n\n"
+  }
+}

@@ -1,0 +1,6 @@
+
+Running 1 test using 1 worker
+
+  ✓  1 [desktop] › tests/e2e/complaint-flow.spec.ts:16:1 › complaint case: decision in the enum, a C- rule, and a remedy when accepted (25.7s)
+
+  1 passed (31.0s)

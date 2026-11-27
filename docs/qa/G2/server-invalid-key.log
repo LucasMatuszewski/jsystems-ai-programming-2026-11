@@ -1,0 +1,13 @@
+$ next start
+▲ Next.js 16.4.6
+- Local:         http://localhost:3000
+- Network:       http://10.123.4.35:3000
+✓ Ready in 4.3s
+✓ Running next.config.ts took 943ms
+[hsdc] {"type":"incoming","requestId":"0a57882e-3228-4e15-963a-0d9f00ee04d1","route":"/api/cases","status":200}
+[hsdc] {"type":"upstream","requestId":"0a57882e-3228-4e15-963a-0d9f00ee04d1","stage":"signals","modelId":"typesafe/jev-1.14","outcome":"error","status":401,"latencyMs":440}
+[hsdc] {"type":"upstream","requestId":"0a57882e-3228-4e15-963a-0d9f00ee04d1","stage":"escalated","modelId":"openai/gpt-6-luna","outcome":"error","status":401,"latencyMs":149}
+[hsdc] {"type":"incoming","requestId":"59db6f16-6d83-44a6-b7ea-d286264e5442","route":"/api/cases","status":200}
+[hsdc] {"type":"upstream","requestId":"59db6f16-6d83-44a6-b7ea-d286264e5442","stage":"signals","modelId":"typesafe/jev-1.14","outcome":"error","status":401,"latencyMs":238}
+[hsdc] {"type":"upstream","requestId":"59db6f16-6d83-44a6-b7ea-d286264e5442","stage":"escalated","modelId":"openai/gpt-6-luna","outcome":"error","status":401,"latencyMs":668}
+[ELIFECYCLE] Command failed with exit code 143.

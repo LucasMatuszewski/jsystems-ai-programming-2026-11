@@ -15,6 +15,8 @@ secrets
 # .claude/skills/ holds the CLI's links to .agents/skills/.
 .agents/skills/*
 !.agents/skills/evidence-research/
+!.agents/skills/orchestrate-gated-fixes/
+!.agents/skills/qa-demo-video/
 .claude/skills/
 __pycache__/
 *.pyc
@@ -36,6 +38,7 @@ playwright/.cache/
 
 # Private agent briefs and Java build artifacts
 .agent-briefs/
+.agent-runs/
 **/target/
 *.class
 /.idea

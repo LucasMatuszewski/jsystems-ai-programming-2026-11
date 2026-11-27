@@ -26,6 +26,8 @@ docs/                PRD, ADR, design system
 course-materials/    Notes, scripts, examples, research
 ```
 
+`app/AGENTS.md` holds the stack-specific rules for the application.
+
 **Do not read `course-materials/` on your own.** It holds teaching examples from this and earlier courses: sample PRDs, ADRs, prompts and agent instructions. They are not requirements or conventions for this app. Do not browse, search or index it during normal work; open a file there only when the user names it or asks for course material.
 
 ---
@@ -78,6 +80,7 @@ Use **the Playwright CLI** to drive the real running app like a human tester:
 4. Verify the flow actually works: correct navigation, correct data displayed, no console errors, Polish UI text.
 5. **Compare your screenshots against the brand reference** (`assets/homepage.png` + `docs/design-guidelines.md` tokens): colors, typography, spacing, button styles and logo placement must match the application's agreed brand reference.
 6. Report what you validated (steps + screenshots) in your task summary. If anything looks or behaves wrong, fix it before committing.
+7. Before a feature is done, the last QA step records a condensed demo video of the accepted version, covering the happy paths and the error states, and links it in the PR description (skill `qa-demo-video`).
 
 ### Verification (required before every commit)
 
@@ -93,6 +96,9 @@ Verify only the scope relevant to your change. If the change affects runtime beh
 **Verification:** For runtime changes, start the real application and finish with Manual QA. Record compilation/build, test execution and startup as separate checks, including discovery counts and skips. A successful build or E2E run alone does not establish that the app works. Documentation-only changes use diff, link and consistency checks and do not require application startup. Fix errors and warnings introduced by the change; report pre-existing failures without hiding them.
 
 **Env Vars:** See `.env.example` (OPENROUTER_API_KEY required)
+
+### Long-running processes
+Bound every build, server, E2E or recording run with a hard timeout and a log file. Watch background work, and report a run that overruns as a defect instead of waiting on it (details: `.claude/rules/long-running-processes.md`).
 
 ### Sub-agents
 - Prefer ad hoc subagents for one-off work. Reuse a named role only after checking its model and permissions; add a short custom definition (for example under `.claude/agents/` for Claude Code or `.codex/agents/` for Codex) only for a recurring need. The starting repository has no active custom roles.

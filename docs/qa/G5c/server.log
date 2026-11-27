@@ -1,0 +1,8 @@
+▲ Next.js 16.4.6
+- Local:         http://localhost:3001
+- Network:       http://10.123.4.35:3001
+✓ Ready in 556ms
+✓ Running next.config.ts took 233ms
+[hsdc] {"type":"incoming","requestId":"8fd59601-c14f-4c8c-b0ce-3836d64902a2","route":"/api/cases","status":200}
+[hsdc] {"type":"upstream","requestId":"8fd59601-c14f-4c8c-b0ce-3836d64902a2","stage":"signals","modelId":"typesafe/jev-1.14","outcome":"ok","latencyMs":705,"costUsd":0}
+[hsdc] {"type":"upstream","requestId":"8fd59601-c14f-4c8c-b0ce-3836d64902a2","stage":"writer","modelId":"openai/gpt-6-luna","outcome":"ok","latencyMs":7841,"costUsd":0}

@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "app-dev",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--dir", "app", "dev"],
+      "port": 3000
+    },
+    {
+      "name": "app-dev-3002",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--dir", "app", "dev", "--port", "3002"],
+      "port": 3002
+    }
+  ]
+}

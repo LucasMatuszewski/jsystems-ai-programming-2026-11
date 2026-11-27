@@ -1,0 +1,40 @@
+{
+  "meta": {
+    "capturedAt": "2026-11-26T11:18:37.327Z",
+    "target": "/api/cases",
+    "request": {
+      "method": "POST",
+      "contentType": "multipart/form-data",
+      "fields": {
+        "caseType": "return",
+        "category": "laptop",
+        "model": "Lenovo ThinkPad E14",
+        "reason": "",
+        "consent": "true",
+        "purchaseDate": "2026-11-16"
+      },
+      "photo": "laptop-2.webp",
+      "photoMime": "image/webp"
+    },
+    "appCommit": "fa1c749",
+    "versions": {
+      "next": "16.4.6",
+      "ai": "7.0.118",
+      "@openrouter/ai-sdk-provider": "3.1.0"
+    },
+    "durationMs": 1616,
+    "upstreamCalls": 2,
+    "logLines": [
+      "{\"type\":\"incoming\",\"requestId\":\"6805a289-4d30-46e7-a71e-efa2e130a1f4\",\"route\":\"/api/cases\",\"status\":200}",
+      "{\"type\":\"upstream\",\"requestId\":\"6805a289-4d30-46e7-a71e-efa2e130a1f4\",\"stage\":\"signals\",\"modelId\":\"typesafe/jev-1.14\",\"outcome\":\"error\",\"status\":401,\"latencyMs\":325}",
+      "{\"type\":\"upstream\",\"requestId\":\"6805a289-4d30-46e7-a71e-efa2e130a1f4\",\"stage\":\"escalated\",\"modelId\":\"openai/gpt-6-luna\",\"outcome\":\"error\",\"status\":401,\"latencyMs\":130}"
+    ],
+    "script": "record-app.ts",
+    "notes": "Second server instance with OPENROUTER_API_KEY=sk-or-v1-invalid."
+  },
+  "response": {
+    "status": 200,
+    "contentType": "application/x-ndjson",
+    "body": "{\"type\":\"stage\",\"stage\":\"analysis\"}\n{\"type\":\"stage\",\"stage\":\"decision\"}\n{\"type\":\"error\",\"code\":\"model_unavailable\"}\n"
+  }
+}

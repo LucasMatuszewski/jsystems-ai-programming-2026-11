@@ -1,0 +1,10 @@
+$ next start
+▲ Next.js 16.4.6
+- Local:         http://localhost:3000
+- Network:       http://10.123.4.35:3000
+✓ Ready in 890ms
+✓ Running next.config.ts took 377ms
+[hsdc] {"type":"incoming","requestId":"64333fa0-c7bb-4593-b2ad-661359d0f64f","route":"/api/cases","status":200}
+[hsdc] {"type":"upstream","requestId":"64333fa0-c7bb-4593-b2ad-661359d0f64f","stage":"signals","modelId":"typesafe/jev-1.14","outcome":"ok","latencyMs":1827,"costUsd":0}
+[hsdc] {"type":"upstream","requestId":"64333fa0-c7bb-4593-b2ad-661359d0f64f","stage":"escalated","modelId":"openai/gpt-6-luna","outcome":"ok","latencyMs":18113,"costUsd":0}
+[ELIFECYCLE] Command failed with exit code 143.

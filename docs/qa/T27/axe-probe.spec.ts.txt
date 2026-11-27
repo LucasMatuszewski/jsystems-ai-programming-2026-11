@@ -1,0 +1,11 @@
+import AxeBuilder from "@axe-core/playwright"
+import { test } from "@playwright/test"
+
+test("probe", async ({ page }) => {
+  await page.goto("/")
+  await page.waitForSelector("h1")
+  const r = await new AxeBuilder({ page }).analyze()
+  for (const v of r.violations)
+    for (const n of v.nodes)
+      console.log(v.id, v.impact, n.html.slice(0, 200), JSON.stringify(n.any.map((a) => a.data)))
+})

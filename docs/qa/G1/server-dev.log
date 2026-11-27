@@ -1,0 +1,13 @@
+$ next dev
+▲ Next.js 16.4.6 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://10.123.4.35:3000
+✓ Ready in 984ms
+✓ Running next.config.ts took 130ms
+
+✓ Generated AGENTS.md for AI agents. Set `agentRules: false` in next.config to disable.
+○ Compiling / ...
+ GET / 200 in 2.0s (next.js: 299ms, application-code: 1720ms)
+ POST /api/chat 200 in 9.4s (next.js: 217ms, application-code: 9.2s)
+[ELIFECYCLE] Command failed with signal SIGTERM.
+[?25h

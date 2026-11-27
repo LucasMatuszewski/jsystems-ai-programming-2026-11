@@ -1,0 +1,11 @@
+# T25 manual check (pnpm start, playwright-cli, 2026-11-26)
+- Created a return case (laptop, Lenovo ThinkPad X1, laptop-2.webp) -> /chat with the first decision.
+- Turn 1 clarifying question (packing): plain reply, 1 chat-step.
+- Turn 2 new fact (unused laptop): model kept the recommendation, no update card (non-deterministic), 1 chat-step.
+- Turn 3 stronger fact: update card "Zaktualizowana rekomendacja: Akceptacja", 2 chat-steps.
+- Turn 4 "Jaki model urządzenia zgłosiłem?": "Zgłoszony model to Lenovo ThinkPad X1.", 1 chat-step.
+- POST /api/chat: 4 (1 per turn); [hsdc] chat-step lines: 5 (1+1+2+1).
+- Reload: log text 2989 chars / 9 children before and after, 0 /api/chat requests after reload.
+- Console: 0 errors, 0 warnings. 360 px: scrollWidth 360 = innerWidth.
+- Screenshots: chat-desktop.png (1440), chat-mobile.png (360x780).
+- Server stopped, browser session closed. Spend: usage unchanged at USD 0.1115 (BYOK).

@@ -1,0 +1,11 @@
+$ tsx scripts/record-openrouter.ts --compare
+compare: baseline = errors/decisions-upstream-account-deactivated-2.json (newest upstream error recording, captured 2026-11-26T10:13:39.685Z)
+compare: structural differences:
+  status: baseline=401 live=200
+  .error: only in fixture
+  .answers: only in live
+  .id: only in live
+  .model: only in live
+  .provider: only in live
+  .usage: only in live
+[ELIFECYCLE] Command failed with exit code 1.

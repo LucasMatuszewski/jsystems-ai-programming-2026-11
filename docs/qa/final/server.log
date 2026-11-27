@@ -1,0 +1,18 @@
+$ next start
+▲ Next.js 16.4.6
+- Local:         http://localhost:3000
+- Network:       http://10.123.4.35:3000
+✓ Ready in 336ms
+✓ Running next.config.ts took 91ms
+[hsdc] {"type":"incoming","requestId":"d3931d09-af3c-47ad-8f58-c2b3c3bd4a51","route":"/api/cases","status":200}
+[hsdc] {"type":"upstream","requestId":"d3931d09-af3c-47ad-8f58-c2b3c3bd4a51","stage":"signals","modelId":"typesafe/jev-1.14","outcome":"ok","latencyMs":585,"costUsd":0}
+[hsdc] {"type":"upstream","requestId":"d3931d09-af3c-47ad-8f58-c2b3c3bd4a51","stage":"escalated","modelId":"openai/gpt-6-luna","outcome":"ok","latencyMs":15051,"costUsd":0}
+[hsdc] {"type":"incoming","requestId":"024afef6-a972-4285-bdf2-6ba4d74c63fc","route":"/api/chat","status":200}
+[hsdc] {"type":"upstream","requestId":"024afef6-a972-4285-bdf2-6ba4d74c63fc","stage":"chat-step","modelId":"openai/gpt-6-luna","outcome":"ok","latencyMs":4929,"costUsd":0}
+[hsdc] {"type":"incoming","requestId":"91956ebb-936f-407a-b98e-7efe459ab0a5","route":"/api/chat","status":200}
+[hsdc] {"type":"upstream","requestId":"91956ebb-936f-407a-b98e-7efe459ab0a5","stage":"chat-step","modelId":"openai/gpt-6-luna","outcome":"ok","latencyMs":2528,"costUsd":0}
+[hsdc] {"type":"upstream","requestId":"91956ebb-936f-407a-b98e-7efe459ab0a5","stage":"chat-step","modelId":"openai/gpt-6-luna","outcome":"ok","latencyMs":3923,"costUsd":0}
+[hsdc] {"type":"incoming","requestId":"6147e033-f843-4d3c-836c-d7f31b5f3b07","route":"/api/cases","status":200}
+[hsdc] {"type":"upstream","requestId":"6147e033-f843-4d3c-836c-d7f31b5f3b07","stage":"signals","modelId":"typesafe/jev-1.14","outcome":"ok","latencyMs":334,"costUsd":0}
+[hsdc] {"type":"upstream","requestId":"6147e033-f843-4d3c-836c-d7f31b5f3b07","stage":"escalated","modelId":"openai/gpt-6-luna","outcome":"ok","latencyMs":37554,"costUsd":0}
+[ELIFECYCLE] Command failed with exit code 143.

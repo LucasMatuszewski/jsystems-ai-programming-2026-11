@@ -1,0 +1,69 @@
+$ next start
+▲ Next.js 16.4.6
+- Local:         http://localhost:3000
+- Network:       http://10.123.4.35:3000
+✓ Ready in 733ms
+✓ Running next.config.ts took 228ms
+[hsdc] {"type":"incoming","requestId":"412743e0-0c25-41d3-988c-d808e0660e28","route":"/api/cases","status":200}
+[hsdc] {"type":"upstream","requestId":"412743e0-0c25-41d3-988c-d808e0660e28","stage":"signals","modelId":"typesafe/jev-1.14","outcome":"ok","latencyMs":645,"costUsd":0}
+[hsdc] {"type":"upstream","requestId":"412743e0-0c25-41d3-988c-d808e0660e28","stage":"escalated","modelId":"openai/gpt-6-luna","outcome":"ok","latencyMs":17769,"costUsd":0}
+[hsdc] {"type":"incoming","requestId":"d2c0a4b1-503e-4564-8a72-a837288a3d17","route":"/api/cases","status":200}
+[hsdc] {"type":"upstream","requestId":"d2c0a4b1-503e-4564-8a72-a837288a3d17","stage":"signals","modelId":"typesafe/jev-1.14","outcome":"ok","latencyMs":310,"costUsd":0}
+[hsdc] {"type":"upstream","requestId":"d2c0a4b1-503e-4564-8a72-a837288a3d17","stage":"escalated","modelId":"openai/gpt-6-luna","outcome":"ok","latencyMs":25684,"costUsd":0}
+[hsdc] {"type":"incoming","requestId":"2132fea0-d696-4bdc-b288-9e27f3c0d102","route":"/api/cases","status":200}
+[hsdc] {"type":"upstream","requestId":"2132fea0-d696-4bdc-b288-9e27f3c0d102","stage":"signals","modelId":"typesafe/jev-1.14","outcome":"ok","latencyMs":350,"costUsd":0}
+[hsdc] {"type":"upstream","requestId":"2132fea0-d696-4bdc-b288-9e27f3c0d102","stage":"writer","modelId":"openai/gpt-6-luna","outcome":"ok","latencyMs":9704,"costUsd":0}
+[hsdc] {"type":"incoming","requestId":"5a283736-13c5-491e-a51b-7a604883e2fa","route":"/api/cases","status":200}
+[hsdc] {"type":"upstream","requestId":"5a283736-13c5-491e-a51b-7a604883e2fa","stage":"signals","modelId":"typesafe/jev-1.14","outcome":"ok","latencyMs":279,"costUsd":0}
+[hsdc] {"type":"upstream","requestId":"5a283736-13c5-491e-a51b-7a604883e2fa","stage":"writer","modelId":"openai/gpt-6-luna","outcome":"ok","latencyMs":9337,"costUsd":0}
+[hsdc] {"type":"incoming","requestId":"52b4faad-4e81-44ed-9c4e-d52108c3fe77","route":"/api/cases","status":200}
+[hsdc] {"type":"upstream","requestId":"52b4faad-4e81-44ed-9c4e-d52108c3fe77","stage":"signals","modelId":"typesafe/jev-1.14","outcome":"ok","latencyMs":677,"costUsd":0}
+[hsdc] {"type":"upstream","requestId":"52b4faad-4e81-44ed-9c4e-d52108c3fe77","stage":"escalated","modelId":"openai/gpt-6-luna","outcome":"ok","latencyMs":11543,"costUsd":0}
+[hsdc] {"type":"incoming","requestId":"3af9c0f8-b469-4e22-9a4d-aa2452383c06","route":"/api/cases","status":200}
+[hsdc] {"type":"upstream","requestId":"3af9c0f8-b469-4e22-9a4d-aa2452383c06","stage":"signals","modelId":"typesafe/jev-1.14","outcome":"ok","latencyMs":332,"costUsd":0}
+[hsdc] {"type":"upstream","requestId":"3af9c0f8-b469-4e22-9a4d-aa2452383c06","stage":"escalated","modelId":"openai/gpt-6-luna","outcome":"ok","latencyMs":13832,"costUsd":0}
+[hsdc] {"type":"incoming","requestId":"78c2f025-a2b3-43da-9b44-a8bb6f5badde","route":"/api/cases","status":200}
+[hsdc] {"type":"upstream","requestId":"78c2f025-a2b3-43da-9b44-a8bb6f5badde","stage":"signals","modelId":"typesafe/jev-1.14","outcome":"ok","latencyMs":373,"costUsd":0}
+[hsdc] {"type":"upstream","requestId":"78c2f025-a2b3-43da-9b44-a8bb6f5badde","stage":"escalated","modelId":"openai/gpt-6-luna","outcome":"ok","latencyMs":15417,"costUsd":0}
+[hsdc] {"type":"incoming","requestId":"9c722cff-646a-4e84-a9ad-63974a6e316b","route":"/api/cases","status":200}
+[hsdc] {"type":"upstream","requestId":"9c722cff-646a-4e84-a9ad-63974a6e316b","stage":"signals","modelId":"typesafe/jev-1.14","outcome":"ok","latencyMs":430,"costUsd":0}
+[hsdc] {"type":"upstream","requestId":"9c722cff-646a-4e84-a9ad-63974a6e316b","stage":"escalated","modelId":"openai/gpt-6-luna","outcome":"ok","latencyMs":13433,"costUsd":0}
+[hsdc] {"type":"incoming","requestId":"2aa88aa1-b6de-4284-80f2-9ae540d1359c","route":"/api/cases","status":200}
+[hsdc] {"type":"upstream","requestId":"2aa88aa1-b6de-4284-80f2-9ae540d1359c","stage":"signals","modelId":"typesafe/jev-1.14","outcome":"ok","latencyMs":357,"costUsd":0}
+[hsdc] {"type":"upstream","requestId":"2aa88aa1-b6de-4284-80f2-9ae540d1359c","stage":"escalated","modelId":"openai/gpt-6-luna","outcome":"ok","latencyMs":12655,"costUsd":0}
+[hsdc] {"type":"incoming","requestId":"9037112f-2c5c-46ad-9991-e5f8089df991","route":"/api/cases","status":200}
+[hsdc] {"type":"upstream","requestId":"9037112f-2c5c-46ad-9991-e5f8089df991","stage":"signals","modelId":"typesafe/jev-1.14","outcome":"ok","latencyMs":449,"costUsd":0}
+[hsdc] {"type":"upstream","requestId":"9037112f-2c5c-46ad-9991-e5f8089df991","stage":"escalated","modelId":"openai/gpt-6-luna","outcome":"ok","latencyMs":16477,"costUsd":0}
+[hsdc] {"type":"incoming","requestId":"9560f86e-ae99-4f17-aba2-4c30dd610f4f","route":"/api/cases","status":200}
+[hsdc] {"type":"upstream","requestId":"9560f86e-ae99-4f17-aba2-4c30dd610f4f","stage":"signals","modelId":"typesafe/jev-1.14","outcome":"ok","latencyMs":351,"costUsd":0}
+[hsdc] {"type":"upstream","requestId":"9560f86e-ae99-4f17-aba2-4c30dd610f4f","stage":"escalated","modelId":"openai/gpt-6-luna","outcome":"ok","latencyMs":15902,"costUsd":0}
+[hsdc] {"type":"incoming","requestId":"9547f82b-6cae-463f-91ec-a3b56b21dc3e","route":"/api/cases","status":200}
+[hsdc] {"type":"upstream","requestId":"9547f82b-6cae-463f-91ec-a3b56b21dc3e","stage":"signals","modelId":"typesafe/jev-1.14","outcome":"ok","latencyMs":402,"costUsd":0}
+[hsdc] {"type":"upstream","requestId":"9547f82b-6cae-463f-91ec-a3b56b21dc3e","stage":"escalated","modelId":"openai/gpt-6-luna","outcome":"ok","latencyMs":10048,"costUsd":0}
+[hsdc] {"type":"incoming","requestId":"e023930f-72ea-4a4f-935b-8ae5954fbd92","route":"/api/cases","status":200}
+[hsdc] {"type":"upstream","requestId":"e023930f-72ea-4a4f-935b-8ae5954fbd92","stage":"signals","modelId":"typesafe/jev-1.14","outcome":"ok","latencyMs":365,"costUsd":0}
+[hsdc] {"type":"upstream","requestId":"e023930f-72ea-4a4f-935b-8ae5954fbd92","stage":"escalated","modelId":"openai/gpt-6-luna","outcome":"ok","latencyMs":13253,"costUsd":0}
+[hsdc] {"type":"incoming","requestId":"fef34d64-b967-4e5c-a675-b932d75eb44e","route":"/api/cases","status":200}
+[hsdc] {"type":"upstream","requestId":"fef34d64-b967-4e5c-a675-b932d75eb44e","stage":"signals","modelId":"typesafe/jev-1.14","outcome":"ok","latencyMs":299,"costUsd":0}
+[hsdc] {"type":"upstream","requestId":"fef34d64-b967-4e5c-a675-b932d75eb44e","stage":"escalated","modelId":"openai/gpt-6-luna","outcome":"ok","latencyMs":21296,"costUsd":0}
+[hsdc] {"type":"incoming","requestId":"783eabdd-683c-439c-9375-a2f5ddd92459","route":"/api/cases","status":200}
+[hsdc] {"type":"upstream","requestId":"783eabdd-683c-439c-9375-a2f5ddd92459","stage":"signals","modelId":"typesafe/jev-1.14","outcome":"ok","latencyMs":441,"costUsd":0}
+[hsdc] {"type":"upstream","requestId":"783eabdd-683c-439c-9375-a2f5ddd92459","stage":"escalated","modelId":"openai/gpt-6-luna","outcome":"ok","latencyMs":13720,"costUsd":0}
+[hsdc] {"type":"incoming","requestId":"1cc0f363-086a-4986-bf46-18ba1a5c5d52","route":"/api/cases","status":200}
+[hsdc] {"type":"upstream","requestId":"1cc0f363-086a-4986-bf46-18ba1a5c5d52","stage":"signals","modelId":"typesafe/jev-1.14","outcome":"ok","latencyMs":414,"costUsd":0}
+[hsdc] {"type":"upstream","requestId":"1cc0f363-086a-4986-bf46-18ba1a5c5d52","stage":"escalated","modelId":"openai/gpt-6-luna","outcome":"ok","latencyMs":12028,"costUsd":0}
+[hsdc] {"type":"incoming","requestId":"e288b1a3-7a49-4355-88ff-ac6ff65dd8cd","route":"/api/cases","status":200}
+[hsdc] {"type":"upstream","requestId":"e288b1a3-7a49-4355-88ff-ac6ff65dd8cd","stage":"signals","modelId":"typesafe/jev-1.14","outcome":"ok","latencyMs":358,"costUsd":0}
+[hsdc] {"type":"upstream","requestId":"e288b1a3-7a49-4355-88ff-ac6ff65dd8cd","stage":"escalated","modelId":"openai/gpt-6-luna","outcome":"ok","latencyMs":14858,"costUsd":0}
+[hsdc] {"type":"incoming","requestId":"3c150430-66a9-4363-a38c-b591b4f8df40","route":"/api/cases","status":200}
+[hsdc] {"type":"upstream","requestId":"3c150430-66a9-4363-a38c-b591b4f8df40","stage":"signals","modelId":"typesafe/jev-1.14","outcome":"ok","latencyMs":345,"costUsd":0}
+[hsdc] {"type":"upstream","requestId":"3c150430-66a9-4363-a38c-b591b4f8df40","stage":"escalated","modelId":"openai/gpt-6-luna","outcome":"ok","latencyMs":17853,"costUsd":0}
+[hsdc] {"type":"incoming","requestId":"3071b65a-265e-4b28-b437-8a8b29b19314","route":"/api/cases","status":200}
+[hsdc] {"type":"upstream","requestId":"3071b65a-265e-4b28-b437-8a8b29b19314","stage":"signals","modelId":"typesafe/jev-1.14","outcome":"ok","latencyMs":365,"costUsd":0}
+[hsdc] {"type":"upstream","requestId":"3071b65a-265e-4b28-b437-8a8b29b19314","stage":"escalated","modelId":"openai/gpt-6-luna","outcome":"ok","latencyMs":14601,"costUsd":0}
+[hsdc] {"type":"incoming","requestId":"5bcc7a39-b940-49b6-98d9-885740206c85","route":"/api/cases","status":200}
+[hsdc] {"type":"upstream","requestId":"5bcc7a39-b940-49b6-98d9-885740206c85","stage":"signals","modelId":"typesafe/jev-1.14","outcome":"ok","latencyMs":284,"costUsd":0}
+[hsdc] {"type":"upstream","requestId":"5bcc7a39-b940-49b6-98d9-885740206c85","stage":"escalated","modelId":"openai/gpt-6-luna","outcome":"ok","latencyMs":13577,"costUsd":0}
+[hsdc] {"type":"incoming","requestId":"3d3151bf-e206-4810-889a-06677504322a","route":"/api/cases","status":200}
+[hsdc] {"type":"upstream","requestId":"3d3151bf-e206-4810-889a-06677504322a","stage":"signals","modelId":"typesafe/jev-1.14","outcome":"ok","latencyMs":336,"costUsd":0}
+[hsdc] {"type":"upstream","requestId":"3d3151bf-e206-4810-889a-06677504322a","stage":"escalated","modelId":"openai/gpt-6-luna","outcome":"ok","latencyMs":15558,"costUsd":0}

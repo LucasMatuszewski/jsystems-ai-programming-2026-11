@@ -1,0 +1,13 @@
+$ next start
+▲ Next.js 16.4.6
+- Local:         http://localhost:3000
+- Network:       http://10.123.4.35:3000
+✓ Ready in 401ms
+✓ Running next.config.ts took 90ms
+[hsdc] {"type":"incoming","requestId":"901c0b47-536c-4281-848c-7a59263a40ac","route":"/api/chat","status":200}
+[hsdc] {"type":"upstream","requestId":"901c0b47-536c-4281-848c-7a59263a40ac","stage":"chat-step","modelId":"openai/gpt-6-luna","outcome":"ok","latencyMs":17481,"costUsd":0}
+[hsdc] {"type":"incoming","requestId":"e95e730a-340e-4301-8afd-a9647a5cf3c3","route":"/api/chat","status":200}
+[hsdc] {"type":"upstream","requestId":"e95e730a-340e-4301-8afd-a9647a5cf3c3","stage":"chat-step","modelId":"openai/gpt-6-luna","outcome":"ok","latencyMs":14920,"costUsd":0}
+[hsdc] {"type":"incoming","requestId":"f7658a69-8d83-4208-b712-3342dc017165","route":"/api/chat","status":200}
+[hsdc] {"type":"upstream","requestId":"f7658a69-8d83-4208-b712-3342dc017165","stage":"chat-step","modelId":"openai/gpt-6-luna","outcome":"ok","latencyMs":4647,"costUsd":0}
+[ELIFECYCLE] Command failed with signal SIGTERM.

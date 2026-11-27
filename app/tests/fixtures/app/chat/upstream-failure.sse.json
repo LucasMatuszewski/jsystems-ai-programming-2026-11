@@ -1,0 +1,35 @@
+{
+  "meta": {
+    "capturedAt": "2026-11-26T14:02:40.439Z",
+    "target": "/api/chat",
+    "request": {
+      "method": "POST",
+      "contentType": "application/json",
+      "caseSource": "escalated-return-laptop-2.ndjson.json",
+      "caseType": "return",
+      "currentDecision": "Weryfikacja ręczna",
+      "messageCount": 2,
+      "lastUserMessage": "Jak mam zapakować laptopa?",
+      "expected": "error chunk chat_failed, no provider text"
+    },
+    "appCommit": "bcd9513",
+    "versions": {
+      "next": "16.4.6",
+      "ai": "7.0.118",
+      "@openrouter/ai-sdk-provider": "3.1.0"
+    },
+    "durationMs": 1010,
+    "upstreamCalls": 1,
+    "logLines": [
+      "{\"type\":\"incoming\",\"requestId\":\"13a91976-6728-4289-b220-ee8239e0e3e4\",\"route\":\"/api/chat\",\"status\":200}",
+      "{\"type\":\"upstream\",\"requestId\":\"13a91976-6728-4289-b220-ee8239e0e3e4\",\"stage\":\"chat-step\",\"modelId\":\"openai/gpt-6-luna\",\"outcome\":\"error\",\"status\":401,\"latencyMs\":352}"
+    ],
+    "script": "record-app.ts",
+    "notes": "Second server instance with OPENROUTER_API_KEY=sk-or-v1-invalid, request 1."
+  },
+  "response": {
+    "status": 200,
+    "contentType": "text/event-stream",
+    "body": "data: {\"type\":\"start\"}\n\ndata: {\"type\":\"error\",\"errorText\":\"chat_failed\"}\n\ndata: [DONE]\n\n"
+  }
+}

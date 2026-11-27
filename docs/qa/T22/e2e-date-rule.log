@@ -1,0 +1,8 @@
+
+Running 2 tests using 1 worker
+
+  ✓  1 [desktop] › tests/e2e/date-rule.spec.ts:6:1 › return 45 days after purchase is rejected (Odrzucenie) citing R-4 (13.9s)
+  ✓  2 [desktop] › tests/e2e/date-rule.spec.ts:23:1 › complaint 800 days after purchase is rejected citing C-2 (12.1s)
+
+  2 passed (28.2s)
+done 0

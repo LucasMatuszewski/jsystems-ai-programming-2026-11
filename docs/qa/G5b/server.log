@@ -1,0 +1,13 @@
+$ next start
+▲ Next.js 16.4.6
+- Local:         http://localhost:3000
+- Network:       http://10.123.4.35:3000
+✓ Ready in 345ms
+✓ Running next.config.ts took 103ms
+[hsdc] {"type":"incoming","requestId":"c0aee29b-05cb-4299-9972-3105914b1faa","route":"/api/cases","status":200}
+[hsdc] {"type":"upstream","requestId":"c0aee29b-05cb-4299-9972-3105914b1faa","stage":"signals","modelId":"typesafe/jev-1.14","outcome":"ok","latencyMs":610,"costUsd":0}
+[hsdc] {"type":"upstream","requestId":"c0aee29b-05cb-4299-9972-3105914b1faa","stage":"escalated","modelId":"openai/gpt-6-luna","outcome":"ok","latencyMs":14460,"costUsd":0}
+[hsdc] {"type":"incoming","requestId":"30d97994-144d-4d3d-8ee8-c60be5785a03","route":"/api/chat","status":200}
+[hsdc] {"type":"upstream","requestId":"30d97994-144d-4d3d-8ee8-c60be5785a03","stage":"chat-step","modelId":"openai/gpt-6-luna","outcome":"ok","latencyMs":2224,"costUsd":0}
+[hsdc] {"type":"upstream","requestId":"30d97994-144d-4d3d-8ee8-c60be5785a03","stage":"chat-step","modelId":"openai/gpt-6-luna","outcome":"ok","latencyMs":1329,"costUsd":0}
+[ELIFECYCLE] Command failed with signal SIGTERM.

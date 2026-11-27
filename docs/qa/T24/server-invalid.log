@@ -1,0 +1,9 @@
+$ next start -p 3001
+▲ Next.js 16.4.6
+- Local:         http://localhost:3001
+- Network:       http://10.123.4.35:3001
+✓ Ready in 738ms
+✓ Running next.config.ts took 333ms
+[hsdc] {"type":"incoming","requestId":"13a91976-6728-4289-b220-ee8239e0e3e4","route":"/api/chat","status":200}
+[hsdc] {"type":"upstream","requestId":"13a91976-6728-4289-b220-ee8239e0e3e4","stage":"chat-step","modelId":"openai/gpt-6-luna","outcome":"error","status":401,"latencyMs":352}
+[ELIFECYCLE] Command failed with exit code 143.

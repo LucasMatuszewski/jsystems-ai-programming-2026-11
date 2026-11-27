@@ -1,0 +1,19 @@
+$ tsx scripts/record-openrouter.ts --compare
+node:fs:483
+    return binding.readFileUtf8(path, stringToFlags(options.flag));
+                   ^
+
+Error: ENOENT: no such file or directory, open '/home/labuser/jsystems-ai-programming-2026-11/app/tests/fixtures/openrouter/decisions/return-laptop-2.json'
+    at Object.readFileSync (node:fs:483:20)
+    at <anonymous> (/home/labuser/jsystems-ai-programming-2026-11/app/scripts/record-openrouter.ts:220:33)
+    at ModuleJob.run (node:internal/modules/esm/module_job:561:25)
+    at async node:internal/modules/esm/loader:647:26
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/home/labuser/jsystems-ai-programming-2026-11/app/tests/fixtures/openrouter/decisions/return-laptop-2.json'
+}
+
+Node.js v24.22.3
+[ELIFECYCLE] Command failed with exit code 1.

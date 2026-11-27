@@ -1,0 +1,15 @@
+
+Running 10 tests using 1 worker
+
+  ✓   1 [desktop] › tests/e2e/form-validation.spec.ts:19:1 › empty submit shows errors, focuses the first invalid field and sends no request (AC-12) (1.7s)
+  ✓   2 [desktop] › tests/e2e/form-validation.spec.ts:33:1 › complaint without a reason shows the reason error (AC-06) (1.8s)
+  ✓   3 [desktop] › tests/e2e/form-validation.spec.ts:47:1 › future purchase date is rejected (AC-05) (1.5s)
+  ✓   4 [desktop] › tests/e2e/form-validation.spec.ts:60:1 › SVG logo is rejected with the unsupported type message (AC-09) (833ms)
+  ✓   5 [desktop] › tests/e2e/form-validation.spec.ts:69:1 › JPEG named .png is accepted with thumbnail, file name and change action (AC-08, AC-10) (1.0s)
+  ✓   6 [desktop] › tests/e2e/form-validation.spec.ts:81:1 › entered values and the selected photo are kept after a validation error (AC-12) (1.9s)
+  ✓   7 [desktop] › tests/e2e/form-validation.spec.ts:98:1 › whole form can be completed with the keyboard only (AC-46) (16.6s)
+  ✓   8 [desktop] › tests/e2e/form-validation.spec.ts:148:1 › model shorter than 2 characters is rejected (AC-04) (1.5s)
+  ✓   9 [desktop] › tests/e2e/form-validation.spec.ts:162:1 › purchase date older than 5 years is rejected (AC-05) (1.8s)
+  ✓  10 [desktop] › tests/e2e/form-validation.spec.ts:175:1 › reason longer than 2000 characters is rejected (AC-06) (1.7s)
+
+  10 passed (39.0s)

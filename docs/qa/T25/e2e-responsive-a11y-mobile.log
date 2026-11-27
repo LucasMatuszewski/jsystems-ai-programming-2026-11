@@ -1,0 +1,6 @@
+
+Running 1 test using 1 worker
+
+  ✓  1 [mobile] › tests/e2e/responsive-a11y.spec.ts:58:1 › mobile: case summary is collapsed by default on /chat (PRD 9.3) (18.6s)
+
+  1 passed (21.8s)
