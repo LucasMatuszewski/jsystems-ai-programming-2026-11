@@ -31,7 +31,6 @@
       "Bash(npm run:*)",
       "Bash(npm test:*)",
       "Bash(npm audit:*)",
-      "Bash(npx:*)",
       "Bash(pnpm install:*)",
       "Bash(pnpm run:*)",
       "Bash(pnpm test:*)",
@@ -45,13 +44,8 @@
       "Bash(vitest:*)",
       "Bash(next:*)",
       "Bash(turbo:*)",
-      "Bash(tsx:*)",
-      "Bash(node:*)",
 
-      "Bash(python:*)",
-      "Bash(python3:*)",
       "Bash(pip install:*)",
-      "Bash(uv:*)",
       "Bash(pytest:*)",
 
       "Bash(docker ps:*)",
@@ -110,8 +104,6 @@
       "Bash(chmod:*)",
       "Bash(chown:*)",
       "Bash(sudo:*)",
-      "Bash(curl:*)",
-      "Bash(wget:*)",
       "Bash(ssh:*)",
       "Bash(scp:*)",
       "Bash(docker run:*)",
@@ -130,6 +122,17 @@
   },
   "plansDirectory": "./docs/plans",
   "hooks": {
+    "PostModelSwitch": [
+      {
+        "matcher": ".*fable.*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cat \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/fable-instructions.md"
+          }
+        ]
+      }
+    ],
     "PreToolUse": [
       {
         "matcher": "Edit|Write",
